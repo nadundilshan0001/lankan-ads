@@ -1,10 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: Auth Registration (Connected to DB)
-// ============================================================
-
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
-import { generateSalt, hashPassword } from "@/lib/auth";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -45,9 +41,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: checkError.message }, { status: 500 });
     }
 
-    // Generate secure random salt and hash password with PBKDF2
-    const salt = generateSalt();
-    const passwordHash = hashPassword(password, salt);
+    // Hash password using SHA-256
+    const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
 
     if (existingUser) {
       if (existingUser.is_verified) {
@@ -56,12 +51,11 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       } else {
-        // Update password hash, salt, and language preference for unverified user
+        // Update password hash and language preference for unverified user
         const { error: updateError } = await supabaseAdmin
           .from("users")
           .update({ 
-            password_hash: passwordHash, 
-            salt,
+            password_hash: passwordHash,
             language_preference: languagePreference || "en" 
           })
           .eq("id", existingUser.id);
@@ -77,7 +71,6 @@ export async function POST(request: Request) {
         .insert({
           phone_number: phoneNumber,
           password_hash: passwordHash,
-          salt,
           language_preference: languagePreference || "en",
           is_verified: false,
         });
@@ -99,3 +92,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

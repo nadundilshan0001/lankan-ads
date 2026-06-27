@@ -14,6 +14,8 @@ import {
 import { getAdBySlug } from "@/lib/db/queries";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import AdGallery from "@/components/AdGallery";
+import AdActions from "@/components/AdActions";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -55,41 +57,13 @@ export default async function AdDetailPage({ params }: PageProps) {
         />
 
         <article className={styles.adDetail} id={`ad-detail-${ad.id}`}>
-          {/* Image Gallery */}
-          <div className={styles.gallery}>
-            <div className={styles.mainImage}>
-              {ad.images && ad.images.length > 0 ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={ad.images[0].cloudinaryUrl}
-                  alt={ad.titleEn}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "12px" }}
-                />
-              ) : (
-                <div className={styles.imagePlaceholder}>
-                  <span className={styles.placeholderIcon}>{category?.icon || ""}</span>
-                  <span className={styles.placeholderText}>Ad Image</span>
-                </div>
-              )}
-              <span className={`badge badge-${ad.adTier} ${styles.tierBadge}`}>
-                {ad.adTier.charAt(0).toUpperCase() + ad.adTier.slice(1)}
-              </span>
-            </div>
-            {ad.images && ad.images.length > 0 && (
-              <div className={styles.thumbnails}>
-                {ad.images.map((img) => (
-                  <div key={img.id} className={styles.thumbnail}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.cloudinaryUrl}
-                      alt={img.altText || ad.titleEn}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "6px" }}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Image Gallery (Client Component) */}
+          <AdGallery
+            images={ad.images || []}
+            titleEn={ad.titleEn}
+            adTier={ad.adTier}
+            categoryIcon={category?.icon}
+          />
 
           {/* Content */}
           <div className={styles.content}>
@@ -115,6 +89,9 @@ export default async function AdDetailPage({ params }: PageProps) {
               </div>
             </header>
 
+            {/* Like, Save, Share Buttons */}
+            <AdActions adId={ad.id} title={ad.titleEn} />
+
             {/* Price */}
             {ad.priceRange && (
               <div className={styles.priceBox}>
@@ -129,46 +106,7 @@ export default async function AdDetailPage({ params }: PageProps) {
               <p className={styles.description}>{ad.descriptionEn}</p>
             </section>
 
-            {/* Details */}
-            <section className={styles.detailsSection}>
-              <h2 className={styles.sectionTitle}>Details</h2>
-              <div className={styles.detailsGrid}>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Category</span>
-                  <span className={styles.detailValue}>{category?.name}</span>
-                </div>
-                {ad.subCategory && (
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Type</span>
-                    <span className={styles.detailValue}>
-                      {ad.subCategory.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                    </span>
-                  </div>
-                )}
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Location</span>
-                  <span className={styles.detailValue}>{ad.serviceArea}</span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>District</span>
-                  <span className={styles.detailValue}>{ad.district}</span>
-                </div>
-                {ad.availabilityHours && (
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Hours</span>
-                    <span className={styles.detailValue}>{ad.availabilityHours}</span>
-                  </div>
-                )}
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Ad Tier</span>
-                  <span className={styles.detailValue}>
-                    <span className={`badge badge-${ad.adTier}`}>
-                      {ad.adTier.charAt(0).toUpperCase() + ad.adTier.slice(1)}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </section>
+
 
             {/* Contact CTA */}
             <section className={styles.contactSection}>
@@ -204,13 +142,6 @@ export default async function AdDetailPage({ params }: PageProps) {
             </div>
           </div>
         </article>
-
-        {/* Back Link */}
-        <div className={styles.backLink}>
-          <Link href={`/${ad.category}`} className="btn btn-secondary">
-            Back to {category?.name}
-          </Link>
-        </div>
       </div>
     </>
   );

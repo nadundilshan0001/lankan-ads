@@ -116,7 +116,7 @@ export default async function HomePage() {
                 Enhanced visibility — featured for 24 hours
               </p>
             </div>
-            <div className={`grid grid-4 ${styles.adGrid}`}>
+            <div className={`grid grid-3 ${styles.adGrid}`}>
               {premiumAds.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
@@ -138,7 +138,7 @@ export default async function HomePage() {
                 Browse all recent listings
               </p>
             </div>
-            <div className={`grid grid-4 ${styles.adGrid}`}>
+            <div className={`grid grid-3 ${styles.adGrid}`}>
               {standardAds.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}

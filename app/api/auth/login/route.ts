@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       // --------------------------------------------------------
       const { data: user, error: fetchError } = await supabaseAdmin
         .from("users")
-        .select("id, phone_number, password_hash, salt, is_verified")
+        .select("id, phone_number, password_hash, is_verified")
         .eq("phone_number", phoneNumber)
         .maybeSingle();
 
@@ -103,21 +103,11 @@ export async function POST(request: Request) {
         );
       }
 
-      // Password verification with legacy fallback upgrade
+      // Password verification — users table uses SHA-256 (no salt column)
       let isValid = false;
-      if (!user.salt) {
-        const legacyHash = crypto.createHash("sha256").update(password).digest("hex");
-        if (legacyHash === user.password_hash) {
-          isValid = true;
-          const newSalt = generateSalt();
-          const newHash = hashPassword(password, newSalt);
-          await supabaseAdmin
-            .from("users")
-            .update({ password_hash: newHash, salt: newSalt })
-            .eq("id", user.id);
-        }
-      } else {
-        isValid = hashPassword(password, user.salt) === user.password_hash;
+      const legacyHash = crypto.createHash("sha256").update(password).digest("hex");
+      if (legacyHash === user.password_hash) {
+        isValid = true;
       }
 
       if (!isValid) {

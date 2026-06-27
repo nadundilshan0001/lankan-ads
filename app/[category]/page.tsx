@@ -124,7 +124,7 @@ export default async function CategoryPage({ params }: PageProps) {
               <span className="badge badge-standard">Standard</span>
               <h2 className={styles.tierTitle}>Standard Ads</h2>
             </div>
-            <div className={`grid grid-4 ${styles.adGrid}`}>
+            <div className={`grid grid-3 ${styles.adGrid}`}>
               {standardAds.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
