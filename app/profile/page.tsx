@@ -83,6 +83,9 @@ export default function ProfilePage() {
   const [permDeleteId, setPermDeleteId] = useState<string | null>(null);
   const [isPermDeleting, setIsPermDeleting] = useState(false);
 
+  // Error state for failed operations
+  const [actionError, setActionError] = useState<string | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem("lankan_ads_token");
     const phone = localStorage.getItem("lankan_ads_phone");
@@ -117,20 +120,27 @@ export default function ProfilePage() {
   };
 
   // ── Soft-delete (move to Recover) ──
+  // Uses status="draft" which is the DB-valid soft-delete value
   const handleSoftDelete = async (adId: string) => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token) return;
+    setActionError(null);
     setIsDeletingId(adId);
     try {
       const res = await fetch(`/api/ads?id=${adId}`, {
         method: "PATCH",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "deleted" }),
+        body: JSON.stringify({ status: "draft" }),
       });
       const data = await res.json();
-      if (data.success) fetchMyAds(token);
+      if (data.success) {
+        fetchMyAds(token);
+      } else {
+        setActionError(data.error || "Failed to delete ad. Please try again.");
+      }
     } catch (err) {
       console.error("Delete failed:", err);
+      setActionError("Network error. Please check your connection and try again.");
     } finally {
       setIsDeletingId(null);
       setDeleteConfirmId(null);
@@ -141,6 +151,7 @@ export default function ProfilePage() {
   const handleRecover = async () => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token || !recoverAdId) return;
+    setActionError(null);
     setIsRecovering(true);
     try {
       const res = await fetch(`/api/ads?id=${recoverAdId}`, {
@@ -152,9 +163,12 @@ export default function ProfilePage() {
       if (data.success) {
         fetchMyAds(token);
         setRecoverAdId(null);
+      } else {
+        setActionError(data.error || "Failed to restore ad. Please try again.");
       }
     } catch (err) {
       console.error("Recover failed:", err);
+      setActionError("Network error. Please check your connection and try again.");
     } finally {
       setIsRecovering(false);
     }
@@ -164,6 +178,7 @@ export default function ProfilePage() {
   const handlePermanentDelete = async (adId: string) => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token) return;
+    setActionError(null);
     setIsPermDeleting(true);
     try {
       const res = await fetch(`/api/ads?id=${adId}`, {
@@ -171,7 +186,11 @@ export default function ProfilePage() {
         headers: { "Authorization": `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success) fetchMyAds(token);
+      if (data.success) {
+        fetchMyAds(token);
+      } else {
+        setActionError(data.error || "Failed to permanently delete ad.");
+      }
     } catch (err) {
       console.error("Permanent delete failed:", err);
     } finally {
@@ -217,6 +236,31 @@ export default function ProfilePage() {
           </button>
         </div>
       </section>
+
+      {/* ===== ACTION ERROR BANNER ===== */}
+      {actionError && (
+        <div
+          style={{
+            background: "rgba(239,68,68,0.12)",
+            border: "1px solid rgba(239,68,68,0.3)",
+            color: "#f87171",
+            borderRadius: "var(--radius-lg)",
+            padding: "0.75rem 1.25rem",
+            fontSize: "var(--text-sm)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>⚠ {actionError}</span>
+          <button
+            onClick={() => setActionError(null)}
+            style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontWeight: 700, fontSize: "1rem" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* ===== TAB NAVIGATION ===== */}
       <nav className={styles.tabNav} role="tablist" aria-label="Profile sections">
