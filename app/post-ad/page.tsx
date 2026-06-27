@@ -275,7 +275,7 @@ export default function PostAdPage() {
               Ad Submitted Successfully!
             </h2>
             <p className={styles.text} style={{ maxWidth: "500px", margin: "1rem auto 2rem" }}>
-              Thank you for your payment of <strong>{activeTier?.priceFormatted}</strong>. Your ad for <strong>&quot;{titleEn}&quot;</strong> has been received and is currently in the review queue. Ads are typically approved by admin within 1-2 hours.
+              Thank you for your payment of <strong>{activeTier?.priceFormatted}</strong>. Your ad <strong>&quot;{titleEn}&quot;</strong> is now <strong style={{ color: "#10b981" }}>live</strong> and visible to everyone on Lankan Ads!
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button onClick={() => {

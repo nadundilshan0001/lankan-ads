@@ -192,7 +192,7 @@ export async function POST(request: Request) {
         city,
         price_range: priceRange || "",
         ad_tier: adTier || "standard",
-        status: "pending", // enters review queue
+        status: "active", // immediately live after payment
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .select("id")
@@ -258,7 +258,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Ad created successfully. Entering review queue.",
+      message: "Ad created successfully and is now live.",
       ad: {
         id: adRow.id,
         slug,
