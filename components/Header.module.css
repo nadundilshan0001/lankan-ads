@@ -174,6 +174,10 @@
   gap: 0.5rem;
 }
 
+.mobileNavActions {
+  display: none;
+}
+
 .postAdBtn {
   animation: pulse-glow 3s ease-in-out infinite;
 }
@@ -271,11 +275,21 @@
   }
 
   .navActions {
-    gap: 0.35rem;
+    display: none;
   }
 
-  .navActions .btn {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.75rem;
+  .mobileNavActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .mobileNavActions > a {
+    width: 100%;
+    justify-content: center;
   }
 }

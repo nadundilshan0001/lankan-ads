@@ -22,6 +22,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     "standard",
   ]);
   const [sortBy, setSortBy] = useState("latest");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -145,7 +146,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
   return (
     <div className={styles.container}>
       {/* ===== FILTER SIDEBAR (LEFT) ===== */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${showMobileFilters ? styles.sidebarOpen : ""}`}>
         <div className={styles.sidebarHeader}>
           <span className={styles.sidebarTitle}>Filters</span>
           <button onClick={handleClearFilters} className={styles.clearBtn}>
@@ -238,6 +239,14 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
 
       {/* ===== CATALOG PANEL (RIGHT) ===== */}
       <main className={styles.mainContent}>
+        <button
+          className={styles.mobileFilterToggle}
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+        >
+          <span style={{ marginRight: "6px" }}>⚙</span>
+          {showMobileFilters ? "Hide Filters" : "Filter Listings"}
+        </button>
+
         {/* Results Header */}
         <div className={styles.contentHeader}>
           <div className={styles.resultCount}>

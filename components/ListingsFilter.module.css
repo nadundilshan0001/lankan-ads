@@ -260,18 +260,46 @@
   line-height: 1.6;
 }
 
-.resetFiltersBtn {
-  margin-top: 0.5rem;
+.mobileFilterToggle {
+  display: none;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .container {
     grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .mobileFilterToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: var(--space-md);
+    transition: all var(--transition-fast);
+  }
+
+  .mobileFilterToggle:hover {
+    border-color: var(--color-primary-light);
+    background: rgba(139, 92, 246, 0.05);
   }
 
   .sidebar {
+    display: none;
     position: static;
+  }
+
+  .sidebarOpen {
+    display: flex !important;
   }
 
   .adGrid {

@@ -93,6 +93,20 @@ export default function Header() {
             <Link href="/about" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
+            <div className={styles.mobileNavActions}>
+              <Link href="/post-ad" className={`btn btn-primary btn-sm ${styles.postAdBtn}`} onClick={() => setMobileMenuOpen(false)}>
+                Post Ad
+              </Link>
+              {isLoggedIn ? (
+                <Link href="/profile" className="btn btn-glass btn-sm" onClick={() => setMobileMenuOpen(false)}>
+                  My Profile
+                </Link>
+              ) : (
+                <Link href="/login" className="btn btn-glass btn-sm" onClick={() => setMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className={styles.navActions}>
