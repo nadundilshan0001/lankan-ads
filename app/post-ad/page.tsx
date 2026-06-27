@@ -396,7 +396,7 @@ export default function PostAdPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="price">Price</label>
+                <label className={styles.label} htmlFor="price">Starting price</label>
                 <input
                   id="price"
                   type="text"

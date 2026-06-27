@@ -98,8 +98,8 @@ export default async function AdDetailPage({ params }: PageProps) {
             {/* Price */}
             {ad.priceRange && (
               <div className={styles.priceBox}>
-                <span className={styles.priceLabel}>Price Range</span>
-                <span className={styles.priceValue}>{ad.priceRange}</span>
+                <span className={styles.priceLabel}>Starting Price</span>
+                <span className={styles.priceValue}>Rs. {ad.priceRange}</span>
               </div>
             )}
 

@@ -98,7 +98,7 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
           </span>
           {ad.priceRange && (
             <span className={styles.metaItem}>
-              {ad.priceRange}
+              Rs. {ad.priceRange}
             </span>
           )}
         </div>
