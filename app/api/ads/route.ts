@@ -157,17 +157,20 @@ export async function POST(request: Request) {
     }
 
     // Auto-generate clean SEO slug from Title + City
-    const cleanTitle = titleEn
+    let cleanTitle = titleEn
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
       .replace(/\s+/g, "-");
     
-    const cleanCity = city
+    let cleanCity = city
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
       .replace(/\s+/g, "-");
+
+    if (!cleanTitle) cleanTitle = "ad";
+    if (!cleanCity) cleanCity = "location";
       
     const slug = `${cleanTitle}-${cleanCity}-${Math.floor(100 + Math.random() * 900)}`;
 

@@ -376,7 +376,7 @@ export default function PostAdPage() {
                   className={styles.input}
                   value={titleEn}
                   onChange={(e) => setTitleEn(e.target.value)}
-                  maxLength={100}
+                  maxLength={300}
                   required
                 />
               </div>
