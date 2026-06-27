@@ -114,6 +114,25 @@
   resize: vertical;
 }
 
+.cityTextarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: all var(--transition-fast);
+  min-height: 100px;
+  resize: vertical;
+}
+
+.cityTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary-light);
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .charCounter {
   font-size: var(--text-xs);
   color: var(--text-muted);

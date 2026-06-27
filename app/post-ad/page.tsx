@@ -442,6 +442,7 @@ export default function PostAdPage() {
                   required
                 >
                   <option value="">-- Select District --</option>
+                  <option value="All District">All District</option>
                   {DISTRICTS.map((dist) => (
                     <option key={dist} value={dist}>
                       {dist}
@@ -452,11 +453,10 @@ export default function PostAdPage() {
 
               <div className={styles.formGroup}>
                 <label className={styles.label} htmlFor="city">City / Area</label>
-                <input
+                <textarea
                   id="city"
-                  type="text"
-                  placeholder="e.g. Colombo 07, Cinnamon Gardens"
-                  className={styles.input}
+                  placeholder="e.g. Colombo 07, Cinnamon Gardens, Colombo 03 (You can enter multiple areas)"
+                  className={styles.cityTextarea}
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   required

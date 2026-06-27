@@ -586,3 +586,9 @@ textarea.input {
   font-size: var(--text-sm);
   color: var(--color-secondary-light);
 }
+
+/* Fix dropdown select option visibility in dark/light mode */
+select option {
+  background-color: #121214 !important;
+  color: #ffffff !important;
+}
