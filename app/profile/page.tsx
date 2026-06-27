@@ -10,8 +10,9 @@ import Link from "next/link";
 import { Ad } from "@/lib/types";
 import styles from "./page.module.css";
 
-type Tab = "my-ads" | "new-ad" | "recover";
+type Tab = "my-ads" | "new-ad" | "recover" | "change-password";
 type RecoverTier = "standard" | "premium" | "platinum";
+type CpStep = "request" | "otp" | "newpw";
 
 const TIER_DETAILS = {
   standard:  { displayName: "Standard Ad",  price: "Rs. 699",   color: "#a78bfa" },
@@ -85,6 +86,17 @@ export default function ProfilePage() {
 
   // Error state for failed operations
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // ── Change Password state ──
+  const [cpStep, setCpStep] = useState<CpStep>("request");
+  const [cpOtp, setCpOtp] = useState(["" ,"", "", "", "", ""]);
+  const [cpNewPw, setCpNewPw] = useState("");
+  const [cpConfirmPw, setCpConfirmPw] = useState("");
+  const [cpLoading, setCpLoading] = useState(false);
+  const [cpError, setCpError] = useState("");
+  const [cpSuccess, setCpSuccess] = useState("");
+  const [cpDevOtp, setCpDevOtp] = useState("");
+  const cpOtpRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem("lankan_ads_token");
@@ -298,6 +310,16 @@ export default function ProfilePage() {
           {deletedAds.length > 0 && (
             <span className={styles.tabBadge} style={{ background: "#ef4444" }}>{deletedAds.length}</span>
           )}
+        </button>
+
+        <button
+          id="tab-change-password"
+          role="tab"
+          aria-selected={activeTab === "change-password"}
+          className={`${styles.tab} ${activeTab === "change-password" ? styles.tabActive : ""}`}
+          onClick={() => { setActiveTab("change-password"); setCpStep("request"); setCpError(""); setCpSuccess(""); }}
+        >
+          🔑 Change Password
         </button>
       </nav>
 
@@ -522,6 +544,216 @@ export default function ProfilePage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* CHANGE PASSWORD */}
+      {activeTab === "change-password" && (
+        <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-change-password">
+          <div style={{ maxWidth: "460px", margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+              <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
+                Change Your Password
+              </h2>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>
+                We will send a one-time code to <strong style={{ color: "var(--text-primary)" }}>{userPhone}</strong> to verify it&apos;s you.
+              </p>
+            </div>
+
+            {/* Step progress bar */}
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
+              {(["request", "otp", "newpw"] as CpStep[]).map((s, i) => (
+                <div key={s} style={{
+                  flex: 1, height: "4px", borderRadius: "2px",
+                  background: (cpStep === "request" ? 0 : cpStep === "otp" ? 1 : 2) >= i
+                    ? "linear-gradient(90deg,#8b5cf6,#a78bfa)" : "rgba(255,255,255,0.08)",
+                  transition: "background 0.3s",
+                }} />
+              ))}
+            </div>
+
+            {/* Errors / Success */}
+            {cpError && (
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171", borderRadius: "var(--radius-lg)", padding: "0.65rem 1rem", fontSize: "var(--text-sm)", marginBottom: "1rem", textAlign: "center" }}>
+                ⚠️ {cpError}
+              </div>
+            )}
+            {cpSuccess && (
+              <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", borderRadius: "var(--radius-lg)", padding: "0.65rem 1rem", fontSize: "var(--text-sm)", marginBottom: "1rem", textAlign: "center" }}>
+                ✓ {cpSuccess}
+              </div>
+            )}
+            {cpDevOtp && cpStep === "otp" && (
+              <div style={{ background: "rgba(139,92,246,0.05)", border: "1px solid rgba(139,92,246,0.12)", borderRadius: "var(--radius-lg)", padding: "0.65rem 1rem", fontSize: "var(--text-sm)", marginBottom: "1rem", textAlign: "center", color: "var(--text-secondary)" }}>
+                🔧 <strong>Dev Mode OTP:</strong> {cpDevOtp}
+              </div>
+            )}
+
+            {/* Step 1: Request OTP */}
+            {cpStep === "request" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)", textAlign: "center", padding: "1rem", background: "rgba(255,255,255,0.02)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)" }}>
+                  An OTP will be sent to <strong style={{ color: "var(--text-primary)" }}>{userPhone}</strong>
+                </p>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={cpLoading}
+                  id="cp-send-otp-btn"
+                  onClick={async () => {
+                    setCpError("");
+                    setCpLoading(true);
+                    try {
+                      const res = await fetch("/api/auth/forgot-password", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ phoneNumber: userPhone }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        if (data.testOtpCode) setCpDevOtp(data.testOtpCode);
+                        setCpStep("otp");
+                      } else {
+                        setCpError(data.error || "Failed to send OTP.");
+                      }
+                    } catch { setCpError("Network error. Please try again."); }
+                    finally { setCpLoading(false); }
+                  }}
+                >
+                  {cpLoading ? "Sending OTP..." : "Send OTP to My Number"}
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: Verify OTP */}
+            {cpStep === "otp" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", textAlign: "center" }}>
+                  Enter the 6-digit code sent to your number
+                </p>
+                {/* OTP boxes */}
+                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+                  {cpOtp.map((digit, i) => (
+                    <input
+                      key={i}
+                      ref={el => { cpOtpRefs.current[i] = el; }}
+                      id={`cp-otp-${i}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={e => {
+                        const v = e.target.value.replace(/\D/, "");
+                        const updated = [...cpOtp];
+                        updated[i] = v.slice(-1);
+                        setCpOtp(updated);
+                        if (v && i < 5) cpOtpRefs.current[i + 1]?.focus();
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === "Backspace" && !cpOtp[i] && i > 0) cpOtpRefs.current[i - 1]?.focus();
+                      }}
+                      style={{
+                        width: "48px", height: "52px", textAlign: "center",
+                        fontSize: "1.25rem", fontWeight: 700,
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-lg)",
+                        color: "var(--text-primary)",
+                        outline: "none",
+                        transition: "border-color 0.2s",
+                      }}
+                    />
+                  ))}
+                </div>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={cpLoading}
+                  id="cp-verify-otp-btn"
+                  onClick={() => {
+                    setCpError("");
+                    if (cpOtp.join("").length !== 6) { setCpError("Please enter all 6 digits."); return; }
+                    setCpStep("newpw");
+                  }}
+                >
+                  Verify OTP
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  onClick={() => { setCpStep("request"); setCpOtp(["","","","","",""]); setCpDevOtp(""); }}
+                >
+                  ← Resend OTP
+                </button>
+              </div>
+            )}
+
+            {/* Step 3: New Password */}
+            {cpStep === "newpw" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <label style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }} htmlFor="cp-new-pw">
+                    New Password
+                  </label>
+                  <input
+                    id="cp-new-pw"
+                    type="password"
+                    placeholder="At least 6 characters"
+                    value={cpNewPw}
+                    onChange={e => setCpNewPw(e.target.value)}
+                    disabled={cpLoading}
+                    style={{ width: "100%", padding: "var(--space-sm) var(--space-md)", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", color: "var(--text-primary)", fontSize: "var(--text-base)" }}
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  <label style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }} htmlFor="cp-confirm-pw">
+                    Confirm New Password
+                  </label>
+                  <input
+                    id="cp-confirm-pw"
+                    type="password"
+                    placeholder="Repeat your password"
+                    value={cpConfirmPw}
+                    onChange={e => setCpConfirmPw(e.target.value)}
+                    disabled={cpLoading}
+                    style={{ width: "100%", padding: "var(--space-sm) var(--space-md)", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", color: "var(--text-primary)", fontSize: "var(--text-base)" }}
+                  />
+                </div>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={cpLoading}
+                  id="cp-reset-pw-btn"
+                  onClick={async () => {
+                    setCpError("");
+                    if (cpNewPw.length < 6) { setCpError("Password must be at least 6 characters."); return; }
+                    if (cpNewPw !== cpConfirmPw) { setCpError("Passwords do not match."); return; }
+                    setCpLoading(true);
+                    try {
+                      const res = await fetch("/api/auth/reset-password", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ phoneNumber: userPhone, otp: cpOtp.join(""), newPassword: cpNewPw }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setCpSuccess("Password changed successfully!");
+                        setCpStep("request");
+                        setCpOtp(["","","","","",""]);
+                        setCpNewPw(""); setCpConfirmPw(""); setCpDevOtp("");
+                      } else {
+                        setCpError(data.error || "Failed to update password.");
+                        if (data.error?.toLowerCase().includes("expired")) { setCpStep("request"); }
+                      }
+                    } catch { setCpError("Network error. Please try again."); }
+                    finally { setCpLoading(false); }
+                  }}
+                >
+                  {cpLoading ? "Updating Password..." : "Update Password"}
+                </button>
               </div>
             )}
           </div>
