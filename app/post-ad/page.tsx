@@ -41,6 +41,7 @@ export default function PostAdPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); // default to true, check on mount
 
   // Check login state
   useEffect(() => {
@@ -51,8 +52,25 @@ export default function PostAdPage() {
     } else {
       setIsAuthenticated(true);
       if (phone) setUserPhone(phone);
+      checkFirstAdStatus(token);
     }
   }, []);
+
+  const checkFirstAdStatus = async (token: string) => {
+    try {
+      const res = await fetch("/api/ads", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (data.success && data.ads) {
+        setHasPostedAds(data.ads.length > 0);
+      }
+    } catch (err) {
+      console.error("Failed to check first ad status:", err);
+    }
+  };
 
   // Handle image selection simulation
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,8 +143,12 @@ export default function PostAdPage() {
       return;
     }
 
-    // If valid, open PayHere checkout simulator modal
-    setIsCheckoutOpen(true);
+    if (selectedTier === "standard" && !hasPostedAds) {
+      // First standard ad is free: bypass payment simulator checkout
+      executePayment();
+    } else {
+      setIsCheckoutOpen(true);
+    }
   };
 
   const uploadImageToCloudinary = async (base64Data: string): Promise<string> => {
@@ -501,36 +523,55 @@ export default function PostAdPage() {
               <span className={styles.sectionStep}>4</span> Visibility Tier
             </h2>
             <div className={styles.tierGrid}>
-              {TIERS.map((tier) => (
-                <div
-                  key={tier.name}
-                  className={`${styles.tierCard} ${
-                    selectedTier === tier.name ? styles.tierCardActive : ""
-                  }`}
-                  onClick={() => setSelectedTier(tier.name)}
-                >
-                  {tier.name === "platinum" && (
-                    <span className={styles.tierPopular}>Max Visibility</span>
-                  )}
-                  <h3 className={styles.tierName}>{tier.displayName}</h3>
-                  <div className={styles.tierPrice}>{tier.priceFormatted}</div>
-                  <div className={styles.tierDuration}>
-                    {tier.topLayerDuration !== "N/A" ? `${tier.topLayerDuration} spotlight` : "Standard Placement"}
+              {TIERS.map((tier) => {
+                const isFreeStandard = tier.name === "standard" && !hasPostedAds;
+                const priceFormatted = isFreeStandard ? "Free (First Ad)" : tier.priceFormatted;
+
+                return (
+                  <div
+                    key={tier.name}
+                    className={`${styles.tierCard} ${
+                      selectedTier === tier.name ? styles.tierCardActive : ""
+                    }`}
+                    onClick={() => setSelectedTier(tier.name)}
+                  >
+                    {tier.name === "platinum" && (
+                      <span className={styles.tierPopular}>Max Visibility</span>
+                    )}
+                    {tier.name === "standard" && !hasPostedAds && (
+                      <span className={styles.tierPopular} style={{ background: "#10b981" }}>First Ad Free</span>
+                    )}
+                    <h3 className={styles.tierName}>{tier.displayName}</h3>
+                    <div className={styles.tierPrice}>{priceFormatted}</div>
+                    <div className={styles.tierDuration}>
+                      {tier.topLayerDuration !== "N/A" ? `${tier.topLayerDuration} spotlight` : "Standard Placement"}
+                    </div>
+                    <ul className={styles.tierFeatures}>
+                      {tier.features.map((feat, i) => (
+                        <li key={i} className={styles.tierFeature}>
+                          <span className={styles.tierCheck}></span> {feat}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className={styles.tierFeatures}>
-                    {tier.features.map((feat, i) => (
-                      <li key={i} className={styles.tierFeature}>
-                        <span className={styles.tierCheck}></span> {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div style={{ marginTop: "var(--space-xl)", display: "flex", justifyContent: "flex-end" }}>
-              <button type="submit" className="btn btn-primary btn-lg" style={{ width: "100%", maxWidth: "300px" }}>
-                Submit &amp; Pay {activeTier?.priceFormatted}
+              <button 
+                type="submit" 
+                className="btn btn-primary btn-lg" 
+                style={{ width: "100%", maxWidth: "300px" }}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  "Submitting..."
+                ) : (
+                  selectedTier === "standard" && !hasPostedAds
+                    ? "Submit Free Ad"
+                    : `Submit & Pay ${activeTier?.priceFormatted}`
+                )}
               </button>
             </div>
           </div>

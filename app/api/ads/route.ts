@@ -224,8 +224,18 @@ export async function POST(request: Request) {
     }
 
     // 3. Insert Payment Row (auto-completed for development simulation)
+    const { count: adsCount } = await supabaseAdmin
+      .from("ads")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    const isFirstAd = (adsCount || 0) <= 1;
+
     const payhereOrderId = `LAD-${Math.floor(100000 + Math.random() * 900000)}`;
-    const amountLkr = adTier === "platinum" ? 8000 : adTier === "premium" ? 1399 : 699;
+    let amountLkr = adTier === "platinum" ? 8000 : adTier === "premium" ? 1399 : 699;
+    if (adTier === "standard" && isFirstAd) {
+      amountLkr = 0;
+    }
 
     const { error: paymentError } = await supabaseAdmin
       .from("payments")

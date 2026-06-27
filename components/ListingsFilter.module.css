@@ -186,8 +186,51 @@
 
 .adGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
+}
+
+.adGrid > article:first-child {
+  grid-column: span 2;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pageBtn {
+  padding: 0.5rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--color-primary-light);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.pageBtnDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* ===== EMPTY STATE ===== */
@@ -229,5 +272,13 @@
 
   .sidebar {
     position: static;
+  }
+
+  .adGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adGrid > article:first-child {
+    grid-column: span 1;
   }
 }

@@ -117,6 +117,16 @@
   z-index: var(--z-dropdown);
 }
 
+.dropdownMenu::before {
+  content: '';
+  position: absolute;
+  top: -0.6rem;
+  left: 0;
+  right: 0;
+  height: 0.6rem;
+  background: transparent;
+}
+
 .dropdownItem {
   display: flex;
   align-items: center;

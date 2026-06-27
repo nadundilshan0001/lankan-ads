@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
 import { Ad } from "@/lib/types";
 import AdCard from "./AdCard";
@@ -22,6 +22,15 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     "standard",
   ]);
   const [sortBy, setSortBy] = useState("latest");
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const adsPerPage = 100;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedSubCategory, selectedDistrict, selectedTiers, sortBy]);
 
   // Get subcategories of active category
   const activeCategory = useMemo(() => {
@@ -125,6 +134,13 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [initialAds, searchQuery, selectedCategory, selectedSubCategory, selectedDistrict, selectedTiers, sortBy]);
+
+  // Compute total pages and paginated slice of ads
+  const totalPages = Math.ceil(processedAds.length / adsPerPage) || 1;
+  const paginatedAds = useMemo(() => {
+    const startIndex = (currentPage - 1) * adsPerPage;
+    return processedAds.slice(startIndex, startIndex + adsPerPage);
+  }, [processedAds, currentPage, adsPerPage]);
 
   return (
     <div className={styles.container}>
@@ -244,12 +260,37 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
         </div>
 
         {/* Grid / Empty State */}
-        {processedAds.length > 0 ? (
-          <div className={styles.adGrid}>
-            {processedAds.map((ad) => (
-              <AdCard key={ad.id} ad={ad} />
-            ))}
-          </div>
+        {paginatedAds.length > 0 ? (
+          <>
+            <div className={styles.adGrid}>
+              {paginatedAds.map((ad) => (
+                <AdCard key={ad.id} ad={ad} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`${styles.pageBtn} ${currentPage === 1 ? styles.pageBtnDisabled : ""}`}
+                >
+                  Previous
+                </button>
+                <span className={styles.pageInfo}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`${styles.pageBtn} ${currentPage === totalPages ? styles.pageBtnDisabled : ""}`}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className={styles.emptyState}>
             <h3 className={styles.emptyTitle}>No Matching Listings Found</h3>
