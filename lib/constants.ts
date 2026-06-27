@@ -228,8 +228,8 @@ export const TIERS: TierInfo[] = [
   {
     name: "platinum",
     displayName: "Platinum",
-    price: 8000,
-    priceFormatted: "Rs. 8,000",
+    price: 6000,
+    priceFormatted: "Rs. 6,000",
     topLayerDuration: "3 Days (72h)",
     totalDuration: 7,
     description:

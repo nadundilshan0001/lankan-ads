@@ -94,7 +94,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className={styles.card}>
-              <h3 className={styles.cardTitle}>Platinum (Rs. 8,000)</h3>
+              <h3 className={styles.cardTitle}>Platinum (Rs. 6,000)</h3>
               <p className={styles.cardText}>
                 The ultimate visibility tier. Puts your ad in the absolute top spotlight layer of our site for 3 days, followed by 4 days of standard placement.
               </p>

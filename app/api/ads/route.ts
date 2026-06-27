@@ -235,7 +235,7 @@ export async function POST(request: Request) {
     const isFirstAd = (adsCount || 0) <= 1;
 
     const payhereOrderId = `LAD-${Math.floor(100000 + Math.random() * 900000)}`;
-    let amountLkr = adTier === "platinum" ? 8000 : adTier === "premium" ? 1399 : 699;
+    let amountLkr = adTier === "platinum" ? 6000 : adTier === "premium" ? 1399 : 699;
     if (adTier === "standard" && isFirstAd) {
       amountLkr = 0;
     }

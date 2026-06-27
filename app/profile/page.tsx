@@ -16,7 +16,7 @@ type RecoverTier = "standard" | "premium" | "platinum";
 const TIER_DETAILS = {
   standard:  { displayName: "Standard Ad",  price: "Rs. 699",   color: "#a78bfa" },
   premium:   { displayName: "Premium Ad",   price: "Rs. 1,399", color: "#f59e0b" },
-  platinum:  { displayName: "Platinum Ad",  price: "Rs. 8,000", color: "#ef4444" },
+  platinum:  { displayName: "Platinum Ad",  price: "Rs. 6,000", color: "#ef4444" },
 };
 
 // Helper: format a district string for use in a URL segment
@@ -398,7 +398,7 @@ export default function ProfilePage() {
                   🔥 Max Visibility
                 </div>
                 <h3 className={styles.tierName}>Platinum Ad</h3>
-                <div className={styles.tierPrice}>Rs. 8,000</div>
+                <div className={styles.tierPrice}>Rs. 6,000</div>
                 <p className={styles.tierDesc}>Top placement across all category and district pages. Maximum exposure for serious advertisers.</p>
                 <ul className={styles.tierFeatures}>
                   <li>✓ Priority top placement</li>
