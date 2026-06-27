@@ -385,14 +385,14 @@ export default function PostAdPage() {
                 <label className={styles.label} htmlFor="descEn">Ad Description</label>
                 <textarea
                   id="descEn"
-                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 1500 characters."
+                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 2000 characters."
                   className={styles.textarea}
                   value={descriptionEn}
-                  onChange={(e) => setDescriptionEn(e.target.value.substring(0, 1500))}
-                  maxLength={1500}
+                  onChange={(e) => setDescriptionEn(e.target.value.substring(0, 2000))}
+                  maxLength={2000}
                   required
                 />
-                <div className={styles.charCounter}>{descriptionEn.length}/1500 characters</div>
+                <div className={styles.charCounter}>{descriptionEn.length}/2000 characters</div>
               </div>
 
               <div className={styles.formGroup}>
