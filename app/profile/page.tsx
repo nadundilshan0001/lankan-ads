@@ -11,6 +11,13 @@ import { Ad } from "@/lib/types";
 import styles from "./page.module.css";
 
 type Tab = "my-ads" | "new-ad" | "recover";
+type RecoverTier = "standard" | "premium" | "platinum";
+
+const TIER_DETAILS = {
+  standard:  { displayName: "Standard Ad",  price: "Rs. 699",   color: "#a78bfa" },
+  premium:   { displayName: "Premium Ad",   price: "Rs. 1,399", color: "#f59e0b" },
+  platinum:  { displayName: "Platinum Ad",  price: "Rs. 8,000", color: "#ef4444" },
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -18,8 +25,19 @@ export default function ProfilePage() {
   const [myAds, setMyAds] = useState<Ad[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("my-ads");
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-  const [restoredIds, setRestoredIds] = useState<string[]>([]);
+
+  // Delete confirm dialog state
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+
+  // Recover: tier selection modal
+  const [recoverAdId, setRecoverAdId] = useState<string | null>(null);
+  const [recoverTier, setRecoverTier] = useState<RecoverTier>("standard");
+  const [isRecovering, setIsRecovering] = useState(false);
+
+  // Permanent delete confirm in recover tab
+  const [permDeleteId, setPermDeleteId] = useState<string | null>(null);
+  const [isPermDeleting, setIsPermDeleting] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("lankan_ads_token");
@@ -54,28 +72,67 @@ export default function ProfilePage() {
     router.push("/home");
   };
 
-  const handleRestore = async (adId: string) => {
+  // ── Soft-delete (move to Recover) ──
+  const handleSoftDelete = async (adId: string) => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token) return;
-    setRestoringId(adId);
+    setIsDeletingId(adId);
     try {
       const res = await fetch(`/api/ads?id=${adId}`, {
         method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "pending" }),
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "deleted" }),
+      });
+      const data = await res.json();
+      if (data.success) fetchMyAds(token);
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setIsDeletingId(null);
+      setDeleteConfirmId(null);
+    }
+  };
+
+  // ── Recover: set active with new tier ──
+  const handleRecover = async () => {
+    const token = localStorage.getItem("lankan_ads_token");
+    if (!token || !recoverAdId) return;
+    setIsRecovering(true);
+    try {
+      const res = await fetch(`/api/ads?id=${recoverAdId}`, {
+        method: "PATCH",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "active", adTier: recoverTier }),
       });
       const data = await res.json();
       if (data.success) {
-        setRestoredIds((prev) => [...prev, adId]);
         fetchMyAds(token);
+        setRecoverAdId(null);
       }
     } catch (err) {
-      console.error("Restore failed:", err);
+      console.error("Recover failed:", err);
     } finally {
-      setRestoringId(null);
+      setIsRecovering(false);
+    }
+  };
+
+  // ── Permanent delete ──
+  const handlePermanentDelete = async (adId: string) => {
+    const token = localStorage.getItem("lankan_ads_token");
+    if (!token) return;
+    setIsPermDeleting(true);
+    try {
+      const res = await fetch(`/api/ads?id=${adId}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) fetchMyAds(token);
+    } catch (err) {
+      console.error("Permanent delete failed:", err);
+    } finally {
+      setIsPermDeleting(false);
+      setPermDeleteId(null);
     }
   };
 
@@ -87,8 +144,8 @@ export default function ProfilePage() {
     );
   }
 
-  const activeAds = myAds.filter((ad) => ad.status === "active");
-  const pendingAds = myAds.filter((ad) => ad.status === "pending");
+  const liveAds    = myAds.filter((ad) => ad.status === "active" || ad.status === "pending");
+  const deletedAds = myAds.filter((ad) => ad.status === "deleted" || ad.status === "expired" || ad.status === "draft");
 
   return (
     <div className={styles.container}>
@@ -102,15 +159,11 @@ export default function ProfilePage() {
           </span>
           <div className={styles.adStats}>
             <span className={styles.adStatItem}>
-              <span className={styles.adStatNum}>{myAds.length}</span> Total Ads
+              <span className={styles.adStatNum}>{liveAds.length}</span> Live Ads
             </span>
             <span className={styles.adStatDivider}>•</span>
             <span className={styles.adStatItem}>
-              <span className={styles.adStatNum}>{activeAds.length}</span> Active
-            </span>
-            <span className={styles.adStatDivider}>•</span>
-            <span className={styles.adStatItem}>
-              <span className={styles.adStatNum}>{pendingAds.length}</span> Pending
+              <span className={styles.adStatNum}>{deletedAds.length}</span> In Recover
             </span>
           </div>
         </div>
@@ -131,8 +184,8 @@ export default function ProfilePage() {
           onClick={() => setActiveTab("my-ads")}
         >
           My Advertisements
-          {myAds.length > 0 && (
-            <span className={styles.tabBadge}>{myAds.length}</span>
+          {liveAds.length > 0 && (
+            <span className={styles.tabBadge}>{liveAds.length}</span>
           )}
         </button>
 
@@ -154,6 +207,9 @@ export default function ProfilePage() {
           onClick={() => setActiveTab("recover")}
         >
           Recover
+          {deletedAds.length > 0 && (
+            <span className={styles.tabBadge} style={{ background: "#ef4444" }}>{deletedAds.length}</span>
+          )}
         </button>
       </nav>
 
@@ -162,15 +218,14 @@ export default function ProfilePage() {
       {/* MY ADVERTISEMENTS */}
       {activeTab === "my-ads" && (
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-my-ads">
-          {myAds.length > 0 ? (
+          {liveAds.length > 0 ? (
             <div className={styles.adsList}>
-              {myAds.map((ad) => {
+              {liveAds.map((ad) => {
                 const displayDate = new Date(ad.createdAt).toLocaleDateString("en-LK", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
+                  year: "numeric", month: "short", day: "numeric",
                 });
                 const detailUrl = `/${ad.category}/${ad.district}/${ad.slug}`;
+                const isDeleting = isDeletingId === ad.id;
 
                 return (
                   <div key={ad.id} className={styles.adItem} id={`my-ad-${ad.id}`}>
@@ -192,13 +247,13 @@ export default function ProfilePage() {
                         {ad.priceRange && (
                           <>
                             <span>•</span>
-                            <span>{ad.priceRange}</span>
+                            <span>Rs. {ad.priceRange}</span>
                           </>
                         )}
                       </div>
                       <div className={styles.statusBadges}>
-                        <span className={`${styles.statusBadge} ${styles["status" + ad.status.charAt(0).toUpperCase() + ad.status.slice(1)]}`}>
-                          {ad.status === "active" ? "Approved" : ad.status === "pending" ? "Awaiting Review" : "Draft"}
+                        <span className={`${styles.statusBadge} ${styles.statusActive}`}>
+                          Live
                         </span>
                         <span className={`${styles.tierBadge} ${styles["tier" + ad.adTier]}`}>
                           {ad.adTier.toUpperCase()}
@@ -207,15 +262,17 @@ export default function ProfilePage() {
                     </div>
 
                     <div className={styles.adActions}>
-                      {ad.status === "active" ? (
-                        <Link href={detailUrl} className="btn btn-secondary btn-sm" id={`view-ad-${ad.id}`}>
-                          View Live Ad
-                        </Link>
-                      ) : (
-                        <button disabled className="btn btn-secondary btn-sm" style={{ opacity: 0.5, cursor: "not-allowed" }}>
-                          In Queue
-                        </button>
-                      )}
+                      <Link href={detailUrl} className="btn btn-secondary btn-sm" id={`view-ad-${ad.id}`}>
+                        View Ad
+                      </Link>
+                      <button
+                        className={`btn btn-sm ${styles.deleteBtn}`}
+                        onClick={() => setDeleteConfirmId(ad.id)}
+                        disabled={isDeleting}
+                        id={`delete-ad-${ad.id}`}
+                      >
+                        {isDeleting ? "Deleting..." : "🗑 Delete"}
+                      </button>
                     </div>
                   </div>
                 );
@@ -223,9 +280,9 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className={styles.emptyState}>
-              <h3 className={styles.emptyTitle}>No Ads Created Yet</h3>
+              <h3 className={styles.emptyTitle}>No Live Ads</h3>
               <p className={styles.emptyText}>
-                You have not posted any classified listings under this account. Click the button below to publish your first advertisement!
+                You have no active advertisements. Click below to post your first ad!
               </p>
               <button onClick={() => setActiveTab("new-ad")} className="btn btn-primary">
                 Post an Ad Now
@@ -242,7 +299,7 @@ export default function ProfilePage() {
             <div className={styles.newAdHeader}>
               <h2 className={styles.newAdTitle}>Post a New Advertisement</h2>
               <p className={styles.newAdSubtitle}>
-                Choose your listing tier and reach thousands of potential clients across Sri Lanka. Your ad will be reviewed and published within minutes.
+                Choose your listing tier and reach thousands of potential clients across Sri Lanka. Your ad goes live instantly after payment.
               </p>
             </div>
 
@@ -314,83 +371,178 @@ export default function ProfilePage() {
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-recover">
           <div className={styles.recoverSection}>
             <div className={styles.recoverHeader}>
-              <h2 className={styles.recoverTitle}>Recover Deleted Posts</h2>
+              <h2 className={styles.recoverTitle}>Recover Deleted Ads</h2>
               <p className={styles.recoverSubtitle}>
-                Your expired or removed advertisements are listed below. You can restore them back to pending review and they will be re-published once approved by our team.
+                Your deleted or expired advertisements are listed below. You can restore them by selecting a new payment tier, or permanently remove them from the system.
               </p>
             </div>
 
-            {(() => {
-              const deletedAds = myAds.filter((ad) => ad.status === "expired" || ad.status === "draft");
-              if (deletedAds.length === 0) {
-                return (
-                  <div className={styles.recoverEmpty}>
-                    <h3>No Deleted Posts</h3>
-                    <p>You have no expired or removed advertisements at this time.</p>
-                  </div>
-                );
-              }
-              return (
-                <div className={styles.deletedAdsList}>
-                  {deletedAds.map((ad) => {
-                    const isRestored = restoredIds.includes(ad.id);
-                    const isRestoring = restoringId === ad.id;
-                    const displayDate = new Date(ad.createdAt).toLocaleDateString("en-LK", {
-                      year: "numeric", month: "short", day: "numeric",
-                    });
-                    return (
-                      <div key={ad.id} className={`${styles.deletedAdItem} ${isRestored ? styles.deletedAdRestored : ""}`}>
-                        <div className={styles.adImageContainer}>
-                          {ad.images && ad.images.length > 0 ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={ad.images[0].cloudinaryUrl} alt={ad.titleEn} className={styles.adImage} />
-                          ) : (
-                            <div className={styles.placeholderImage}>No Photo</div>
-                          )}
+            {deletedAds.length === 0 ? (
+              <div className={styles.recoverEmpty}>
+                <h3>No Deleted Ads</h3>
+                <p>You have no deleted or expired advertisements at this time.</p>
+              </div>
+            ) : (
+              <div className={styles.deletedAdsList}>
+                {deletedAds.map((ad) => {
+                  const displayDate = new Date(ad.createdAt).toLocaleDateString("en-LK", {
+                    year: "numeric", month: "short", day: "numeric",
+                  });
+                  return (
+                    <div key={ad.id} className={styles.deletedAdItem}>
+                      <div className={styles.adImageContainer}>
+                        {ad.images && ad.images.length > 0 ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={ad.images[0].cloudinaryUrl} alt={ad.titleEn} className={styles.adImage} />
+                        ) : (
+                          <div className={styles.placeholderImage}>No Photo</div>
+                        )}
+                      </div>
+                      <div className={styles.adDetails}>
+                        <h3 className={styles.adTitle}>{ad.titleEn}</h3>
+                        <div className={styles.adMeta}>
+                          <span>{ad.city}, {ad.district}</span>
+                          <span>•</span>
+                          <span>Posted {displayDate}</span>
                         </div>
-                        <div className={styles.adDetails}>
-                          <h3 className={styles.adTitle}>{ad.titleEn}</h3>
-                          <div className={styles.adMeta}>
-                            <span>{ad.city}, {ad.district}</span>
-                            <span>•</span>
-                            <span>Posted {displayDate}</span>
-                          </div>
-                          <div className={styles.statusBadges}>
-                            <span className={`${styles.statusBadge} ${ad.status === "expired" ? styles.statusDraft : styles.statusPending}`}>
-                              {ad.status === "expired" ? "Expired" : "Draft"}
-                            </span>
-                            <span className={`${styles.tierBadge} ${styles["tier" + ad.adTier]}`}>
-                              {ad.adTier.toUpperCase()}
-                            </span>
-                          </div>
-                        </div>
-                        <div className={styles.adActions}>
-                          {isRestored ? (
-                            <span className={styles.restoredLabel}>✓ Submitted</span>
-                          ) : (
-                            <button
-                              className="btn btn-primary btn-sm"
-                              onClick={() => handleRestore(ad.id)}
-                              disabled={isRestoring}
-                              id={`restore-ad-${ad.id}`}
-                            >
-                              {isRestoring ? "Restoring..." : "↺ Restore"}
-                            </button>
-                          )}
+                        <div className={styles.statusBadges}>
+                          <span className={`${styles.statusBadge} ${styles.statusDeleted}`}>
+                            Deleted
+                          </span>
+                          <span className={`${styles.tierBadge} ${styles["tier" + ad.adTier]}`}>
+                            {ad.adTier.toUpperCase()}
+                          </span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-
-            <div className={styles.recoverHelp}>
-              <h4>How does restoration work?</h4>
-              <p>Restored ads will be set to "Awaiting Review" and published on the site after verification by our moderation team. This usually takes less than 24 hours.</p>
-            </div>
+                      <div className={styles.adActions} style={{ flexDirection: "column", gap: "0.5rem" }}>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => { setRecoverAdId(ad.id); setRecoverTier("standard"); }}
+                          id={`recover-ad-${ad.id}`}
+                        >
+                          ↺ Recover
+                        </button>
+                        <button
+                          className={`btn btn-sm ${styles.permDeleteBtn}`}
+                          onClick={() => setPermDeleteId(ad.id)}
+                          id={`perm-delete-${ad.id}`}
+                        >
+                          🗑 Delete Forever
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
+      )}
+
+      {/* ===== DELETE CONFIRM MODAL ===== */}
+      {deleteConfirmId && (
+        <div className={styles.modalOverlay} onClick={() => setDeleteConfirmId(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmIcon}>🗑</div>
+            <h3 className={styles.confirmTitle}>Delete this Ad?</h3>
+            <p className={styles.confirmText}>
+              This ad will be moved to your <strong>Recover</strong> section. You can restore it later by making a new payment.
+            </p>
+            <div className={styles.confirmBtns}>
+              <button
+                className={`btn btn-sm ${styles.deleteBtn}`}
+                onClick={() => handleSoftDelete(deleteConfirmId)}
+                disabled={!!isDeletingId}
+                id="confirm-delete-btn"
+              >
+                {isDeletingId ? "Deleting..." : "Yes, Delete It"}
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setDeleteConfirmId(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== PERMANENT DELETE CONFIRM MODAL ===== */}
+      {permDeleteId && (
+        <div className={styles.modalOverlay} onClick={() => setPermDeleteId(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmIcon} style={{ color: "#ef4444" }}>⚠️</div>
+            <h3 className={styles.confirmTitle} style={{ color: "#ef4444" }}>Permanently Delete?</h3>
+            <p className={styles.confirmText}>
+              This action <strong>cannot be undone</strong>. The ad and all its data will be erased from the system forever.
+            </p>
+            <div className={styles.confirmBtns}>
+              <button
+                className={`btn btn-sm ${styles.permDeleteBtn}`}
+                onClick={() => handlePermanentDelete(permDeleteId)}
+                disabled={isPermDeleting}
+                id="confirm-perm-delete-btn"
+              >
+                {isPermDeleting ? "Deleting..." : "Delete Forever"}
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setPermDeleteId(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== RECOVER TIER SELECTION MODAL ===== */}
+      {recoverAdId && (
+        <div className={styles.modalOverlay} onClick={() => setRecoverAdId(null)}>
+          <div className={styles.recoverModal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.recoverModalTitle}>Restore Your Ad</h3>
+            <p className={styles.recoverModalSubtitle}>
+              Select a visibility tier to bring this ad back live. Payment will be required.
+            </p>
+
+            <div className={styles.recoverTierGrid}>
+              {(["platinum", "premium", "standard"] as RecoverTier[]).map((tier) => (
+                <div
+                  key={tier}
+                  className={`${styles.recoverTierCard} ${recoverTier === tier ? styles.recoverTierActive : ""}`}
+                  onClick={() => setRecoverTier(tier)}
+                >
+                  <div className={styles.recoverTierName}>{TIER_DETAILS[tier].displayName}</div>
+                  <div className={styles.recoverTierPrice} style={{ color: TIER_DETAILS[tier].color }}>
+                    {TIER_DETAILS[tier].price}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.recoverModalNote}>
+              Selected: <strong>{TIER_DETAILS[recoverTier].displayName}</strong> — {TIER_DETAILS[recoverTier].price}
+            </div>
+
+            <div className={styles.confirmBtns}>
+              <button
+                className="btn btn-primary"
+                onClick={handleRecover}
+                disabled={isRecovering}
+                id="confirm-recover-btn"
+              >
+                {isRecovering ? "Restoring..." : `✓ Restore — ${TIER_DETAILS[recoverTier].price}`}
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setRecoverAdId(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

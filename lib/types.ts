@@ -19,7 +19,7 @@ export interface SubCategory {
 }
 
 export type AdTier = "standard" | "premium" | "platinum";
-export type AdStatus = "draft" | "pending" | "active" | "expired";
+export type AdStatus = "draft" | "pending" | "active" | "expired" | "deleted";
 
 export interface Ad {
   id: string;

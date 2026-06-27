@@ -271,3 +271,118 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// PATCH handler: update ad status (soft-delete or restore)
+export async function PATCH(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const adId = searchParams.get("id");
+
+    if (!adId) {
+      return NextResponse.json({ error: "Missing ad id parameter." }, { status: 400 });
+    }
+
+    const authHeader = request.headers.get("authorization");
+    const auth = parseToken(authHeader);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    let userId = auth.userId;
+    if (!userId) {
+      const { data: user } = await supabaseAdmin
+        .from("users")
+        .select("id")
+        .eq("phone_number", auth.phoneNumber)
+        .maybeSingle();
+      if (!user) return NextResponse.json({ error: "User not found." }, { status: 401 });
+      userId = user.id;
+    }
+
+    // Verify ownership
+    const { data: existing } = await supabaseAdmin
+      .from("ads")
+      .select("id, user_id")
+      .eq("id", adId)
+      .maybeSingle();
+
+    if (!existing || existing.user_id !== userId) {
+      return NextResponse.json({ error: "Ad not found or unauthorized." }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { status, adTier } = body;
+
+    const updatePayload: Record<string, string> = {};
+    if (status) updatePayload.status = status;
+    if (adTier) updatePayload.ad_tier = adTier;
+
+    const { error: updateError } = await supabaseAdmin
+      .from("ads")
+      .update(updatePayload)
+      .eq("id", adId);
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+  }
+}
+
+// DELETE handler: permanently delete an ad and its images
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const adId = searchParams.get("id");
+
+    if (!adId) {
+      return NextResponse.json({ error: "Missing ad id parameter." }, { status: 400 });
+    }
+
+    const authHeader = request.headers.get("authorization");
+    const auth = parseToken(authHeader);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    let userId = auth.userId;
+    if (!userId) {
+      const { data: user } = await supabaseAdmin
+        .from("users")
+        .select("id")
+        .eq("phone_number", auth.phoneNumber)
+        .maybeSingle();
+      if (!user) return NextResponse.json({ error: "User not found." }, { status: 401 });
+      userId = user.id;
+    }
+
+    // Verify ownership
+    const { data: existing } = await supabaseAdmin
+      .from("ads")
+      .select("id, user_id")
+      .eq("id", adId)
+      .maybeSingle();
+
+    if (!existing || existing.user_id !== userId) {
+      return NextResponse.json({ error: "Ad not found or unauthorized." }, { status: 403 });
+    }
+
+    // Delete images first (FK constraint)
+    await supabaseAdmin.from("ad_images").delete().eq("ad_id", adId);
+    // Delete payments associated
+    await supabaseAdmin.from("payments").delete().eq("ad_id", adId);
+    // Delete the ad
+    const { error: deleteError } = await supabaseAdmin.from("ads").delete().eq("id", adId);
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+  }
+}
