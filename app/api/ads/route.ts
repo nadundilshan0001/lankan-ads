@@ -40,23 +40,37 @@ export async function GET(request: Request) {
     const tier = searchParams.get("tier");
     const status = searchParams.get("status") || "active";
 
-    // Use admin client if querying pending or non-active ads to bypass client RLS policies
-    let query = status === "active"
-      ? supabase.from("ads").select("*, ad_images(*)")
-      : supabaseAdmin.from("ads").select("*, ad_images(*)");
+    const authHeader = request.headers.get("authorization");
+    const userPayload = parseToken(authHeader);
 
-    query = query.eq("status", status).order("created_at", { ascending: false });
+    let query;
 
-    if (category) {
-      query = query.eq("category", category);
-    }
+    if (userPayload?.userId) {
+      // Authenticated view: retrieve user's own ads across all statuses
+      query = supabaseAdmin
+        .from("ads")
+        .select("*, ad_images(*)")
+        .eq("user_id", userPayload.userId)
+        .order("created_at", { ascending: false });
+    } else {
+      // Public directory view: list active/pending ads based on search parameters
+      query = status === "active"
+        ? supabase.from("ads").select("*, ad_images(*)")
+        : supabaseAdmin.from("ads").select("*, ad_images(*)");
 
-    if (district) {
-      query = query.ilike("district", district.replace(/-/g, " "));
-    }
+      query = query.eq("status", status).order("created_at", { ascending: false });
 
-    if (tier) {
-      query = query.eq("ad_tier", tier);
+      if (category) {
+        query = query.eq("category", category);
+      }
+
+      if (district) {
+        query = query.ilike("district", district.replace(/-/g, " "));
+      }
+
+      if (tier) {
+        query = query.eq("ad_tier", tier);
+      }
     }
 
     const { data, error } = await query;

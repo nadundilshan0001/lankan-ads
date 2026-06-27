@@ -24,12 +24,6 @@ export default function Header() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSignOut = () => {
-    localStorage.removeItem("lankan_ads_token");
-    localStorage.removeItem("lankan_ads_phone");
-    setIsLoggedIn(false);
-  };
-
   return (
     <header className={styles.header} id="site-header">
       <nav className={styles.nav} aria-label="Main navigation">
@@ -43,6 +37,9 @@ export default function Header() {
 
           <div className={`${styles.navLinks} ${mobileMenuOpen ? styles.navLinksOpen : ""}`}>
             <Link href="/" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>
+              Ads
+            </Link>
+            <Link href="/home" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>
               Home
             </Link>
 
@@ -103,9 +100,9 @@ export default function Header() {
               Post Ad
             </Link>
             {isLoggedIn ? (
-              <button onClick={handleSignOut} className={`btn btn-glass btn-sm`}>
-                Sign Out
-              </button>
+              <Link href="/profile" className={`btn btn-glass btn-sm`}>
+                My Profile
+              </Link>
             ) : (
               <Link href="/login" className={`btn btn-glass btn-sm`}>
                 Sign In

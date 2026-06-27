@@ -185,3 +185,23 @@ export async function getFaqs(): Promise<any[]> {
   }
 }
 
+// 9. Get all active ads ordered by tier weight and then date
+export async function getAllActiveAds(): Promise<Ad[]> {
+  const { data, error } = await supabase
+    .from("ads")
+    .select("*, ad_images(*)")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching all active ads:", error);
+    return [];
+  }
+  
+  const mapped = (data || []).map(mapDbAd);
+  
+  // Sort by tier weight (platinum = 1, premium = 2, standard = 3)
+  const tierWeight = { platinum: 1, premium: 2, standard: 3 };
+  return mapped.sort((a, b) => tierWeight[a.adTier] - tierWeight[b.adTier]);
+}
+

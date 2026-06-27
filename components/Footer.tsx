@@ -50,11 +50,11 @@ export default function Footer() {
           <div className={styles.column}>
             <h3 className={styles.columnTitle}>Quick Links</h3>
             <ul className={styles.list}>
+              <li><Link href="/home" className={styles.link}>Home</Link></li>
+              <li><Link href="/" className={styles.link}>Browse Ads</Link></li>
               <li><Link href="/post-ad" className={styles.link}>Post an Ad</Link></li>
               <li><Link href="/faq" className={styles.link}>FAQ</Link></li>
               <li><Link href="/about" className={styles.link}>About Us</Link></li>
-              <li><Link href="/login" className={styles.link}>Sign In</Link></li>
-              <li><Link href="/register" className={styles.link}>Register</Link></li>
             </ul>
           </div>
 
