@@ -1,0 +1,181 @@
+/* Category-District and Category-Subcategory Listing Page Styles */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.header {
+  padding: var(--space-2xl) 0 var(--space-xl);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.headerContent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.headerIcon {
+  font-size: 3rem;
+  background: rgba(139, 92, 246, 0.08);
+  padding: var(--space-md);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary) 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 0.5rem;
+}
+
+.adCount {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Editorial Section for GEO/AEO */
+.editorialSection {
+  margin: var(--space-xl) 0 var(--space-2xl);
+  padding: var(--space-xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+
+.editorialTitle {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.editorialText {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Tier Sections */
+.tierSection {
+  margin-bottom: var(--space-2xl);
+  padding-top: var(--space-md);
+}
+
+.tierHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.tierTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.adGrid {
+  margin-bottom: var(--space-lg);
+}
+
+/* FAQs Section */
+.faqSection {
+  margin: var(--space-3xl) 0 var(--space-xl);
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.faqTitle {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.faqItem[open] {
+  border-color: var(--border-hover);
+}
+
+.faqQuestion {
+  font-weight: 600;
+  color: var(--text-primary);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion::after {
+  content: "↓";
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  transition: transform var(--transition-fast);
+}
+
+.faqItem[open] .faqQuestion::after {
+  transform: rotate(180deg);
+}
+
+.faqAnswer {
+  margin-top: var(--space-sm);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  padding: var(--space-3xl) 0;
+}
+
+.empty p {
+  margin-bottom: var(--space-lg);
+  color: var(--text-muted);
+  font-size: var(--text-lg);
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+}

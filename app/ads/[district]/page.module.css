@@ -1,0 +1,146 @@
+/* District-wide Listing Page Styles */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.header {
+  padding: var(--space-2xl) 0 var(--space-xl);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary) 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 0.5rem;
+}
+
+.adCount {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Category Filter Chips */
+.filtersSection {
+  margin-bottom: var(--space-2xl);
+}
+
+.filterTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.filterChip {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+}
+
+.filterChip:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* Tier Sections */
+.tierSection {
+  margin-bottom: var(--space-2xl);
+}
+
+.tierHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.tierTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.adGrid {
+  margin-bottom: var(--space-lg);
+}
+
+/* Districts Directory */
+.districtsSection {
+  margin: var(--space-3xl) 0 var(--space-xl);
+  padding: var(--space-2xl) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.sectionTitle {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+
+.districtGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-sm);
+}
+
+.districtChip {
+  padding: var(--space-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.districtChip:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  padding: var(--space-3xl) 0;
+}
+
+.empty p {
+  margin-bottom: var(--space-lg);
+  color: var(--text-muted);
+  font-size: var(--text-lg);
+}
