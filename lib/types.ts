@@ -34,6 +34,7 @@ export interface Ad {
   metaTitle?: string;
   metaDescription?: string;
   contactNumber: string;
+  whatsappNumber?: string;
   serviceArea: string;
   district: string;
   city: string;

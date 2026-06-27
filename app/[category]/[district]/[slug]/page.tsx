@@ -113,7 +113,7 @@ export default async function AdDetailPage({ params }: PageProps) {
               <h2 className={styles.sectionTitle}>Contact</h2>
               <div className={styles.contactActions}>
                 <a
-                  href={`https://wa.me/${ad.contactNumber.replace(/[^0-9]/g, "")}`}
+                  href={`https://wa.me/${(ad.whatsappNumber || ad.contactNumber).replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`btn btn-primary btn-lg ${styles.whatsappBtn}`}

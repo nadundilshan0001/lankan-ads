@@ -152,7 +152,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "live-cam",
-    name: "Live Cam",
+    name: "Live Cam Show",
     slug: "live-cam",
     description:
       "Virtual streaming and webcam session providers available on WhatsApp and Telegram.",

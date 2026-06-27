@@ -26,6 +26,7 @@ export default function PostAdPage() {
   const [descriptionEn, setDescriptionEn] = useState<string>("");
   const [priceRange, setPriceRange] = useState<string>("");
   const [contactNumber, setContactNumber] = useState<string>("");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
   const [district, setDistrict] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [availabilityHours, setAvailabilityHours] = useState<string>("");
@@ -200,10 +201,10 @@ export default function PostAdPage() {
           category: selectedCategory,
           subCategory: selectedSubCategory,
           titleEn,
-          titleSi,
+          titleSi: "",
           descriptionEn,
           priceRange,
-          contactNumber,
+          contactNumber: `${contactNumber}|${whatsappNumber || contactNumber}`,
           district,
           city,
           availabilityHours,
@@ -286,6 +287,7 @@ export default function PostAdPage() {
                 setDescriptionEn("");
                 setPriceRange("");
                 setContactNumber("");
+                setWhatsappNumber("");
                 setDistrict("");
                 setCity("");
                 setAvailabilityHours("");
@@ -366,7 +368,7 @@ export default function PostAdPage() {
             </h2>
             <div className={styles.formGrid}>
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.label} htmlFor="titleEn">Ad Title (English)</label>
+                <label className={styles.label} htmlFor="titleEn">Ad Title</label>
                 <input
                   id="titleEn"
                   type="text"
@@ -380,54 +382,53 @@ export default function PostAdPage() {
               </div>
 
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.label} htmlFor="titleSi">Ad Title (Sinhala — Optional)</label>
-                <input
-                  id="titleSi"
-                  type="text"
-                  placeholder="සිංහල මාතෘකාව (උදාහරණ: ප්‍රිමියම් තායි ස්පා තෙරපි)"
-                  className={styles.input}
-                  value={titleSi}
-                  onChange={(e) => setTitleSi(e.target.value)}
-                  maxLength={100}
-                />
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.label} htmlFor="descEn">Ad Description (English)</label>
+                <label className={styles.label} htmlFor="descEn">Ad Description</label>
                 <textarea
                   id="descEn"
-                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 1000 characters."
+                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 1500 characters."
                   className={styles.textarea}
                   value={descriptionEn}
-                  onChange={(e) => setDescriptionEn(e.target.value.substring(0, 1000))}
-                  maxLength={1000}
+                  onChange={(e) => setDescriptionEn(e.target.value.substring(0, 1500))}
+                  maxLength={1500}
                   required
                 />
-                <div className={styles.charCounter}>{descriptionEn.length}/1000 characters</div>
+                <div className={styles.charCounter}>{descriptionEn.length}/1500 characters</div>
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="price">Price / Price Range (Optional)</label>
+                <label className={styles.label} htmlFor="price">Price</label>
                 <input
                   id="price"
                   type="text"
-                  placeholder="e.g. LKR 3,000 — 5,000"
+                  placeholder="e.g. 5000"
                   className={styles.input}
                   value={priceRange}
-                  onChange={(e) => setPriceRange(e.target.value)}
+                  onChange={(e) => setPriceRange(e.target.value.replace(/[^0-9]/g, ""))}
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="contact">WhatsApp Contact Number</label>
+                <label className={styles.label} htmlFor="contact">Contact number(For normal call)</label>
                 <input
                   id="contact"
                   type="tel"
-                  placeholder="e.g. +94771234567"
+                  placeholder="e.g. 0771234567"
                   className={styles.input}
                   value={contactNumber}
                   onChange={(e) => setContactNumber(e.target.value)}
                   required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="whatsappContact">WhatsApp Contact Number (Optional)</label>
+                <input
+                  id="whatsappContact"
+                  type="tel"
+                  placeholder="e.g. 0771234567 (same as above if blank)"
+                  className={styles.input}
+                  value={whatsappNumber}
+                  onChange={(e) => setWhatsappNumber(e.target.value)}
                 />
               </div>
 
