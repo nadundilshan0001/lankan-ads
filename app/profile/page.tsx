@@ -4,7 +4,7 @@
 // Lankan Ads — User Profile Dashboard
 // ============================================================
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Ad } from "@/lib/types";
@@ -18,6 +18,50 @@ const TIER_DETAILS = {
   premium:   { displayName: "Premium Ad",   price: "Rs. 1,399", color: "#f59e0b" },
   platinum:  { displayName: "Platinum Ad",  price: "Rs. 8,000", color: "#ef4444" },
 };
+
+// Helper: format a district string for use in a URL segment
+function slugifyDistrict(district: string): string {
+  return district.toLowerCase().replace(/\s+/g, "-");
+}
+
+// Hook: live countdown to an expiry date
+function useCountdown(expiresAt: string) {
+  const calcRemaining = useCallback(() => {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return null;
+    const days    = Math.floor(diff / 86400000);
+    const hours   = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    return { days, hours, minutes, seconds };
+  }, [expiresAt]);
+
+  const [remaining, setRemaining] = useState(calcRemaining);
+
+  useEffect(() => {
+    const id = setInterval(() => setRemaining(calcRemaining()), 1000);
+    return () => clearInterval(id);
+  }, [calcRemaining]);
+
+  return remaining;
+}
+
+// Sub-component: countdown badge for one ad
+function AdCountdown({ expiresAt }: { expiresAt: string }) {
+  const r = useCountdown(expiresAt);
+  if (!r) return <span className={styles.countdownExpired}>Expired</span>;
+  return (
+    <div className={styles.countdown}>
+      <span className={styles.countdownLabel}>Expires in</span>
+      <span className={styles.countdownTime}>
+        {r.days > 0 && <><strong>{r.days}</strong>d </>}
+        <strong>{String(r.hours).padStart(2, "0")}</strong>h{" "}
+        <strong>{String(r.minutes).padStart(2, "0")}</strong>m{" "}
+        <strong>{String(r.seconds).padStart(2, "0")}</strong>s
+      </span>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -224,7 +268,7 @@ export default function ProfilePage() {
                 const displayDate = new Date(ad.createdAt).toLocaleDateString("en-LK", {
                   year: "numeric", month: "short", day: "numeric",
                 });
-                const detailUrl = `/${ad.category}/${ad.district}/${ad.slug}`;
+                const detailUrl = `/${ad.category}/${slugifyDistrict(ad.district)}/${ad.slug}`;
                 const isDeleting = isDeletingId === ad.id;
 
                 return (
@@ -259,6 +303,7 @@ export default function ProfilePage() {
                           {ad.adTier.toUpperCase()}
                         </span>
                       </div>
+                      <AdCountdown expiresAt={ad.expiresAt} />
                     </div>
 
                     <div className={styles.adActions}>

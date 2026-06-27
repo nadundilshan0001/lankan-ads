@@ -286,6 +286,51 @@
   gap: var(--space-sm);
 }
 
+/* ===== COUNTDOWN ===== */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.6rem;
+  width: fit-content;
+}
+
+.countdownLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.countdownTime {
+  font-size: 0.7rem;
+  color: var(--color-primary-light);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.countdownTime strong {
+  font-weight: 800;
+}
+
+.countdownExpired {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.5rem;
+}
+
 .emptyState {
   text-align: center;
   background: var(--bg-card);

@@ -88,9 +88,9 @@ export async function getAdsByDistrict(district: string): Promise<Ad[]> {
   return (data || []).map(mapDbAd);
 }
 
-// 4. Get ad by slug
 export async function getAdBySlug(slug: string): Promise<Ad | null> {
-  const { data, error } = await supabase
+  // Use admin client so the owner can always view their own ad
+  const { data, error } = await supabaseAdmin
     .from("ads")
     .select("*, ad_images(*)")
     .eq("slug", slug)
