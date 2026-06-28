@@ -7,7 +7,7 @@ import crypto from "crypto";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { phoneNumber, password, languagePreference } = body;
+    const { phoneNumber, password } = body;
 
     if (!phoneNumber || !password) {
       return NextResponse.json(
@@ -39,12 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (languagePreference && !["en", "si"].includes(languagePreference)) {
-      return NextResponse.json(
-        { error: "Invalid language preference." },
-        { status: 400 }
-      );
-    }
+
 
     // Check if user already exists
     const { data: existingUser, error: checkError } = await supabaseAdmin
@@ -75,7 +70,7 @@ export async function POST(request: Request) {
           .update({
             password_hash: passwordHash,
             salt,
-            language_preference: languagePreference || "en",
+            language_preference: "en",
           })
           .eq("id", existingUser.id);
 
@@ -92,7 +87,7 @@ export async function POST(request: Request) {
           phone_number: phoneNumber.trim(),
           password_hash: passwordHash,
           salt,
-          language_preference: languagePreference || "en",
+          language_preference: "en",
           is_verified: false,
         });
 

@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [langPref, setLangPref] = useState<"en" | "si">("en");
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   
   // Validation / Feedback States
@@ -44,7 +43,7 @@ export default function RegisterPage() {
     fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phoneNumber, password, languagePreference: langPref }),
+      body: JSON.stringify({ phoneNumber, password }),
     })
       .then(async (res) => {
         const data = await res.json();
@@ -158,18 +157,7 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Language Preference</label>
-              <select
-                className={styles.input}
-                value={langPref}
-                onChange={(e) => setLangPref(e.target.value as "en" | "si")}
-                disabled={loading}
-              >
-                <option value="en">English (default)</option>
-                <option value="si">සිංහල (Sinhala)</option>
-              </select>
-            </div>
+
 
             <button
               type="submit"
