@@ -52,7 +52,7 @@
   left: 15px;
   right: 15px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   z-index: 10;
   pointer-events: none;
 }

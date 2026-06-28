@@ -51,11 +51,6 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
     >
       {/* Overlapping Top Badges */}
       <div className={styles.topBadges}>
-        {(ad.adTier === "platinum" || ad.adTier === "premium") && (
-          <span className={`${styles.badgeOverlapping} ${styles.badgeGreen}`}>
-            Cash Back Guaranteed
-          </span>
-        )}
         <span className={`${styles.badgeOverlapping} ${styles["badge" + ad.adTier.charAt(0).toUpperCase() + ad.adTier.slice(1)]}`}>
           {ad.adTier === "platinum" ? "Platinum Ad" : ad.adTier === "premium" ? "Premium Ad" : "Standard Ad"}
         </span>
