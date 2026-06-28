@@ -1,8 +1,27 @@
 import { supabase, supabaseAdmin } from "./supabase";
 import { Ad, AdImage, AdTier, AdStatus, User } from "@/lib/types";
+import fs from "fs";
+import path from "path";
+
+function getLocalLikeCount(adId: string): number | null {
+  try {
+    const filePath = path.join(process.cwd(), "lib/db/local_likes.json");
+    if (fs.existsSync(filePath)) {
+      const map = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      if (typeof map[adId] === "number") {
+        return map[adId];
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
 
 // Helper: map database fields (snake_case) to client interface (camelCase)
 export function mapDbAd(dbAd: any): Ad {
+  const localLikes = getLocalLikeCount(dbAd.id);
+  const resolvedLikeCount = localLikes !== null ? localLikes : (dbAd.like_count || 0);
   let role: string | undefined = undefined;
   let availabilityHours = dbAd.availability_hours || "";
 
@@ -41,7 +60,7 @@ export function mapDbAd(dbAd: any): Ad {
     expiresAt: dbAd.expires_at,
     createdAt: dbAd.created_at,
     viewCount: dbAd.view_count || 0,
-    likeCount: dbAd.like_count || 0,
+    likeCount: resolvedLikeCount,
     images: (dbAd.ad_images || dbAd.images || []).map((img: any) => ({
       id: img.id,
       cloudinaryUrl: img.cloudinary_url,

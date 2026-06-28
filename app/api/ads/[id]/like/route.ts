@@ -1,5 +1,32 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import fs from "fs";
+import path from "path";
+
+function getLocalLikesMap(): Record<string, number> {
+  try {
+    const filePath = path.join(process.cwd(), "lib/db/local_likes.json");
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, "utf8"));
+    }
+  } catch {
+    // ignore
+  }
+  return {};
+}
+
+function saveLocalLikesMap(map: Record<string, number>) {
+  try {
+    const filePath = path.join(process.cwd(), "lib/db/local_likes.json");
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify(map, null, 2), "utf8");
+  } catch (err) {
+    console.error("Failed to write local likes:", err);
+  }
+}
 
 export async function POST(
   request: Request,
@@ -38,7 +65,10 @@ export async function POST(
         if (backupError || !adBackup) {
           return NextResponse.json({ error: backupError?.message || "Ad not found." }, { status: 404 });
         }
-        currentLikes = Math.floor((adBackup.view_count || 0) * 0.08) + 2;
+        
+        // Read local file likes fallback
+        const localLikes = getLocalLikesMap();
+        currentLikes = typeof localLikes[id] === "number" ? localLikes[id] : 0;
       } else {
         return NextResponse.json({ error: fetchError.message }, { status: 500 });
       }
@@ -52,7 +82,7 @@ export async function POST(
     // 2. Calculate new likes value
     const newLikes = action === "like" ? currentLikes + 1 : Math.max(0, currentLikes - 1);
 
-    // 3. Update database if the column is present
+    // 3. Update database or fallback file
     if (!isColumnMissing) {
       const { error: updateError } = await supabaseAdmin
         .from("ads")
@@ -63,11 +93,15 @@ export async function POST(
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
     } else {
+      const localLikes = getLocalLikesMap();
+      localLikes[id] = newLikes;
+      saveLocalLikesMap(localLikes);
+
       console.warn(
         "WARNING: Database schema is missing 'like_count' column. " +
         "Please execute this SQL command in your Supabase SQL Editor:\n" +
         "ALTER TABLE ads ADD COLUMN IF NOT EXISTS like_count INT DEFAULT 0;\n" +
-        "Using in-memory simulated fallback likes."
+        "Saved to local files fallback instead."
       );
     }
 
