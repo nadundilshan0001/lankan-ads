@@ -4,6 +4,7 @@
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { otpStore } from "@/lib/otpStore";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,13 @@ export async function POST(request: Request) {
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+
+    // Store in-memory as a reliable backup/primary mechanism
+    otpStore.set(phoneNumber, {
+      otpCode: otp,
+      expiresAt: new Date(expiresAt),
+      used: false,
+    });
 
     // Store OTP in password_reset_otps table (or reuse a generic otp_codes table)
     // We store it in users table in a temp column, or use a dedicated table.

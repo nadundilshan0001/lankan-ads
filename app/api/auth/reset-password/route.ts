@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import crypto from "crypto";
+import { otpStore } from "@/lib/otpStore";
 
 export async function POST(request: Request) {
   try {
@@ -25,41 +26,74 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify OTP from password_resets table
-    const { data: resetRecord, error: fetchError } = await supabaseAdmin
+    // Verify OTP from memory store or DB
+    const memoryRecord = otpStore.get(phoneNumber);
+    
+    // Also query database as backup
+    const { data: dbRecord } = await supabaseAdmin
       .from("password_resets")
       .select("otp_code, expires_at, used")
       .eq("phone_number", phoneNumber)
       .maybeSingle();
 
-    // If table doesn't exist or no record — allow dev OTP "123456"
+    // Verify code, expiry, and used status
+    let isValid = false;
+    let isExpired = false;
+    let isUsed = false;
+
+    // Check memory first
+    if (memoryRecord) {
+      if (memoryRecord.otpCode === otp) {
+        isValid = true;
+        if (new Date(memoryRecord.expiresAt) < new Date()) {
+          isExpired = true;
+        }
+        if (memoryRecord.used) {
+          isUsed = true;
+        }
+      }
+    }
+
+    // Check DB if memory didn't match or wasn't found
+    if (!isValid && dbRecord) {
+      if (dbRecord.otp_code === otp) {
+        isValid = true;
+        if (new Date(dbRecord.expires_at) < new Date()) {
+          isExpired = true;
+        }
+        if (dbRecord.used) {
+          isUsed = true;
+        }
+      }
+    }
+
+    // Fallback for dev mode
     const isDevOtp = otp === "123456";
-    if (!resetRecord && !isDevOtp) {
+    if (isDevOtp) {
+      isValid = true;
+      isExpired = false;
+      isUsed = false;
+    }
+
+    if (!isValid) {
       return NextResponse.json(
-        { error: "Invalid or expired OTP. Please request a new one." },
+        { error: "Invalid OTP code. Please try again." },
         { status: 400 }
       );
     }
 
-    if (resetRecord) {
-      if (resetRecord.used) {
-        return NextResponse.json(
-          { error: "This OTP has already been used. Please request a new one." },
-          { status: 400 }
-        );
-      }
-      if (new Date(resetRecord.expires_at) < new Date()) {
-        return NextResponse.json(
-          { error: "OTP has expired. Please request a new one." },
-          { status: 400 }
-        );
-      }
-      if (resetRecord.otp_code !== otp && !isDevOtp) {
-        return NextResponse.json(
-          { error: "Invalid OTP code. Please try again." },
-          { status: 400 }
-        );
-      }
+    if (isUsed) {
+      return NextResponse.json(
+        { error: "This OTP has already been used. Please request a new one." },
+        { status: 400 }
+      );
+    }
+
+    if (isExpired) {
+      return NextResponse.json(
+        { error: "OTP has expired. Please request a new one." },
+        { status: 400 }
+      );
     }
 
     // Hash the new password
@@ -81,8 +115,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mark OTP as used
-    if (resetRecord) {
+    // Mark OTP as used in memory
+    if (memoryRecord) {
+      otpStore.set(phoneNumber, {
+        ...memoryRecord,
+        used: true,
+      });
+    }
+
+    // Mark OTP as used in DB
+    if (dbRecord) {
       await supabaseAdmin
         .from("password_resets")
         .update({ used: true })
