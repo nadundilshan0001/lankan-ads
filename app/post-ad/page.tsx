@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CATEGORIES, DISTRICTS, TIERS } from "@/lib/constants";
+import CategoryIcon from "@/components/CategoryIcon";
 import styles from "./page.module.css";
 
 export default function PostAdPage() {
@@ -125,18 +126,33 @@ export default function PostAdPage() {
       return;
     }
 
-    if (!titleEn.trim()) {
-      setError("Please enter a title in English.");
+    const trimmedTitle = titleEn.trim();
+    if (trimmedTitle.length < 5 || trimmedTitle.length > 100) {
+      setError("Ad Title must be between 5 and 100 characters long.");
       return;
     }
 
-    if (!descriptionEn.trim()) {
-      setError("Please enter a description.");
+    const trimmedDesc = descriptionEn.trim();
+    if (trimmedDesc.length < 20 || trimmedDesc.length > 3000) {
+      setError("Ad Description must be between 20 and 3000 characters long.");
       return;
     }
 
-    if (!contactNumber.trim()) {
-      setError("Please enter a contact number.");
+    const trimmedContact = contactNumber.trim();
+    if (!trimmedContact) {
+      setError("Please enter a primary contact number.");
+      return;
+    }
+
+    const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
+    if (!phoneRegex.test(trimmedContact)) {
+      setError("Primary contact number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
+      return;
+    }
+
+    const trimmedWhatsapp = whatsappNumber.trim();
+    if (trimmedWhatsapp && !phoneRegex.test(trimmedWhatsapp)) {
+      setError("WhatsApp number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
       return;
     }
 
@@ -145,8 +161,9 @@ export default function PostAdPage() {
       return;
     }
 
-    if (!city.trim()) {
-      setError("Please enter a city.");
+    const trimmedCity = city.trim();
+    if (trimmedCity.length < 2 || trimmedCity.length > 50) {
+      setError("City must be between 2 and 50 characters long.");
       return;
     }
 
@@ -332,7 +349,9 @@ export default function PostAdPage() {
                       setSelectedSubCategory(""); // Reset subcategory when category changes
                     }}
                   >
-                    <span className={styles.categoryIcon}>{cat.icon}</span>
+                    <span className={styles.categoryIcon}>
+                      <CategoryIcon slug={cat.slug} size={32} />
+                    </span>
                     <span className={styles.categoryName}>{cat.name}</span>
                   </div>
                 ))}

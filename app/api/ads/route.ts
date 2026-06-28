@@ -7,26 +7,25 @@ import { supabase, supabaseAdmin } from "@/lib/db/supabase";
 import { mapDbAd } from "@/lib/db/queries";
 
 import { verifyToken } from "@/lib/auth";
+import { CATEGORIES, DISTRICTS } from "@/lib/constants";
+
+function sanitizeInput(val: any): string {
+  if (typeof val !== "string") return "";
+  // Strip HTML tags to prevent XSS
+  return val.replace(/<\/?[^>]+(>|$)/g, "").trim();
+}
+
+function isValidSriLankanPhone(phone: string): boolean {
+  return /^(?:\+94|0)?7[0-9]{8}$/.test(phone.trim());
+}
 
 function parseToken(authHeader: string | null) {
   if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
   const token = authHeader.split(" ")[1];
-  
-  // 1. Verify securely signed JWT token
+  // Verify securely signed JWT token only — legacy bypass tokens removed for security
   const payload = verifyToken(token);
   if (payload) {
     return { phoneNumber: payload.phoneNumber, userId: payload.userId };
-  }
-  
-  // 2. Backward compatibility fallback for active legacy sessions during transition
-  if (token.startsWith("db-token-for-")) {
-    const parts = token.replace("db-token-for-", "").split("-");
-    const phoneNumber = parts[0];
-    const userId = parts.slice(1).join("-");
-    return { phoneNumber, userId };
-  } else if (token.startsWith("mock-jwt-token-for-")) {
-    const phoneNumber = token.replace("mock-jwt-token-for-", "");
-    return { phoneNumber, userId: null };
   }
   return null;
 }
@@ -87,7 +86,7 @@ export async function GET(request: Request) {
     });
   } catch (err: any) {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }
@@ -157,14 +156,128 @@ export async function POST(request: Request) {
       );
     }
 
+    // 1. Sanitize string inputs to prevent HTML tag injection (XSS)
+    const sanitizedTitleEn = sanitizeInput(titleEn);
+    const sanitizedTitleSi = sanitizeInput(titleSi || "");
+    const sanitizedDescriptionEn = sanitizeInput(descriptionEn);
+    const sanitizedDescriptionSi = sanitizeInput(descriptionSi || "");
+    const sanitizedCity = sanitizeInput(city);
+    const sanitizedPriceRange = sanitizeInput(priceRange || "");
+    const sanitizedAvailabilityHours = sanitizeInput(availabilityHours || "");
+
+    // 2. Enforce length constraints
+    if (sanitizedTitleEn.length < 5 || sanitizedTitleEn.length > 100) {
+      return NextResponse.json(
+        { error: "English Title must be between 5 and 100 characters long." },
+        { status: 400 }
+      );
+    }
+
+    if (titleSi && (sanitizedTitleSi.length < 5 || sanitizedTitleSi.length > 100)) {
+      return NextResponse.json(
+        { error: "Sinhala Title must be between 5 and 100 characters long if provided." },
+        { status: 400 }
+      );
+    }
+
+    if (sanitizedDescriptionEn.length < 20 || sanitizedDescriptionEn.length > 3000) {
+      return NextResponse.json(
+        { error: "English Description must be between 20 and 3000 characters long." },
+        { status: 400 }
+      );
+    }
+
+    if (descriptionSi && (sanitizedDescriptionSi.length < 20 || sanitizedDescriptionSi.length > 3000)) {
+      return NextResponse.json(
+        { error: "Sinhala Description must be between 20 and 3000 characters long if provided." },
+        { status: 400 }
+      );
+    }
+
+    if (sanitizedCity.length < 2 || sanitizedCity.length > 50) {
+      return NextResponse.json(
+        { error: "City must be between 2 and 50 characters long." },
+        { status: 400 }
+      );
+    }
+
+    // 3. Validate Sri Lankan Phone Numbers (Primary & Whatsapp)
+    const phoneParts = contactNumber.split("|");
+    const primaryPhone = phoneParts[0];
+    const whatsappPhone = phoneParts[1] || primaryPhone;
+
+    if (!isValidSriLankanPhone(primaryPhone)) {
+      return NextResponse.json(
+        { error: "Primary contact number must be a valid Sri Lankan mobile number." },
+        { status: 400 }
+      );
+    }
+
+    if (whatsappPhone && !isValidSriLankanPhone(whatsappPhone)) {
+      return NextResponse.json(
+        { error: "WhatsApp contact number must be a valid Sri Lankan mobile number." },
+        { status: 400 }
+      );
+    }
+
+    // 4. Enforce valid Category and Subcategory matching
+    const matchedCategory = CATEGORIES.find((c) => c.slug === category || c.id === category);
+    if (!matchedCategory) {
+      return NextResponse.json(
+        { error: "Invalid category selected." },
+        { status: 400 }
+      );
+    }
+
+    if (subCategory) {
+      const matchedSubCategory = matchedCategory.subCategories.find(
+        (sub) => sub.slug === subCategory || sub.id === subCategory || sub.name === subCategory
+      );
+      if (!matchedSubCategory) {
+        return NextResponse.json(
+          { error: "Invalid sub-category selected for the chosen category." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 5. Enforce valid Gay category roles
+    if (matchedCategory.slug === "gay" || matchedCategory.id === "gay") {
+      if (!role || !["Top", "Bottom", "50/50"].includes(role)) {
+        return NextResponse.json(
+          { error: "Please select a valid role (Top, Bottom, or 50/50) for the Gay category." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 6. Enforce valid District matching
+    const matchedDistrict = DISTRICTS.find(
+      (d) => d.toLowerCase() === district.toLowerCase()
+    );
+    if (!matchedDistrict) {
+      return NextResponse.json(
+        { error: "Invalid district selected." },
+        { status: 400 }
+      );
+    }
+
+    // 7. Validate Ad Tier values
+    if (adTier && !["platinum", "premium", "standard"].includes(adTier)) {
+      return NextResponse.json(
+        { error: "Invalid ad tier selected." },
+        { status: 400 }
+      );
+    }
+
     // Auto-generate clean SEO slug from Title + City
-    let cleanTitle = titleEn
+    let cleanTitle = sanitizedTitleEn
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
       .replace(/\s+/g, "-");
     
-    let cleanCity = city
+    let cleanCity = sanitizedCity
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
@@ -180,19 +293,19 @@ export async function POST(request: Request) {
       .from("ads")
       .insert({
         user_id: userId,
-        category,
+        category: matchedCategory.slug, // ensure consistent slug notation
         sub_category: subCategory || "",
-        title_en: titleEn,
-        title_si: titleSi || "",
-        description_en: descriptionEn,
-        description_si: descriptionSi || "",
+        title_en: sanitizedTitleEn,
+        title_si: sanitizedTitleSi,
+        description_en: sanitizedDescriptionEn,
+        description_si: sanitizedDescriptionSi,
         slug,
         contact_number: contactNumber,
-        service_area: `${city}, ${district}`,
-        district,
-        city,
-        price_range: priceRange || "",
-        availability_hours: role ? JSON.stringify({ role, hours: availabilityHours || "" }) : (availabilityHours || ""),
+        service_area: `${sanitizedCity}, ${matchedDistrict}`,
+        district: matchedDistrict,
+        city: sanitizedCity,
+        price_range: sanitizedPriceRange,
+        availability_hours: role ? JSON.stringify({ role, hours: sanitizedAvailabilityHours }) : sanitizedAvailabilityHours,
         ad_tier: adTier || "standard",
         status: "active", // immediately live after payment
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -209,15 +322,29 @@ export async function POST(request: Request) {
 
     // 2. Insert Images if any are provided
     if (images && images.length > 0) {
-      const imageRows = images.map((img: any, idx: number) => {
-        const cloudinaryUrl = typeof img === "string" ? img : img.cloudinaryUrl;
-        return {
+      // SECURITY: Validate image count and Cloudinary URL origin before DB insert
+      const MAX_IMAGES = 5;
+      const safeImages = images.slice(0, MAX_IMAGES);
+
+      const imageRows = safeImages
+        .map((img: any) => {
+          const cloudinaryUrl = typeof img === "string" ? img : img.cloudinaryUrl;
+          // Reject any URL not from our Cloudinary account
+          if (
+            typeof cloudinaryUrl !== "string" ||
+            !cloudinaryUrl.startsWith("https://res.cloudinary.com/")
+          ) {
+            return null;
+          }
+          return cloudinaryUrl;
+        })
+        .filter(Boolean)
+        .map((cloudinaryUrl: string, idx: number) => ({
           ad_id: adRow.id,
           cloudinary_url: cloudinaryUrl,
-          alt_text: `Image for ${titleEn}`,
+          alt_text: `Image for ${sanitizedTitleEn}`,
           display_order: idx + 1,
-        };
-      });
+        }));
 
       const { error: imageError } = await supabaseAdmin
         .from("ad_images")
@@ -268,7 +395,7 @@ export async function POST(request: Request) {
     });
   } catch (err: any) {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }
@@ -315,6 +442,23 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { status, adTier } = body;
 
+    // SECURITY: Users may only set safe status values — block self-approval
+    const USER_SAFE_STATUSES = ["draft", "paused"];
+    if (status && !USER_SAFE_STATUSES.includes(status)) {
+      return NextResponse.json(
+        { error: "Invalid status value. Users may only set status to draft or paused." },
+        { status: 400 }
+      );
+    }
+
+    // Validate adTier if provided
+    if (adTier && !["platinum", "premium", "standard"].includes(adTier)) {
+      return NextResponse.json(
+        { error: "Invalid ad tier value." },
+        { status: 400 }
+      );
+    }
+
     const updatePayload: Record<string, string> = {};
     if (status) updatePayload.status = status;
     if (adTier) updatePayload.ad_tier = adTier;
@@ -330,7 +474,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }
 
@@ -385,6 +529,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

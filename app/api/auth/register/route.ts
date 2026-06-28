@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { hashPassword, generateSalt } from "@/lib/auth";
+import { otpStore } from "@/lib/otpStore";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -16,16 +18,30 @@ export async function POST(request: Request) {
 
     // Sri Lankan mobile number format validation
     const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    if (!phoneRegex.test(phoneNumber.trim())) {
       return NextResponse.json(
-        { error: "Invalid Sri Lankan mobile number." },
+        { error: "Invalid Sri Lankan mobile number. Format must be e.g. 0771234567." },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
+    if (typeof password !== "string" || password.length < 6) {
       return NextResponse.json(
         { error: "Password must be at least 6 characters." },
+        { status: 400 }
+      );
+    }
+
+    if (password.length > 128) {
+      return NextResponse.json(
+        { error: "Password must not exceed 128 characters." },
+        { status: 400 }
+      );
+    }
+
+    if (languagePreference && !["en", "si"].includes(languagePreference)) {
+      return NextResponse.json(
+        { error: "Invalid language preference." },
         { status: 400 }
       );
     }
@@ -34,15 +50,17 @@ export async function POST(request: Request) {
     const { data: existingUser, error: checkError } = await supabaseAdmin
       .from("users")
       .select("id, is_verified")
-      .eq("phone_number", phoneNumber)
+      .eq("phone_number", phoneNumber.trim())
       .maybeSingle();
 
     if (checkError) {
-      return NextResponse.json({ error: checkError.message }, { status: 500 });
+      console.error("[register] DB check error:", checkError.message);
+      return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
     }
 
-    // Hash password using SHA-256
-    const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
+    // SECURITY: Hash password with PBKDF2-SHA512 + random salt (replaces insecure SHA-256)
+    const salt = generateSalt();
+    const passwordHash = hashPassword(password, salt);
 
     if (existingUser) {
       if (existingUser.is_verified) {
@@ -51,17 +69,19 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       } else {
-        // Update password hash and language preference for unverified user
+        // Update password hash and salt for unverified user re-registering
         const { error: updateError } = await supabaseAdmin
           .from("users")
-          .update({ 
+          .update({
             password_hash: passwordHash,
-            language_preference: languagePreference || "en" 
+            salt,
+            language_preference: languagePreference || "en",
           })
           .eq("id", existingUser.id);
 
         if (updateError) {
-          return NextResponse.json({ error: updateError.message }, { status: 500 });
+          console.error("[register] DB update error:", updateError.message);
+          return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
         }
       }
     } else {
@@ -69,25 +89,43 @@ export async function POST(request: Request) {
       const { error: insertError } = await supabaseAdmin
         .from("users")
         .insert({
-          phone_number: phoneNumber,
+          phone_number: phoneNumber.trim(),
           password_hash: passwordHash,
+          salt,
           language_preference: languagePreference || "en",
           is_verified: false,
         });
 
       if (insertError) {
-        return NextResponse.json({ error: insertError.message }, { status: 500 });
+        console.error("[register] DB insert error:", insertError.message);
+        return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "OTP verification code dispatched to " + phoneNumber,
-      testOtpCode: "123456", // Mock OTP for development
+    // Generate and store a real 6-digit OTP for this phone number
+    const otpCode = crypto.randomInt(100000, 999999).toString();
+    otpStore.set(phoneNumber.trim(), {
+      otpCode,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+      used: false,
+      attempts: 0,
     });
-  } catch (err: any) {
+
+    // In production: dispatch otpCode via your SMS gateway here
+    const response: Record<string, unknown> = {
+      success: true,
+      message: "Verification code sent to " + phoneNumber,
+    };
+
+    // SECURITY: Only expose OTP in development mode
+    if (process.env.NODE_ENV !== "production") {
+      response.testOtpCode = otpCode;
+    }
+
+    return NextResponse.json(response);
+  } catch {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }

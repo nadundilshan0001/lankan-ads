@@ -5,13 +5,13 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { mapDbAd } from "@/lib/db/queries";
-import { verifyAdminRequest } from "@/lib/auth";
+import { verifyAdminCookieOrBearer } from "@/lib/adminAuth";
 
 // GET admin data: stats, pending ads, and users
 export async function GET(request: Request) {
   try {
     // Verify admin privileges
-    const admin = verifyAdminRequest(request);
+    const admin = verifyAdminCookieOrBearer(request);
     if (!admin) {
       return NextResponse.json({ error: "Access denied. Administrator privileges required." }, { status: 403 });
     }
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     });
   } catch (err: any) {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }
@@ -84,7 +84,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     // Verify admin privileges
-    const admin = verifyAdminRequest(request);
+    const admin = verifyAdminCookieOrBearer(request);
     if (!admin) {
       return NextResponse.json({ error: "Access denied. Administrator privileges required." }, { status: 403 });
     }
@@ -94,6 +94,14 @@ export async function POST(request: Request) {
 
     if (!action) {
       return NextResponse.json({ error: "Action is required." }, { status: 400 });
+    }
+
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (adId && !uuidRegex.test(adId)) {
+      return NextResponse.json({ error: "Invalid Ad ID format." }, { status: 400 });
+    }
+    if (userId && !uuidRegex.test(userId)) {
+      return NextResponse.json({ error: "Invalid User ID format." }, { status: 400 });
     }
 
     if (action === "approve_ad") {
@@ -157,7 +165,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid action." }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }

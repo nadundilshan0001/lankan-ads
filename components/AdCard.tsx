@@ -5,6 +5,7 @@
 import Link from "next/link";
 import type { Ad } from "@/lib/types";
 import { getCategoryBySlug } from "@/lib/constants";
+import CategoryIcon from "./CategoryIcon";
 import styles from "./AdCard.module.css";
 
 interface AdCardProps {
@@ -71,7 +72,9 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
           />
         ) : (
           <div className={styles.imagePlaceholder}>
-            <span className={styles.placeholderIcon}>{category?.icon || ""}</span>
+            <span className={styles.placeholderIcon}>
+              <CategoryIcon slug={ad.category} size={40} />
+            </span>
           </div>
         )}
 

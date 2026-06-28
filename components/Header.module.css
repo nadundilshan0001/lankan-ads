@@ -45,28 +45,65 @@
   z-index: 10;
 }
 
-.logoIcon {
-  font-size: 1.5rem;
-  background: var(--gradient-hero);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 8px var(--color-primary-glow));
+.logoIconContainer {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .logoText {
+  display: inline-flex;
+  align-items: flex-end;
   font-family: var(--font-display);
-  font-size: 1.35rem;
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+  line-height: 1;
+  gap: 1px;
+}
+
+.logoFirstLetter {
+  font-size: 2.45rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.logoO {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: inline-block;
+  margin-left: 1px;
+  margin-right: 1px;
+  line-height: 1;
+}
+
+.logoRest {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+  display: inline-block;
 }
 
 .logoAccent {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
   background: var(--gradient-hero);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
 }
 
 /* Nav Links */

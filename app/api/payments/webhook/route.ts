@@ -50,11 +50,11 @@ export async function POST(request: Request) {
       .digest("hex")
       .toUpperCase();
 
-    // Validate signature in production — uncomment below
-    // if (localSignature !== md5sig.toUpperCase()) {
-    //   console.error("Invalid PayHere signature for order:", orderId);
-    //   return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
-    // }
+    // SECURITY: Enforce PayHere signature validation (prevents fake webhook calls)
+    if (localSignature !== md5sig?.toUpperCase()) {
+      console.error("[Webhook] Invalid PayHere signature for order:", orderId);
+      return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
+    }
 
     // status_code 2 = successful payment
     if (statusCode === "2") {
@@ -115,10 +115,10 @@ export async function POST(request: Request) {
 
     // PayHere requires a simple 200 OK text response
     return new Response("OK", { status: 200 });
-  } catch (err: any) {
-    console.error("[Webhook] Unhandled error:", err);
+  } catch {
+    console.error("[Webhook] Unhandled error");
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }

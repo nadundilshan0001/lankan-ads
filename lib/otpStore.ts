@@ -1,20 +1,19 @@
 // ============================================================
 // Lankan Ads — In-Memory OTP Store for Resets & Verification
-// Persists across Next.js dev server hot-reloads
+// Persists across Next.js hot-reloads in all environments
 // ============================================================
 
-interface OtpData {
+export interface OtpData {
   otpCode: string;
   expiresAt: Date;
   used: boolean;
+  attempts: number; // brute-force counter
 }
 
 const globalForOtp = global as unknown as {
   otpStore: Map<string, OtpData>;
 };
 
-export const otpStore = globalForOtp.otpStore || new Map<string, OtpData>();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForOtp.otpStore = otpStore;
-}
+// Always persist globally — do NOT gate on NODE_ENV (breaks production OTP)
+export const otpStore = globalForOtp.otpStore ?? new Map<string, OtpData>();
+globalForOtp.otpStore = otpStore;

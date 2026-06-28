@@ -7,6 +7,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/constants";
+import CategoryIcon from "./CategoryIcon";
 import styles from "./Header.module.css";
 
 export default function Header() {
@@ -29,9 +30,19 @@ export default function Header() {
       <nav className={styles.nav} aria-label="Main navigation">
         <div className={styles.container}>
           <Link href="/" className={styles.logo} aria-label="Lankan Ads Home">
-            <span className={styles.logoIcon}>◆</span>
+            <div className={styles.logoIconContainer}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo/logo-dark-mode.svg"
+                alt="Lankan Ads Logo"
+                className={styles.logoImage}
+              />
+            </div>
             <span className={styles.logoText}>
-              Lankan<span className={styles.logoAccent}>Ads</span>
+              <span className={styles.logoFirstLetter}>ල</span>
+              <span className={styles.logoO}>o</span>
+              <span className={styles.logoRest}>කන්</span>
+              <span className={styles.logoAccent}>Ads</span>
             </span>
           </Link>
 
@@ -72,7 +83,9 @@ export default function Header() {
                         setMobileMenuOpen(false);
                       }}
                     >
-                      <span className={styles.dropdownIcon}>{cat.icon}</span>
+                      <span className={styles.dropdownIcon}>
+                        <CategoryIcon slug={cat.slug} size={18} />
+                      </span>
                       <div>
                         <span className={styles.dropdownLabel}>{cat.name}</span>
                         <span className={styles.dropdownDesc}>

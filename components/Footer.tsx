@@ -16,9 +16,19 @@ export default function Footer() {
           {/* Brand */}
           <div className={styles.brand}>
             <Link href="/" className={styles.logo}>
-              <span className={styles.logoIcon}>◆</span>
+              <div className={styles.logoIconContainer}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo/logo-dark-mode.svg"
+                  alt="Lankan Ads Logo"
+                  className={styles.logoImage}
+                />
+              </div>
               <span className={styles.logoText}>
-                Lankan<span className={styles.logoAccent}>Ads</span>
+                <span className={styles.logoFirstLetter}>ල</span>
+                <span className={styles.logoO}>o</span>
+                <span className={styles.logoRest}>කන්</span>
+                <span className={styles.logoAccent}>Ads</span>
               </span>
             </Link>
             <p className={styles.brandDescription}>
@@ -28,7 +38,6 @@ export default function Footer() {
             <div className={styles.trustBadges}>
               <span className={styles.badge}>Secure Payments</span>
               <span className={styles.badge}>Verified Providers</span>
-              <span className={styles.badge}>Admin Reviewed</span>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CATEGORIES } from "@/lib/constants";
+import CategoryIcon from "@/components/CategoryIcon";
 import { generateCategoryMetadata } from "@/lib/seo/meta-tags";
 import { generateCollectionPageSchema, generateItemListSchema } from "@/lib/seo/structured-data";
 import { getAdsByCategory } from "@/lib/db/queries";
@@ -58,7 +59,9 @@ export default async function CategoryPage({ params }: PageProps) {
         {/* Header */}
         <section className={styles.header}>
           <div className={styles.headerContent}>
-            <span className={styles.headerIcon}>{category.icon}</span>
+            <span className={styles.headerIcon}>
+              <CategoryIcon slug={category.slug} size={36} />
+            </span>
             <div>
               <h1 className={styles.title}>{category.name}</h1>
               <p className={styles.description}>{category.description}</p>

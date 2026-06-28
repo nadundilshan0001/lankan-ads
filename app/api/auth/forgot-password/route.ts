@@ -5,6 +5,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { otpStore } from "@/lib/otpStore";
+import { rateLimit } from "@/lib/rateLimit";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +20,25 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate phone format
+    const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
+    if (typeof phoneNumber !== "string" || !phoneRegex.test(phoneNumber.trim())) {
+      return NextResponse.json(
+        { error: "Invalid Sri Lankan mobile number format." },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Rate limit — 3 OTP requests per phone per hour
+    const rlKey = `forgot-password:${phoneNumber.trim()}`;
+    const rl = rateLimit(rlKey, 3, 60 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Too many requests. Please try again in ${rl.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     // Check user exists
     const { data: user, error: fetchError } = await supabaseAdmin
       .from("users")
@@ -27,15 +48,15 @@ export async function POST(request: Request) {
 
     if (fetchError || !user) {
       // Return success even if not found to prevent user enumeration
-      return NextResponse.json({
+      const fakeResponse: Record<string, unknown> = {
         success: true,
         message: "If this number is registered, an OTP has been sent.",
-        testOtpCode: "123456",
-      });
+      };
+      return NextResponse.json(fakeResponse);
     }
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate cryptographically secure 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
     // Store in-memory as a reliable backup/primary mechanism
@@ -43,6 +64,7 @@ export async function POST(request: Request) {
       otpCode: otp,
       expiresAt: new Date(expiresAt),
       used: false,
+      attempts: 0,
     });
 
     // Store OTP in password_reset_otps table (or reuse a generic otp_codes table)
@@ -63,16 +85,21 @@ export async function POST(request: Request) {
       // Still return success with the dev OTP
     }
 
-    // In production: send SMS via your SMS gateway
-    // For now, return the OTP in the response (dev mode)
-    return NextResponse.json({
+    // In production: send SMS via your SMS gateway here
+    const response: Record<string, unknown> = {
       success: true,
-      message: `OTP sent to ${phoneNumber}`,
-      testOtpCode: otp, // Remove in production!
-    });
-  } catch (err: any) {
+      message: "If this number is registered, an OTP has been sent.",
+    };
+
+    // SECURITY: Only expose OTP in development mode
+    if (process.env.NODE_ENV !== "production") {
+      response.testOtpCode = otp;
+    }
+
+    return NextResponse.json(response);
+  } catch {
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }

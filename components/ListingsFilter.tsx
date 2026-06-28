@@ -280,7 +280,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
             </div>
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
+            {totalPages >= 1 && (
               <div className={styles.pagination}>
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -289,9 +289,17 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
                 >
                   Previous
                 </button>
-                <span className={styles.pageInfo}>
-                  Page {currentPage} of {totalPages}
-                </span>
+                <div className={styles.pageNumbers}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`${styles.pageNumBtn} ${currentPage === pageNum ? styles.pageNumBtnActive : ""}`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                </div>
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}

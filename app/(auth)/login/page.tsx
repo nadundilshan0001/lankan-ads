@@ -21,10 +21,19 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      setError("Please enter a valid Sri Lankan mobile number.");
-      return;
+    const isEmail = phoneNumber.includes("@");
+    if (isEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(phoneNumber.trim())) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+    } else {
+      const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
+      if (!phoneRegex.test(phoneNumber.trim())) {
+        setError("Please enter a valid Sri Lankan mobile number (e.g. 0771234567).");
+        return;
+      }
     }
 
     if (password.length < 6) {
