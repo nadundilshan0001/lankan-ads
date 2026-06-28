@@ -101,56 +101,6 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "shemale-personal",
-    name: "Shemale Personal",
-    slug: "shemale-personal",
-    description:
-      "Individual transgender and independent providers offering personal services across Sri Lanka.",
-    icon: "",
-    subCategories: [
-      {
-        id: "place-available",
-        name: "Place Available",
-        slug: "place-available",
-        description: "Provider has their own location for service",
-      },
-      {
-        id: "home-hotel-visit",
-        name: "Home/Hotel Visit",
-        slug: "home-hotel-visit",
-        description: "Provider travels to the client's home or hotel",
-      },
-      {
-        id: "both",
-        name: "Both",
-        slug: "both",
-        description: "Place available AND home/hotel visit available",
-      },
-    ],
-  },
-  {
-    id: "marriage-proposals",
-    name: "Marriage Proposals",
-    slug: "marriage-proposals",
-    description:
-      "Traditional matchmaking and matrimonial listings for brides and grooms across Sri Lanka.",
-    icon: "",
-    subCategories: [
-      {
-        id: "brides",
-        name: "Brides",
-        slug: "brides",
-        description: "Female profiles seeking marriage",
-      },
-      {
-        id: "grooms",
-        name: "Grooms",
-        slug: "grooms",
-        description: "Male profiles seeking marriage",
-      },
-    ],
-  },
-  {
     id: "live-cam",
     name: "Live Cam Show",
     slug: "live-cam",
@@ -215,6 +165,34 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
+    id: "shemale-personal",
+    name: "Shemale Personal",
+    slug: "shemale-personal",
+    description:
+      "Individual transgender and independent providers offering personal services across Sri Lanka.",
+    icon: "",
+    subCategories: [
+      {
+        id: "place-available",
+        name: "Place Available",
+        slug: "place-available",
+        description: "Provider has their own location for service",
+      },
+      {
+        id: "home-hotel-visit",
+        name: "Home/Hotel Visit",
+        slug: "home-hotel-visit",
+        description: "Provider travels to the client's home or hotel",
+      },
+      {
+        id: "both",
+        name: "Both",
+        slug: "both",
+        description: "Place available AND home/hotel visit available",
+      },
+    ],
+  },
+  {
     id: "gay",
     name: "Gay",
     slug: "gay",
@@ -232,6 +210,28 @@ export const CATEGORIES: Category[] = [
         name: "Place unavailable",
         slug: "place-unavailable",
         description: "Provider does not have a location for service",
+      },
+    ],
+  },
+  {
+    id: "marriage-proposals",
+    name: "Marriage Proposals",
+    slug: "marriage-proposals",
+    description:
+      "Traditional matchmaking and matrimonial listings for brides and grooms across Sri Lanka.",
+    icon: "",
+    subCategories: [
+      {
+        id: "brides",
+        name: "Brides",
+        slug: "brides",
+        description: "Female profiles seeking marriage",
+      },
+      {
+        id: "grooms",
+        name: "Grooms",
+        slug: "grooms",
+        description: "Male profiles seeking marriage",
       },
     ],
   },
