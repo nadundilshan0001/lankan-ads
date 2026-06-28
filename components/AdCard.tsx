@@ -38,8 +38,8 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
   };
 
   // Simulate active stats for high-fidelity appearance
-  const simulatedViews = ad.viewCount * 12 + 45;
-  const simulatedLikes = Math.floor(simulatedViews * 0.08) + 2;
+  const simulatedViews = ad.viewCount;
+  const simulatedLikes = Math.floor(ad.viewCount * 0.08) + 2;
 
   const formattedViews = formatStatsNumber(simulatedViews);
   const formattedLikes = formatStatsNumber(simulatedLikes);
