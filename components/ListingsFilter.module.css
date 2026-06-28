@@ -30,11 +30,13 @@
   gap: var(--space-sm);
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: var(--space-md);
+  text-align: left;
 }
 
 .sidebarResultsHeader .resultCount {
   font-size: var(--text-sm);
   color: var(--text-secondary);
+  text-align: left;
 }
 
 .sidebarResultsHeader .sortWrapper {
@@ -42,6 +44,8 @@
   flex-direction: column;
   gap: 0.35rem;
   width: 100%;
+  margin-top: 0.75rem;
+  text-align: left;
 }
 
 .sidebarResultsHeader .sortLabel {
