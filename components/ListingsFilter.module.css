@@ -45,11 +45,9 @@
 }
 
 .sidebarResultsHeader .sortLabel {
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--text-primary);
 }
 
 .sidebarResultsHeader .sortSelect {
