@@ -46,6 +46,7 @@ export interface Ad {
   expiresAt: string;
   createdAt: string;
   viewCount: number;
+  likeCount?: number;
   images: AdImage[];
   availabilityHours?: string;
   role?: string;

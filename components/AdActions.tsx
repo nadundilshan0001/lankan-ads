@@ -4,20 +4,65 @@
 // Lankan Ads — Ad Action Buttons (Like, Save, Share)
 // ============================================================
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./AdActions.module.css";
 
 interface AdActionsProps {
   adId: string;
   title: string;
+  initialLikes?: number;
 }
 
-export default function AdActions({ adId, title }: AdActionsProps) {
+export default function AdActions({ adId, title, initialLikes = 0 }: AdActionsProps) {
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(initialLikes);
   const [saved, setSaved] = useState(false);
   const [shared, setShared] = useState(false);
 
-  const handleLike = () => setLiked((prev) => !prev);
+  useEffect(() => {
+    const likedAds = JSON.parse(localStorage.getItem("lankan_ads_liked_ads") || "[]");
+    if (likedAds.includes(adId)) {
+      setLiked(true);
+    }
+  }, [adId]);
+
+  const handleLike = async () => {
+    const likedAds = JSON.parse(localStorage.getItem("lankan_ads_liked_ads") || "[]");
+    const isLiking = !liked;
+
+    // Optimistic UI updates
+    setLiked(isLiking);
+    setLikeCount((prev) => (isLiking ? prev + 1 : Math.max(0, prev - 1)));
+
+    try {
+      const res = await fetch(`/api/ads/${adId}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: isLiking ? "like" : "unlike" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLikeCount(data.likeCount);
+
+        if (isLiking) {
+          if (!likedAds.includes(adId)) likedAds.push(adId);
+        } else {
+          const idx = likedAds.indexOf(adId);
+          if (idx > -1) likedAds.splice(idx, 1);
+        }
+        localStorage.setItem("lankan_ads_liked_ads", JSON.stringify(likedAds));
+      } else {
+        // Rollback
+        setLiked(!isLiking);
+        setLikeCount((prev) => (isLiking ? prev - 1 : prev + 1));
+        if (data.error) alert(data.error);
+      }
+    } catch {
+      // Rollback
+      setLiked(!isLiking);
+      setLikeCount((prev) => (isLiking ? prev - 1 : prev + 1));
+    }
+  };
 
   const handleSave = () => setSaved((prev) => !prev);
 
@@ -49,7 +94,7 @@ export default function AdActions({ adId, title }: AdActionsProps) {
         <svg width="18" height="18" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
-        <span>{liked ? "Liked" : "Like"}</span>
+        <span>{liked ? "Liked" : "Like"} ({likeCount})</span>
       </button>
 
       <button

@@ -41,6 +41,7 @@ export function mapDbAd(dbAd: any): Ad {
     expiresAt: dbAd.expires_at,
     createdAt: dbAd.created_at,
     viewCount: dbAd.view_count || 0,
+    likeCount: dbAd.like_count || 0,
     images: (dbAd.ad_images || dbAd.images || []).map((img: any) => ({
       id: img.id,
       cloudinaryUrl: img.cloudinary_url,

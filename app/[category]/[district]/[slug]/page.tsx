@@ -96,7 +96,7 @@ export default async function AdDetailPage({ params }: PageProps) {
             </header>
 
             {/* Like, Save, Share Buttons */}
-            <AdActions adId={ad.id} title={ad.titleEn} />
+            <AdActions adId={ad.id} title={ad.titleEn} initialLikes={ad.likeCount || 0} />
 
             {/* Price */}
             {ad.priceRange && (
