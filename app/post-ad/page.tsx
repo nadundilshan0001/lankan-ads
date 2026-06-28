@@ -224,7 +224,7 @@ export default function PostAdPage() {
   const executePayment = async () => {
     setIsSubmitting(true);
     setError("");
-    setSubmissionProgress("Uploading listing images to secure Cloudinary storage...");
+    setSubmissionProgress("Uploading photos...");
 
     try {
       // 1. Upload images to Cloudinary in parallel
@@ -232,7 +232,7 @@ export default function PostAdPage() {
         uploadedImages.map((base64) => uploadImageToCloudinary(base64))
       );
 
-      setSubmissionProgress("Creating ad database record and saving promotion settings...");
+      setSubmissionProgress("Publishing listing...");
 
       // 2. Submit ad to database API
       const token = localStorage.getItem("lankan_ads_token");
