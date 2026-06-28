@@ -34,6 +34,7 @@ export default function AdminAdsPage() {
   const [category, setCategory] = useState("");
   const [district, setDistrict] = useState("");
   const [tier, setTier] = useState("");
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const fetchAds = useCallback(async () => {
     setIsLoading(true);
@@ -71,6 +72,7 @@ export default function AdminAdsPage() {
       return;
     }
 
+    setActionLoadingId(adId);
     try {
       const res = await fetch(`/api/admin/ads/${adId}`, {
         method: "POST",
@@ -101,6 +103,8 @@ export default function AdminAdsPage() {
       }
     } catch {
       alert("Network error.");
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -241,8 +245,13 @@ export default function AdminAdsPage() {
                             onClick={() => handleAction(ad.id, "approve")}
                             className={styles.approveBtn}
                             title="Approve Listing"
+                            disabled={actionLoadingId !== null}
                           >
-                            Approve
+                            {actionLoadingId === ad.id ? (
+                              <div className={styles.spinnerMiniInline}></div>
+                            ) : (
+                              "Approve"
+                            )}
                           </button>
                         )}
                         {ad.status === "active" && (
@@ -250,8 +259,13 @@ export default function AdminAdsPage() {
                             onClick={() => handleAction(ad.id, "deactivate")}
                             className={styles.deactivateBtn}
                             title="Pause/Deactivate Listing"
+                            disabled={actionLoadingId !== null}
                           >
-                            Pause
+                            {actionLoadingId === ad.id ? (
+                              <div className={styles.spinnerMiniInline}></div>
+                            ) : (
+                              "Pause"
+                            )}
                           </button>
                         )}
                         {ad.status === "draft" && (
@@ -259,16 +273,26 @@ export default function AdminAdsPage() {
                             onClick={() => handleAction(ad.id, "approve")}
                             className={styles.approveBtn}
                             title="Activate Listing"
+                            disabled={actionLoadingId !== null}
                           >
-                            Activate
+                            {actionLoadingId === ad.id ? (
+                              <div className={styles.spinnerMiniInline}></div>
+                            ) : (
+                              "Activate"
+                            )}
                           </button>
                         )}
                         <button
                           onClick={() => handleAction(ad.id, "delete")}
                           className={styles.deleteBtn}
                           title="Delete Listing Permanently"
+                          disabled={actionLoadingId !== null}
                         >
-                          Delete
+                          {actionLoadingId === ad.id ? (
+                            <div className={styles.spinnerMiniInline}></div>
+                          ) : (
+                            "Delete"
+                          )}
                         </button>
                       </div>
                     </td>

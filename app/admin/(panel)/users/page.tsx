@@ -28,6 +28,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [verified, setVerified] = useState("");
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -63,6 +64,7 @@ export default function AdminUsersPage() {
       return;
     }
 
+    setActionLoadingId(userId);
     try {
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "POST",
@@ -92,6 +94,8 @@ export default function AdminUsersPage() {
       }
     } catch {
       alert("Network error.");
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -201,24 +205,39 @@ export default function AdminUsersPage() {
                           onClick={() => handleAction(user.id, "deactivate")}
                           className={styles.deactivateBtn}
                           title="Deactivate account"
+                          disabled={actionLoadingId !== null}
                         >
-                          Deactivate
+                          {actionLoadingId === user.id ? (
+                            <div className={styles.spinnerMiniInline}></div>
+                          ) : (
+                            "Deactivate"
+                          )}
                         </button>
                       ) : (
                         <button
                           onClick={() => handleAction(user.id, "activate")}
                           className={styles.activateBtn}
                           title="Activate account"
+                          disabled={actionLoadingId !== null}
                         >
-                          Activate
+                          {actionLoadingId === user.id ? (
+                            <div className={styles.spinnerMiniInline}></div>
+                          ) : (
+                            "Activate"
+                          )}
                         </button>
                       )}
                       <button
                         onClick={() => handleAction(user.id, "delete")}
                         className={styles.deleteBtn}
                         title="Delete user account"
+                        disabled={actionLoadingId !== null}
                       >
-                        Delete
+                        {actionLoadingId === user.id ? (
+                          <div className={styles.spinnerMiniInline}></div>
+                        ) : (
+                          "Delete"
+                        )}
                       </button>
                     </div>
                   </td>

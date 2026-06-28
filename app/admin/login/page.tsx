@@ -93,7 +93,14 @@ export default function AdminLogin() {
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={isLoading}>
-            {isLoading ? "Authenticating..." : "Access Control Panel"}
+            {isLoading ? (
+              <span className={styles.btnContent}>
+                <span className={styles.spinnerMini}></span>
+                <span>Authenticating Credentials...</span>
+              </span>
+            ) : (
+              "Access Control Panel"
+            )}
           </button>
         </form>
 

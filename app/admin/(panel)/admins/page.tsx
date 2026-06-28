@@ -194,7 +194,14 @@ export default function AdminUsersManagementPage() {
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={isSubmitLoading}>
-              {isSubmitLoading ? "Provisioning Profile..." : "Authorize Admin Account"}
+              {isSubmitLoading ? (
+                <span className={styles.btnContent}>
+                  <span className={styles.spinnerMini}></span>
+                  <span>Provisioning Account...</span>
+                </span>
+              ) : (
+                "Authorize Admin Account"
+              )}
             </button>
           </form>
         </section>

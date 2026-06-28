@@ -42,6 +42,7 @@ export default function PostAdPage() {
   // Modals / Progress states
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submissionProgress, setSubmissionProgress] = useState<string>("");
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); // default to true, check on mount
@@ -205,12 +206,15 @@ export default function PostAdPage() {
   const executePayment = async () => {
     setIsSubmitting(true);
     setError("");
+    setSubmissionProgress("Uploading listing images to secure Cloudinary storage...");
 
     try {
       // 1. Upload images to Cloudinary in parallel
       const cloudinaryUrls = await Promise.all(
         uploadedImages.map((base64) => uploadImageToCloudinary(base64))
       );
+
+      setSubmissionProgress("Creating ad database record and saving promotion settings...");
 
       // 2. Submit ad to database API
       const token = localStorage.getItem("lankan_ads_token");
@@ -692,6 +696,16 @@ export default function PostAdPage() {
             <p className={styles.testPaymentNote}>
               This is a test checkout simulation representing PayHere Sri Lanka merchant integration. No real funds are transferred.
             </p>
+          </div>
+        </div>
+      )}
+
+      {isSubmitting && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.loadingCard}>
+            <div className={styles.spinnerLarge}></div>
+            <h3 className={styles.loadingTitle}>Processing Listing</h3>
+            <p className={styles.loadingProgressText}>{submissionProgress}</p>
           </div>
         </div>
       )}

@@ -213,14 +213,22 @@ export default function AdminDashboardOverview() {
                               className={styles.approveBtn}
                               disabled={actionLoadingId !== null}
                             >
-                              Approve
+                              {actionLoadingId === ad.id ? (
+                                <div className={styles.spinnerMiniInline}></div>
+                              ) : (
+                                "Approve"
+                              )}
                             </button>
                             <button
                               onClick={() => handleModeration(ad.id, "deactivate")}
                               className={styles.rejectBtn}
                               disabled={actionLoadingId !== null}
                             >
-                              Reject
+                              {actionLoadingId === ad.id ? (
+                                <div className={styles.spinnerMiniInline}></div>
+                              ) : (
+                                "Reject"
+                              )}
                             </button>
                           </div>
                         </td>
