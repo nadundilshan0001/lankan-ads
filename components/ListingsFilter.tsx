@@ -147,6 +147,27 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     <div className={styles.container}>
       {/* ===== FILTER SIDEBAR (LEFT) ===== */}
       <aside className={`${styles.sidebar} ${showMobileFilters ? styles.sidebarOpen : ""}`}>
+        {/* Results Metadata & Sort (Moved to left sidebar) */}
+        <div className={styles.sidebarResultsHeader}>
+          <div className={styles.resultCount}>
+            Showing <span className={styles.resultCountHighlight}>{processedAds.length}</span> active listing{processedAds.length !== 1 ? "s" : ""}
+          </div>
+
+          <div className={styles.sortWrapper}>
+            <span className={styles.sortLabel}>Sort by</span>
+            <select
+              className={styles.sortSelect}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="latest">Latest Postings</option>
+              <option value="popular">Most Viewed</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
         <div className={styles.sidebarHeader}>
           <span className={styles.sidebarTitle}>Filters</span>
           <button onClick={handleClearFilters} className={styles.clearBtn}>
@@ -247,26 +268,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           {showMobileFilters ? "Hide Filters" : "Filter Listings"}
         </button>
 
-        {/* Results Header */}
-        <div className={styles.contentHeader}>
-          <div className={styles.resultCount}>
-            Showing <span className={styles.resultCountHighlight}>{processedAds.length}</span> active listing{processedAds.length !== 1 ? "s" : ""}
-          </div>
 
-          <div className={styles.sortWrapper}>
-            <span className={styles.sortLabel}>Sort by</span>
-            <select
-              className={styles.sortSelect}
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="latest">Latest Postings</option>
-              <option value="popular">Most Viewed</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
 
         {/* Grid / Empty State */}
         {paginatedAds.length > 0 ? (
