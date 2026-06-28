@@ -108,6 +108,38 @@ export default function AdminAdsPage() {
     }
   };
 
+  const handleUpdateViews = async (adId: string, currentViews: number) => {
+    const newValStr = prompt(`Enter new view count for this ad (current: ${currentViews}):`, currentViews.toString());
+    if (newValStr === null) return;
+    
+    const views = parseInt(newValStr, 10);
+    if (isNaN(views) || views < 0) {
+      alert("Please enter a valid non-negative number.");
+      return;
+    }
+
+    setActionLoadingId(adId);
+    try {
+      const res = await fetch(`/api/admin/ads/${adId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update_views", views }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAds((prev) =>
+          prev.map((a) => (a.id === adId ? { ...a, viewCount: views } : a))
+        );
+      } else {
+        alert(data.error || "Failed to update view count.");
+      }
+    } catch {
+      alert("Network error.");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1); // reset to page 1 on new filter
@@ -236,7 +268,23 @@ export default function AdminAdsPage() {
                         {ad.status.toUpperCase()}
                       </span>
                     </td>
-                    <td>{ad.viewCount}</td>
+                    <td>
+                      <div className={styles.viewsCell}>
+                        <span>{ad.viewCount}</span>
+                        <button
+                          onClick={() => handleUpdateViews(ad.id, ad.viewCount)}
+                          className={styles.editViewsBtn}
+                          title="Edit View Count"
+                          disabled={actionLoadingId !== null}
+                        >
+                          {actionLoadingId === ad.id ? (
+                            <div className={styles.spinnerMiniInline}></div>
+                          ) : (
+                            "Edit"
+                          )}
+                        </button>
+                      </div>
+                    </td>
                     <td>{new Date(ad.createdAt).toLocaleDateString("en-LK")}</td>
                     <td>
                       <div className={styles.actions}>

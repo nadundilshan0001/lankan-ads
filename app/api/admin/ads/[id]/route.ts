@@ -26,8 +26,20 @@ export async function POST(
     const body = await request.json();
     const action = body?.action as string;
 
-    if (!["approve", "deactivate", "delete"].includes(action)) {
+    if (!["approve", "deactivate", "delete", "update_views"].includes(action)) {
       return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+    }
+
+    if (action === "update_views") {
+      const views = parseInt(body?.views, 10);
+      if (isNaN(views) || views < 0) {
+        return NextResponse.json({ error: "Invalid views count." }, { status: 400 });
+      }
+      const { error } = await supabaseAdmin
+        .from("ads")
+        .update({ view_count: views })
+        .eq("id", adId);
+      if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
 
     if (action === "approve") {

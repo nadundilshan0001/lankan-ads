@@ -304,6 +304,29 @@
   color: #9ca3af;
 }
 
+.viewsCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editViewsBtn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editViewsBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
 .spinnerMiniInline {
   width: 14px;
   height: 14px;
