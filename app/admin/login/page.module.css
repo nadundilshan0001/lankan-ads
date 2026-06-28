@@ -25,29 +25,76 @@
 
 .logoArea {
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-  gap: 2px;
   margin-bottom: 24px;
 }
 
-.logoSinhala {
-  font-family: 'Outfit', sans-serif;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.logoIconContainer {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoText {
+  display: inline-flex;
+  align-items: flex-end;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  gap: 1px;
+}
+
+.logoFirstLetter {
+  font-size: 1.85rem;
   font-weight: 900;
-  font-size: 32px;
-  background: linear-gradient(135deg, #ff4e50, #f9d423);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
+}
+
+.logoO {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: inline-block;
+  margin-left: 1px;
+  margin-right: 1px;
   line-height: 1;
 }
 
-.logoEnglish {
-  font-family: 'Outfit', sans-serif;
+.logoRest {
+  font-size: 1.1rem;
   font-weight: 800;
-  font-size: 24px;
-  color: #ffffff;
   line-height: 1;
-  padding-bottom: 2px;
+  color: var(--text-primary);
+  display: inline-block;
+}
+
+.logoAccent {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
 }
 
 .title {

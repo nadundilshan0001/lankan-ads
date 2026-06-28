@@ -55,8 +55,22 @@ export default function AdminLogin() {
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <div className={styles.logoArea}>
-          <span className={styles.logoSinhala}>ලoකන්</span>
-          <span className={styles.logoEnglish}>Ads</span>
+          <Link href="/" className={styles.logo}>
+            <div className={styles.logoIconContainer}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo/logo-dark-mode.svg"
+                alt="Lankan Ads Logo"
+                className={styles.logoImage}
+              />
+            </div>
+            <span className={styles.logoText}>
+              <span className={styles.logoFirstLetter}>ල</span>
+              <span className={styles.logoO}>o</span>
+              <span className={styles.logoRest}>කන්</span>
+              <span className={styles.logoAccent}>Ads</span>
+            </span>
+          </Link>
         </div>
         <h1 className={styles.title}>Control Panel Login</h1>
         <p className={styles.subtitle}>Enter your administrator credentials to access the backend dashboard.</p>
