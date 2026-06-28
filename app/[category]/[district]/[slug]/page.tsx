@@ -125,14 +125,14 @@ export default async function AdDetailPage({ params }: PageProps) {
                   className={`btn btn-primary btn-lg ${styles.whatsappBtn}`}
                   id="contact-whatsapp"
                 >
-                  Chat on WhatsApp
+                  Chat on WhatsApp ({ad.whatsappNumber || ad.contactNumber})
                 </a>
                 <a
                   href={`tel:${ad.contactNumber}`}
                   className={`btn btn-secondary btn-lg ${styles.callBtn}`}
                   id="contact-phone"
                 >
-                  Call Now
+                  Call Now ({ad.contactNumber})
                 </a>
               </div>
               <p className={styles.contactNote}>
