@@ -46,17 +46,32 @@ export default function PostAdPage() {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); // default to true, check on mount
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  // Check login state
   useEffect(() => {
-    const token = localStorage.getItem("lankan_ads_token");
-    const phone = localStorage.getItem("lankan_ads_phone");
-    if (!token) {
-      setIsAuthenticated(false);
-    } else {
+    const adminDataStr = localStorage.getItem("lankan_ads_admin");
+    const adminTokenRole = localStorage.getItem("lankan_ads_token_role");
+
+    if (adminDataStr && adminTokenRole === "admin") {
       setIsAuthenticated(true);
-      if (phone) setUserPhone(phone);
-      checkFirstAdStatus(token);
+      setIsAdmin(true);
+      try {
+        const adminData = JSON.parse(adminDataStr);
+        setUserPhone(adminData.email || "System Administrator");
+      } catch {
+        setUserPhone("System Administrator");
+      }
+      setHasPostedAds(true);
+    } else {
+      const token = localStorage.getItem("lankan_ads_token");
+      const phone = localStorage.getItem("lankan_ads_phone");
+      if (!token) {
+        setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(true);
+        if (phone) setUserPhone(phone);
+        checkFirstAdStatus(token);
+      }
     }
   }, []);
 
@@ -168,7 +183,10 @@ export default function PostAdPage() {
       return;
     }
 
-    if (selectedTier === "standard" && !hasPostedAds) {
+    if (isAdmin) {
+      // Admin bypasses payment checkout simulator completely
+      executePayment();
+    } else if (selectedTier === "standard" && !hasPostedAds) {
       // First standard ad is free: bypass payment simulator checkout
       executePayment();
     } else {
@@ -218,12 +236,16 @@ export default function PostAdPage() {
 
       // 2. Submit ad to database API
       const token = localStorage.getItem("lankan_ads_token");
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const res = await fetch("/api/ads", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({
           category: selectedCategory,
           subCategory: selectedSubCategory,

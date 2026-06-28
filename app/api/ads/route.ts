@@ -8,6 +8,7 @@ import { mapDbAd } from "@/lib/db/queries";
 
 import { verifyToken } from "@/lib/auth";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
+import { cookies } from "next/headers";
 
 function sanitizeInput(val: any): string {
   if (typeof val !== "string") return "";
@@ -19,13 +20,28 @@ function isValidSriLankanPhone(phone: string): boolean {
   return /^(?:\+94|0)?7[0-9]{8}$/.test(phone.trim());
 }
 
-function parseToken(authHeader: string | null) {
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
-  const token = authHeader.split(" ")[1];
-  // Verify securely signed JWT token only — legacy bypass tokens removed for security
+async function parseToken(authHeader: string | null) {
+  let token = null;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    try {
+      const cookieStore = await cookies();
+      token = cookieStore.get("admin_session")?.value;
+    } catch {
+      // ignore
+    }
+  }
+
+  if (!token) return null;
+
   const payload = verifyToken(token);
   if (payload) {
-    return { phoneNumber: payload.phoneNumber, userId: payload.userId };
+    return {
+      phoneNumber: payload.phoneNumber || "",
+      userId: payload.userId,
+      role: payload.role || "user",
+    };
   }
   return null;
 }
@@ -40,7 +56,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status") || "active";
 
     const authHeader = request.headers.get("authorization");
-    const userPayload = parseToken(authHeader);
+    const userPayload = await parseToken(authHeader);
 
     let query;
 
@@ -96,31 +112,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization");
-    const auth = parseToken(authHeader);
+    const auth = await parseToken(authHeader);
     
     if (!auth) {
       return NextResponse.json(
         { error: "Unauthorized. Please provide a valid authorization token." },
         { status: 401 }
       );
-    }
-
-    let userId = auth.userId;
-    if (!userId) {
-      // Look up user UUID from phone number in database
-      const { data: user, error: userError } = await supabaseAdmin
-        .from("users")
-        .select("id")
-        .eq("phone_number", auth.phoneNumber)
-        .maybeSingle();
-
-      if (userError || !user) {
-        return NextResponse.json(
-          { error: "User account not found in database. Please register first." },
-          { status: 401 }
-        );
-      }
-      userId = user.id;
     }
 
     const body = await request.json();
@@ -155,6 +153,66 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    let targetPhone = auth.phoneNumber;
+    if (auth.role === "admin") {
+      targetPhone = contactNumber.split("|")[0].trim();
+    }
+
+    let dbUserId;
+    if (auth.role === "admin") {
+      // Look up target user profile
+      const { data: user, error: userError } = await supabaseAdmin
+        .from("users")
+        .select("id")
+        .eq("phone_number", targetPhone)
+        .maybeSingle();
+
+      if (userError) {
+        return NextResponse.json({ error: userError.message }, { status: 500 });
+      }
+
+      if (!user) {
+        // Auto-provision unverified user account so listing can be created
+        const { data: newUser, error: createError } = await supabaseAdmin
+          .from("users")
+          .insert({
+            phone_number: targetPhone,
+            is_verified: false,
+            is_active: true,
+          })
+          .select("id")
+          .single();
+
+        if (createError || !newUser) {
+          return NextResponse.json(
+            { error: "Failed to auto-create user profile for the contact number." },
+            { status: 500 }
+          );
+        }
+        dbUserId = newUser.id;
+      } else {
+        dbUserId = user.id;
+      }
+    } else {
+      // Regular user
+      const { data: user, error: userError } = await supabaseAdmin
+        .from("users")
+        .select("id")
+        .eq("phone_number", targetPhone)
+        .maybeSingle();
+
+      if (userError || !user) {
+        return NextResponse.json(
+          { error: "User account not found in database. Please register first." },
+          { status: 401 }
+        );
+      }
+      dbUserId = user.id;
+    }
+
+    const userId = dbUserId;
+
 
     // 1. Sanitize string inputs to prevent HTML tag injection (XSS)
     const sanitizedTitleEn = sanitizeInput(titleEn);
@@ -292,7 +350,7 @@ export async function POST(request: Request) {
     const { data: adRow, error: adError } = await supabaseAdmin
       .from("ads")
       .insert({
-        user_id: userId,
+        user_id: dbUserId,
         category: matchedCategory.slug, // ensure consistent slug notation
         sub_category: subCategory || "",
         title_en: sanitizedTitleEn,
@@ -412,7 +470,7 @@ export async function PATCH(request: Request) {
     }
 
     const authHeader = request.headers.get("authorization");
-    const auth = parseToken(authHeader);
+    const auth = await parseToken(authHeader);
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
@@ -489,7 +547,7 @@ export async function DELETE(request: Request) {
     }
 
     const authHeader = request.headers.get("authorization");
-    const auth = parseToken(authHeader);
+    const auth = await parseToken(authHeader);
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
