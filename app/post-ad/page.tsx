@@ -20,6 +20,7 @@ export default function PostAdPage() {
   // Form states
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   
   const [titleEn, setTitleEn] = useState<string>("");
   const [titleSi, setTitleSi] = useState<string>("");
@@ -119,6 +120,11 @@ export default function PostAdPage() {
       return;
     }
 
+    if (selectedCategory === "gay" && !role) {
+      setError("Please select your role.");
+      return;
+    }
+
     if (!titleEn.trim()) {
       setError("Please enter a title in English.");
       return;
@@ -208,6 +214,7 @@ export default function PostAdPage() {
           district,
           city,
           availabilityHours,
+          role: selectedCategory === "gay" ? role : undefined,
           adTier: selectedTier,
           images: cloudinaryUrls,
         }),
@@ -282,6 +289,7 @@ export default function PostAdPage() {
                 // Reset form
                 setSelectedCategory("");
                 setSelectedSubCategory("");
+                setRole("");
                 setTitleEn("");
                 setTitleSi("");
                 setDescriptionEn("");
@@ -354,6 +362,31 @@ export default function PostAdPage() {
                         <span className={styles.subOptionName}>{sub.name}</span>
                         <span className={styles.subOptionDesc}>{sub.description}</span>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedCategory === "gay" && (
+              <div className={styles.formGroup} style={{ marginTop: "var(--space-md)" }}>
+                <label className={styles.label}>Select Your Role</label>
+                <div className={styles.roleSelectionGrid}>
+                  {["Top", "Bottom", "50/50"].map((r) => (
+                    <div
+                      key={r}
+                      className={`${styles.roleOption} ${
+                        role === r ? styles.roleOptionActive : ""
+                      }`}
+                      onClick={() => setRole(r)}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        checked={role === r}
+                        onChange={() => {}}
+                        className={styles.radioInput}
+                      />
+                      <span className={styles.roleName}>{r}</span>
                     </div>
                   ))}
                 </div>

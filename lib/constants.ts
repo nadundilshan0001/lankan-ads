@@ -187,6 +187,54 @@ export const CATEGORIES: Category[] = [
     icon: "",
     subCategories: [],
   },
+  {
+    id: "cuckold-couples",
+    name: "Cuckold Couples",
+    slug: "cuckold-couples",
+    description: "Couples sharing intimate experiences with mutual consent across Sri Lanka.",
+    icon: "",
+    subCategories: [
+      {
+        id: "place-available",
+        name: "Place Available",
+        slug: "place-available",
+        description: "Couple has their own location for service",
+      },
+      {
+        id: "home-hotel-visit",
+        name: "Home/Hotel Visit",
+        slug: "home-hotel-visit",
+        description: "Couple travels to the client's home or hotel",
+      },
+      {
+        id: "both",
+        name: "Both",
+        slug: "both",
+        description: "Place available AND home/hotel visit available",
+      },
+    ],
+  },
+  {
+    id: "gay",
+    name: "Gay",
+    slug: "gay",
+    description: "Male-to-male personal services, matching, and companionship across Sri Lanka.",
+    icon: "",
+    subCategories: [
+      {
+        id: "place-available",
+        name: "Place Available",
+        slug: "place-available",
+        description: "Provider has their own location for service",
+      },
+      {
+        id: "place-unavailable",
+        name: "Place unavailable",
+        slug: "place-unavailable",
+        description: "Provider does not have a location for service",
+      },
+    ],
+  },
 ];
 
 export const TIERS: TierInfo[] = [

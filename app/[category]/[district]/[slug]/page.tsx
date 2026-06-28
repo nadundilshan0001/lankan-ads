@@ -74,6 +74,9 @@ export default async function AdDetailPage({ params }: PageProps) {
                 {ad.subCategory && (
                   <span className={styles.subCategory}>• {ad.subCategory.replace(/-/g, " ")}</span>
                 )}
+                {ad.role && (
+                  <span className={styles.subCategory}>• Role: {ad.role}</span>
+                )}
                 <span className={`${styles.adTierBadge} ${styles[ad.adTier]}`}>
                   {ad.adTier}
                 </span>

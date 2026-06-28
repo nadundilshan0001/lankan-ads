@@ -48,6 +48,7 @@ export interface Ad {
   viewCount: number;
   images: AdImage[];
   availabilityHours?: string;
+  role?: string;
 }
 
 export interface AdImage {

@@ -216,6 +216,41 @@
   accent-color: var(--color-primary-light);
 }
 
+/* Role selector options */
+.roleSelectionGrid {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 0.5rem;
+}
+
+.roleOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.roleOption:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.roleOptionActive {
+  background: rgba(139, 92, 246, 0.04);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.roleName {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
 .subOptionText {
   display: flex;
   flex-direction: column;

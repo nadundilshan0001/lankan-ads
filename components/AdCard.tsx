@@ -101,6 +101,11 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
               Rs. {ad.priceRange}
             </span>
           )}
+          {ad.role && (
+            <span className={styles.metaItem} style={{ color: "var(--color-primary-light)", fontWeight: "600" }}>
+              • {ad.role}
+            </span>
+          )}
         </div>
 
         <div className={styles.footer}>

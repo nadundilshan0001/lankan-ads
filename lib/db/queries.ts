@@ -3,6 +3,19 @@ import { Ad, AdImage, AdTier, AdStatus, User } from "@/lib/types";
 
 // Helper: map database fields (snake_case) to client interface (camelCase)
 export function mapDbAd(dbAd: any): Ad {
+  let role: string | undefined = undefined;
+  let availabilityHours = dbAd.availability_hours || "";
+
+  if (availabilityHours.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(availabilityHours);
+      role = parsed.role;
+      availabilityHours = parsed.hours || "";
+    } catch (e) {
+      // ignore
+    }
+  }
+
   return {
     id: dbAd.id,
     userId: dbAd.user_id,
@@ -34,7 +47,8 @@ export function mapDbAd(dbAd: any): Ad {
       altText: img.alt_text || "",
       displayOrder: img.display_order || 1,
     })).sort((a: any, b: any) => a.displayOrder - b.displayOrder),
-    availabilityHours: dbAd.availability_hours || "",
+    availabilityHours,
+    role,
   };
 }
 

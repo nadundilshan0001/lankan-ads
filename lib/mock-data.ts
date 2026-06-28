@@ -332,7 +332,7 @@ export const MOCK_FAQS: FAQ[] = [
     id: "faq-6",
     questionEn: "What categories are available on Lankan Ads?",
     answerEn:
-      "Lankan Ads features six categories: Girls Personal, Boys Personal, Shemale Personal, Marriage Proposals, Live Cam, and Spa & Wellness Services. Each category has specific sub-categories for more refined browsing.",
+      "Lankan Ads features eight categories: Girls Personal, Boys Personal, Shemale Personal, Marriage Proposals, Live Cam Show, Spa & Wellness, Cuckold Couples, and Gay. Each category has specific sub-categories for more refined browsing.",
     displayOrder: 6,
   },
 ];

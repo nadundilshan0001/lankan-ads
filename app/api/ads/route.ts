@@ -137,6 +137,7 @@ export async function POST(request: Request) {
       district,
       city,
       availabilityHours,
+      role,
       adTier,
       images, // Cloudinary URLs array
     } = body;
@@ -191,6 +192,7 @@ export async function POST(request: Request) {
         district,
         city,
         price_range: priceRange || "",
+        availability_hours: role ? JSON.stringify({ role, hours: availabilityHours || "" }) : (availabilityHours || ""),
         ad_tier: adTier || "standard",
         status: "active", // immediately live after payment
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
