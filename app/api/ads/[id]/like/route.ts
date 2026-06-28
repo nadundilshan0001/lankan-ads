@@ -22,6 +22,14 @@ export async function POST(
       .maybeSingle();
 
     if (fetchError || !ad) {
+      if (fetchError?.message.includes("like_count") && fetchError.message.includes("does not exist")) {
+        return NextResponse.json(
+          {
+            error: "Database schema missing 'like_count' column. Please execute this SQL command in your Supabase SQL Editor:\n\nALTER TABLE ads ADD COLUMN IF NOT EXISTS like_count INT DEFAULT 0;"
+          },
+          { status: 500 }
+        );
+      }
       return NextResponse.json({ error: fetchError?.message || "Ad not found." }, { status: 404 });
     }
 
