@@ -12,7 +12,7 @@
   transition: all var(--transition-base);
   animation: fadeInUp 0.5s ease-out forwards;
   opacity: 0;
-  margin-top: 10px;
+  margin-top: 10px; /* Space for overlapping top badges */
 }
 
 .card:hover {
@@ -90,8 +90,8 @@
 /* Image Area (Left side) */
 .imageWrapper {
   position: relative;
-  width: 120px;
-  min-width: 120px;
+  width: 160px;
+  min-width: 160px;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--bg-secondary);
@@ -141,11 +141,11 @@
 /* Content Area (Right side) */
 .content {
   flex: 1;
-  padding: 0.35rem 0.65rem;
+  padding: 0.5rem 0.875rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.2rem;
+  gap: 0.3rem;
 }
 
 .titleLink {
@@ -154,10 +154,10 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.3;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -170,11 +170,11 @@
 }
 
 .description {
-  font-size: 0.67rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
-  line-height: 1.3;
+  line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
@@ -198,18 +198,18 @@
 .footer {
   display: flex;
   align-items: center;
-  padding-top: 0.25rem;
+  padding-top: 0.4rem;
   border-top: 1px solid var(--border-subtle);
-  margin-top: 0.1rem;
+  margin-top: 0.2rem;
 }
 
 .stats {
   display: flex;
-  gap: 0.6rem;
+  gap: 1rem;
 }
 
 .stat {
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
   color: var(--color-primary-light);
   font-weight: 600;
 }
@@ -234,8 +234,8 @@
   }
 
   .imageWrapper {
-    width: 90px;
-    min-width: 90px;
+    width: 110px;
+    min-width: 110px;
     aspect-ratio: 4 / 3;
     border-radius: var(--radius-xl) 0 0 var(--radius-xl);
   }
