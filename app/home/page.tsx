@@ -95,10 +95,17 @@ export default async function HomePage() {
               </p>
             </div>
             <div className={`grid grid-3 ${styles.adGrid}`}>
-              {platinumAds.map((ad) => (
+              {platinumAds.slice(0, 6).map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
             </div>
+            {platinumAds.length > 6 && (
+              <div className={styles.seeMoreContainer}>
+                <Link href="/" className="btn btn-secondary">
+                  See More
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -117,10 +124,17 @@ export default async function HomePage() {
               </p>
             </div>
             <div className={`grid grid-3 ${styles.adGrid}`}>
-              {premiumAds.map((ad) => (
+              {premiumAds.slice(0, 6).map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
             </div>
+            {premiumAds.length > 6 && (
+              <div className={styles.seeMoreContainer}>
+                <Link href="/" className="btn btn-secondary">
+                  See More
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -139,10 +153,17 @@ export default async function HomePage() {
               </p>
             </div>
             <div className={`grid grid-3 ${styles.adGrid}`}>
-              {standardAds.map((ad) => (
+              {standardAds.slice(0, 6).map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
             </div>
+            {standardAds.length > 6 && (
+              <div className={styles.seeMoreContainer}>
+                <Link href="/" className="btn btn-secondary">
+                  See More
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}
