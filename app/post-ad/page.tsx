@@ -184,12 +184,13 @@ export default function PostAdPage() {
     }
 
     if (isAdmin) {
-      // Admin bypasses payment checkout simulator completely
-      executePayment();
+      // Admin bypasses payment — post directly
+      executeDirectPost();
     } else if (selectedTier === "standard" && !hasPostedAds) {
-      // First standard ad is free: bypass payment simulator checkout
-      executePayment();
+      // First standard ad is free — post directly
+      executeDirectPost();
     } else {
+      // Paid tier — open confirmation modal before redirecting to PayHere
       setIsCheckoutOpen(true);
     }
   };
@@ -221,27 +222,22 @@ export default function PostAdPage() {
   };
 
   // Real PayHere & Cloudinary & Database execution
-  const executePayment = async () => {
+  // Used for free ads and admin — creates ad directly and marks as success
+  const executeDirectPost = async () => {
     setIsSubmitting(true);
     setError("");
     setSubmissionProgress("Uploading photos...");
 
     try {
-      // 1. Upload images to Cloudinary in parallel
       const cloudinaryUrls = await Promise.all(
         uploadedImages.map((base64) => uploadImageToCloudinary(base64))
       );
 
       setSubmissionProgress("Publishing listing...");
 
-      // 2. Submit ad to database API
       const token = localStorage.getItem("lankan_ads_token");
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const res = await fetch("/api/ads", {
         method: "POST",
@@ -264,10 +260,7 @@ export default function PostAdPage() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create advertisement");
-      }
+      if (!res.ok) throw new Error(data.error || "Failed to create advertisement");
 
       setIsSubmitting(false);
       setIsCheckoutOpen(false);
@@ -275,6 +268,94 @@ export default function PostAdPage() {
     } catch (err: any) {
       setIsSubmitting(false);
       setError(err.message || "An error occurred during submission.");
+      setIsCheckoutOpen(false);
+    }
+  };
+
+  // Used for paid tiers — uploads images, creates ad as 'pending', then redirects to PayHere
+  const executePayHereCheckout = async () => {
+    setIsSubmitting(true);
+    setError("");
+    setSubmissionProgress("Uploading photos...");
+
+    try {
+      // 1. Upload images first
+      const cloudinaryUrls = await Promise.all(
+        uploadedImages.map((base64) => uploadImageToCloudinary(base64))
+      );
+
+      setSubmissionProgress("Creating your listing...");
+
+      // 2. Create the ad in DB (status: pending until payment confirmed)
+      const token = localStorage.getItem("lankan_ads_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const adRes = await fetch("/api/ads", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          category: selectedCategory,
+          subCategory: selectedSubCategory,
+          titleEn,
+          titleSi: "",
+          descriptionEn,
+          priceRange,
+          contactNumber: `${contactNumber}|${whatsappNumber || contactNumber}`,
+          district,
+          city,
+          availabilityHours,
+          role: selectedCategory === "gay" ? role : undefined,
+          adTier: selectedTier,
+          images: cloudinaryUrls,
+          paymentPending: true, // signal to route that payment is coming
+        }),
+      });
+
+      const adData = await adRes.json();
+      if (!adRes.ok) throw new Error(adData.error || "Failed to create advertisement");
+
+      setSubmissionProgress("Redirecting to payment...");
+
+      // 3. Get signed PayHere checkout params
+      const tierPrices: Record<string, number> = { standard: 500, premium: 1500, platinum: 3000 };
+      const amount = tierPrices[selectedTier] || 500;
+
+      const payRes = await fetch("/api/payments/create", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          adId: adData.ad?.id || adData.id,
+          tier: selectedTier,
+          amount,
+          phone: contactNumber,
+        }),
+      });
+
+      const payData = await payRes.json();
+      if (!payRes.ok) throw new Error(payData.error || "Failed to initiate payment");
+
+      const { checkout } = payData;
+
+      // 4. Auto-submit a hidden form to PayHere's hosted checkout page
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = checkout.action;
+
+      Object.entries(checkout).forEach(([key, value]) => {
+        if (key === "action") return;
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = String(value);
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit(); // Browser navigates to PayHere
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setError(err.message || "An error occurred. Please try again.");
       setIsCheckoutOpen(false);
     }
   };
@@ -657,7 +738,7 @@ export default function PostAdPage() {
         </form>
       )}
 
-      {/* PayHere Checkout Simulator Modal */}
+      {/* PayHere Checkout Confirmation Modal */}
       {isCheckoutOpen && (
         <div className={styles.checkoutOverlay}>
           <div className={styles.checkoutModal}>
@@ -666,7 +747,7 @@ export default function PostAdPage() {
                 Pay<span>Here</span>
               </div>
               <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
-                Sandbox Payment Gateway Simulator
+                Secure Payment — Sri Lanka's #1 Payment Gateway
               </p>
             </div>
 
@@ -681,11 +762,7 @@ export default function PostAdPage() {
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Ad Duration:</span>
-                <span className={styles.detailValue}>7 Days (Total)</span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Order ID:</span>
-                <span className={styles.detailValue}>LAD-{Math.floor(100000 + Math.random() * 900000)}</span>
+                <span className={styles.detailValue}>7 Days</span>
               </div>
               <div className={styles.detailRow} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "8px", marginTop: "8px" }}>
                 <span className={styles.detailLabel} style={{ fontWeight: "700" }}>Total Amount:</span>
@@ -700,10 +777,11 @@ export default function PostAdPage() {
                 type="button"
                 className="btn btn-primary btn-lg"
                 style={{ width: "100%", background: "#2196f3", borderColor: "#2196f3" }}
-                onClick={executePayment}
+                onClick={executePayHereCheckout}
                 disabled={isSubmitting}
+                id="payhere-confirm-btn"
               >
-                {isSubmitting ? "Processing Sandbox Payment..." : "Complete Sandbox Payment (LKR)"}
+                {isSubmitting ? "Preparing payment..." : `Pay ${activeTier?.priceFormatted} via PayHere`}
               </button>
               <button
                 type="button"
@@ -711,12 +789,12 @@ export default function PostAdPage() {
                 onClick={() => setIsCheckoutOpen(false)}
                 disabled={isSubmitting}
               >
-                Cancel Payment
+                Cancel
               </button>
             </div>
 
             <p className={styles.testPaymentNote}>
-              This is a test checkout simulation representing PayHere Sri Lanka merchant integration. No real funds are transferred.
+              You will be redirected to PayHere's secure payment page. Your ad goes live immediately after payment confirmation.
             </p>
           </div>
         </div>

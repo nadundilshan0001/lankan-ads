@@ -137,6 +137,7 @@ export async function POST(request: Request) {
       role,
       adTier,
       images, // Cloudinary URLs array
+      paymentPending, // true when PayHere payment is about to happen
     } = body;
 
     // Check mandatory fields
@@ -365,7 +366,9 @@ export async function POST(request: Request) {
         price_range: sanitizedPriceRange,
         availability_hours: role ? JSON.stringify({ role, hours: sanitizedAvailabilityHours }) : sanitizedAvailabilityHours,
         ad_tier: adTier || "standard",
-        status: "active", // goes live immediately after payment
+        // Paid tier ads start as 'pending' until PayHere webhook confirms payment
+        // Free ads (standard first-time / admin) go live immediately
+        status: paymentPending ? "pending" : "active",
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .select("id")
@@ -413,39 +416,44 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Insert Payment Row (auto-completed for development simulation)
-    const { count: adsCount } = await supabaseAdmin
-      .from("ads")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
+    // 3. Insert Payment Row — only for free ads (first standard ad, admin posts)
+    // Paid tier ads: the PayHere webhook creates the payment record after real payment
+    if (!paymentPending) {
+      const { count: adsCount } = await supabaseAdmin
+        .from("ads")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
 
-    const isFirstAd = (adsCount || 0) <= 1;
+      const isFirstAd = (adsCount || 0) <= 1;
 
-    const payhereOrderId = `LAD-${Math.floor(100000 + Math.random() * 900000)}`;
-    let amountLkr = adTier === "platinum" ? 6000 : adTier === "premium" ? 1399 : 699;
-    if (adTier === "standard" && isFirstAd) {
-      amountLkr = 0;
-    }
+      const payhereOrderId = `LAD-${Math.floor(100000 + Math.random() * 900000)}`;
+      let amountLkr = adTier === "platinum" ? 6000 : adTier === "premium" ? 1399 : 699;
+      if (adTier === "standard" && isFirstAd) {
+        amountLkr = 0;
+      }
 
-    const { error: paymentError } = await supabaseAdmin
-      .from("payments")
-      .insert({
-        user_id: userId,
-        ad_id: adRow.id,
-        payhere_order_id: payhereOrderId,
-        tier_purchased: adTier || "standard",
-        amount_lkr: amountLkr,
-        status: "completed",
-        paid_at: new Date().toISOString(),
-      });
+      const { error: paymentError } = await supabaseAdmin
+        .from("payments")
+        .insert({
+          user_id: userId,
+          ad_id: adRow.id,
+          payhere_order_id: payhereOrderId,
+          tier_purchased: adTier || "standard",
+          amount_lkr: amountLkr,
+          status: "completed",
+          paid_at: new Date().toISOString(),
+        });
 
-    if (paymentError) {
-      console.error("Failed to insert payment record:", paymentError);
+      if (paymentError) {
+        console.error("Failed to insert payment record:", paymentError);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: "Ad created successfully and is now live.",
+      message: paymentPending
+        ? "Ad created. Awaiting payment confirmation."
+        : "Ad created successfully and is now live.",
       ad: {
         id: adRow.id,
         slug,
