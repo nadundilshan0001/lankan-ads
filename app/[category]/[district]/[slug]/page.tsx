@@ -16,6 +16,7 @@ import SchemaMarkup from "@/components/SchemaMarkup";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AdGallery from "@/components/AdGallery";
 import AdActions from "@/components/AdActions";
+import ReportAdButton from "@/components/ReportAdButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -142,9 +143,7 @@ export default async function AdDetailPage({ params }: PageProps) {
 
             {/* Report */}
             <div className={styles.reportLink}>
-              <button className={styles.reportBtn} id="report-ad">
-                Report this ad
-              </button>
+              <ReportAdButton adId={ad.id} />
             </div>
           </div>
         </article>

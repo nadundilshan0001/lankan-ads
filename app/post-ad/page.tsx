@@ -325,7 +325,7 @@ export default function PostAdPage() {
               Ad Submitted Successfully!
             </h2>
             <p className={styles.text} style={{ maxWidth: "500px", margin: "1rem auto 2rem" }}>
-              Thank you for your payment of <strong>{activeTier?.priceFormatted}</strong>. Your ad <strong>&quot;{titleEn}&quot;</strong> is now <strong style={{ color: "#10b981" }}>live</strong> and visible to everyone on Lankan Ads!
+              Thank you for your submission. Your ad <strong>&quot;{titleEn}&quot;</strong> is now <strong style={{ color: "#F59E0B" }}>under review</strong>. Our team will approve it shortly and it will become visible to everyone on Lankan Ads.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button onClick={() => {
