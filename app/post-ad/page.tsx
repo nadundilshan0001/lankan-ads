@@ -322,10 +322,10 @@ export default function PostAdPage() {
           <div className={styles.successCard}>
             <span className={styles.successIcon}></span>
             <h2 className={styles.title} style={{ background: "none", color: "var(--text-primary)", WebkitTextFillColor: "initial" }}>
-              Ad Submitted Successfully!
+              Ad Posted Successfully!
             </h2>
             <p className={styles.text} style={{ maxWidth: "500px", margin: "1rem auto 2rem" }}>
-              Thank you for your submission. Your ad <strong>&quot;{titleEn}&quot;</strong> is now <strong style={{ color: "#F59E0B" }}>under review</strong>. Our team will approve it shortly and it will become visible to everyone on Lankan Ads.
+              Your ad <strong>&quot;{titleEn}&quot;</strong> is now <strong style={{ color: "#10b981" }}>live</strong> and visible to everyone on Lankan Ads!
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button onClick={() => {

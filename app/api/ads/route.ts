@@ -365,7 +365,7 @@ export async function POST(request: Request) {
         price_range: sanitizedPriceRange,
         availability_hours: role ? JSON.stringify({ role, hours: sanitizedAvailabilityHours }) : sanitizedAvailabilityHours,
         ad_tier: adTier || "standard",
-        status: "pending", // requires admin approval before going live
+        status: "active", // goes live immediately after payment
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .select("id")
