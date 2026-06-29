@@ -11,6 +11,7 @@ import {
 import SchemaMarkup from "@/components/SchemaMarkup";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AgeGate from "@/components/AgeGate";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -95,6 +96,7 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        {!isAdmin && <AgeGate />}
         {!isAdmin && <Header />}
         <main id="main-content">{children}</main>
         {!isAdmin && <Footer />}
