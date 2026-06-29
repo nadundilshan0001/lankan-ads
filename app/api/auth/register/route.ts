@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { hashPassword, generateSalt } from "@/lib/auth";
 import { otpStore } from "@/lib/otpStore";
+import { sendOtpSms } from "@/lib/sms";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -106,15 +107,22 @@ export async function POST(request: Request) {
       attempts: 0,
     });
 
-    // In production: dispatch otpCode via your SMS gateway here
+    // Send OTP via Notify.lk SMS gateway
+    const smsResult = await sendOtpSms(phoneNumber.trim(), otpCode);
+
     const response: Record<string, unknown> = {
       success: true,
-      message: "Verification code sent to " + phoneNumber,
+      message: "Verification code sent to your mobile number.",
     };
 
-    // SECURITY: Only expose OTP in development mode
-    if (process.env.NODE_ENV !== "production") {
-      response.testOtpCode = otpCode;
+    if (!smsResult.success) {
+      // SMS failed — log for admin, but still allow dev bypass
+      console.error("[register] SMS dispatch failed:", smsResult.error);
+      // In development: expose OTP so testing is still possible
+      if (process.env.NODE_ENV !== "production") {
+        response.testOtpCode = otpCode;
+        response.smsError = smsResult.error;
+      }
     }
 
     return NextResponse.json(response);
