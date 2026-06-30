@@ -18,6 +18,7 @@ interface PaymentItem {
   userPhone: string;
   amountLkr: number;
   status: "completed" | "pending" | "failed";
+  reference?: string;
   paidAt?: string;
   createdAt: string;
 }
@@ -191,6 +192,7 @@ export default function AdminPaymentsPage() {
                 <th>Tier</th>
                 <th>Advertiser Phone</th>
                 <th>Amount</th>
+                <th>Reference ID</th>
                 <th>Status</th>
                 <th>Created At</th>
               </tr>
@@ -212,6 +214,9 @@ export default function AdminPaymentsPage() {
                   </td>
                   <td>{p.userPhone}</td>
                   <td className={styles.amount}>Rs. {p.amountLkr.toLocaleString()}</td>
+                  <td style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "var(--color-primary-light)" }}>
+                    {p.reference || "N/A"}
+                  </td>
                   <td>
                     <span className={`${styles.statusBadge} ${styles["status_" + p.status]}`}>
                       {p.status.toUpperCase()}

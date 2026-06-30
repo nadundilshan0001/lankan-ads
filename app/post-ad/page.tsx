@@ -51,6 +51,8 @@ export default function PostAdPage() {
   // LankaQR Polling states
   const [currentOrderId, setCurrentOrderId] = useState<string>("");
   const [isPolling, setIsPolling] = useState<boolean>(false);
+  const [paymentReference, setPaymentReference] = useState<string>("");
+  const [referenceError, setReferenceError] = useState<string>("");
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -856,23 +858,102 @@ export default function PostAdPage() {
               </div>
             </details>
 
-            {/* Auto status verify spinner */}
+            {/* Manual Reference input for instant validation */}
+            <div
+              style={{
+                borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                paddingTop: "1rem",
+                marginBottom: "1rem"
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.85rem",
+                  color: "var(--text-primary)",
+                  fontWeight: "600",
+                  marginBottom: "0.4rem"
+                }}
+              >
+                Enter Payment Reference ID / Transaction ID:
+              </label>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input
+                  type="text"
+                  placeholder="e.g. CEFT/2948274 or bank trace ID"
+                  className={styles.input}
+                  style={{ flex: 1, margin: 0, padding: "0.5rem" }}
+                  value={paymentReference}
+                  onChange={(e) => {
+                    setPaymentReference(e.target.value);
+                    setReferenceError("");
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ padding: "0 1.25rem", whiteSpace: "nowrap" }}
+                  onClick={async () => {
+                    if (!paymentReference.trim()) {
+                      setReferenceError("Please enter the reference ID.");
+                      return;
+                    }
+                    setIsSubmitting(true);
+                    try {
+                      const token = localStorage.getItem("lankan_ads_token");
+                      const headers: Record<string, string> = { "Content-Type": "application/json" };
+                      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                      const res = await fetch("/api/payments/submit-reference", {
+                        method: "POST",
+                        headers,
+                        body: JSON.stringify({
+                          orderId: currentOrderId,
+                          reference: paymentReference,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (res.ok && data.success) {
+                        setIsPolling(false);
+                        setIsCheckoutOpen(false);
+                        setIsSuccess(true);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        setReferenceError(data.error || "Failed to submit reference.");
+                      }
+                    } catch {
+                      setReferenceError("Network error. Please try again.");
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Verify & Activate
+                </button>
+              </div>
+              {referenceError && (
+                <p style={{ fontSize: "0.8rem", color: "#EF4444", margin: "0.4rem 0 0 0" }}>{referenceError}</p>
+              )}
+            </div>
+
+            {/* Auto status verify spinner (backup) */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "10px",
-                padding: "0.75rem",
-                background: "rgba(255, 255, 255, 0.02)",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
+                padding: "0.6rem",
+                background: "rgba(255, 255, 255, 0.01)",
+                border: "1px solid rgba(255, 255, 255, 0.03)",
                 borderRadius: "8px",
                 marginBottom: "1rem"
               }}
             >
               <div className={styles.spinnerMiniInline}></div>
-              <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                Awaiting payment alert… Ad will go live instantly.
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                Awaiting payment alert… Ad will go live instantly once transfer completes.
               </span>
             </div>
 
@@ -884,6 +965,8 @@ export default function PostAdPage() {
                 onClick={() => {
                   setIsCheckoutOpen(false);
                   setIsPolling(false);
+                  setPaymentReference("");
+                  setReferenceError("");
                 }}
               >
                 Cancel Submission

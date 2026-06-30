@@ -65,6 +65,7 @@ export async function GET(request: Request) {
       userPhone: p.users?.phone_number || "Unknown",
       amountLkr: p.amount_lkr,
       status: p.status,
+      reference: p.payhere_payment_id || "",
       paidAt: p.paid_at,
       createdAt: p.created_at,
     }));
