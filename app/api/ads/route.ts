@@ -311,9 +311,12 @@ export async function POST(request: Request) {
     }
 
     // 6. Enforce valid District matching
-    const matchedDistrict = DISTRICTS.find(
+    let matchedDistrict: any = DISTRICTS.find(
       (d) => d.toLowerCase() === district.toLowerCase()
     );
+    if (!matchedDistrict && district.toLowerCase() === "all district") {
+      matchedDistrict = "All District";
+    }
     if (!matchedDistrict) {
       return NextResponse.json(
         { error: "Invalid district selected." },

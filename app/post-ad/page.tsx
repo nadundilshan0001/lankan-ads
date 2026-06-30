@@ -137,60 +137,65 @@ export default function PostAdPage() {
     e.preventDefault();
     setError("");
 
+    const triggerValidationError = (msg: string) => {
+      setError(msg);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     if (!selectedCategory) {
-      setError("Please select a category.");
+      triggerValidationError("Please select a category.");
       return;
     }
 
     const categoryObj = CATEGORIES.find(c => c.id === selectedCategory);
     if (categoryObj && categoryObj.subCategories.length > 0 && !selectedSubCategory) {
-      setError("Please select a sub-category.");
+      triggerValidationError("Please select a sub-category.");
       return;
     }
 
     if (selectedCategory === "gay" && !role) {
-      setError("Please select your role.");
+      triggerValidationError("Please select your role.");
       return;
     }
 
     const trimmedTitle = titleEn.trim();
     if (trimmedTitle.length < 5 || trimmedTitle.length > 100) {
-      setError("Ad Title must be between 5 and 100 characters long.");
+      triggerValidationError("Ad Title must be between 5 and 100 characters long.");
       return;
     }
 
     const trimmedDesc = descriptionEn.trim();
     if (trimmedDesc.length < 20 || trimmedDesc.length > 3000) {
-      setError("Ad Description must be between 20 and 3000 characters long.");
+      triggerValidationError("Ad Description must be between 20 and 3000 characters long.");
       return;
     }
 
     const trimmedContact = contactNumber.trim();
     if (!trimmedContact) {
-      setError("Please enter a primary contact number.");
+      triggerValidationError("Please enter a primary contact number.");
       return;
     }
 
     const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
     if (!phoneRegex.test(trimmedContact)) {
-      setError("Primary contact number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
+      triggerValidationError("Primary contact number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
       return;
     }
 
     const trimmedWhatsapp = whatsappNumber.trim();
     if (trimmedWhatsapp && !phoneRegex.test(trimmedWhatsapp)) {
-      setError("WhatsApp number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
+      triggerValidationError("WhatsApp number must be a valid Sri Lankan mobile number (e.g. 0771234567).");
       return;
     }
 
     if (!district) {
-      setError("Please select a district.");
+      triggerValidationError("Please select a district.");
       return;
     }
 
     const trimmedCity = city.trim();
     if (trimmedCity.length < 2 || trimmedCity.length > 50) {
-      setError("City must be between 2 and 50 characters long.");
+      triggerValidationError("City must be between 2 and 50 characters long.");
       return;
     }
 
@@ -280,7 +285,11 @@ export default function PostAdPage() {
       setIsSubmitting(false);
       const errorMsg = err.message || "An error occurred during submission.";
       setError(errorMsg);
-      alert(`⚠️ ERROR: ${errorMsg}`);
+      setCustomAlert({
+        title: "Submission Failed",
+        message: errorMsg,
+        isError: true
+      });
       setIsCheckoutOpen(false);
     }
   };
@@ -359,7 +368,11 @@ export default function PostAdPage() {
       setIsSubmitting(false);
       const errorMsg = err.message || "An error occurred. Please try again.";
       setError(errorMsg);
-      alert(`⚠️ ERROR: ${errorMsg}`);
+      setCustomAlert({
+        title: "Order Failed",
+        message: errorMsg,
+        isError: true
+      });
       setIsCheckoutOpen(false);
     }
   };
@@ -455,7 +468,11 @@ export default function PostAdPage() {
         <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Logged in as: {userPhone}</span>
       </header>
 
-      {error && <div className={styles.errorMsg} style={{ marginBottom: "1rem", textAlign: "center" }}>{error}</div>}
+      {error && (
+        <div className={styles.errorMsg}>
+          <span>⚠️</span> {error}
+        </div>
+      )}
 
       {isSuccess ? (
         <div className={styles.formCard} style={{ display: "flex", justifyContent: "center" }}>
