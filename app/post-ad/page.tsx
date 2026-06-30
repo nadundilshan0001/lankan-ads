@@ -58,6 +58,7 @@ export default function PostAdPage() {
   const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); // Changed to 10 minutes (600s)
   const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
   const [customAlert, setCustomAlert] = useState<{ title: string; message: string; isError?: boolean } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank">("qr");
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -821,16 +822,14 @@ export default function PostAdPage() {
       {isCheckoutOpen && (
         <div className={styles.checkoutOverlay}>
           <div className={styles.checkoutModal} style={{ maxWidth: "520px" }}>
-            <div className={styles.checkoutHeader}>
-              <div className={styles.payhereLogo} style={{ color: "var(--color-primary)" }}>
-                LANKA<span>QR</span>
-              </div>
-              <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
-                Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
-              </p>
+            <div className={styles.checkoutHeader} style={{ textAlign: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", paddingBottom: "1rem", marginBottom: "1rem" }}>
+              <h3 style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-display)" }}>
+                ලoකන්Ads Payment Gateway
+              </h3>
+              
               <div 
                 style={{ 
-                  marginTop: "0.5rem", 
+                  marginTop: "0.6rem", 
                   fontSize: "0.8rem", 
                   color: "#F59E0B", 
                   background: "rgba(245, 158, 11, 0.08)", 
@@ -845,31 +844,14 @@ export default function PostAdPage() {
               </div>
             </div>
 
-            {/* QR Scanner Mockup */}
-            <div style={{ display: "flex", justifyContent: "center", margin: "1.25rem 0" }}>
-              <img
-                src={`/api/payments/qr-code?token=${typeof window !== "undefined" ? localStorage.getItem("lankan_ads_token") || "" : ""}`}
-                alt="LankaQR scan box"
-                style={{
-                  width: "160px",
-                  height: "160px",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(139, 92, 246, 0.2)",
-                  boxShadow: "0 0 20px rgba(139, 92, 246, 0.1)",
-                  objectFit: "contain",
-                  background: "#0d0d13"
-                }}
-              />
-            </div>
-
-            {/* Crucial Instructions */}
+            {/* Essential Reference Box (Top Section) */}
             <div
               style={{
-                background: "transparent",
+                background: "rgba(255, 255, 255, 0.01)",
                 border: "1px dashed rgba(139, 92, 246, 0.3)",
                 borderRadius: "10px",
                 padding: "1rem",
-                marginBottom: "1rem",
+                marginBottom: "1.25rem",
                 textAlign: "center"
               }}
             >
@@ -884,21 +866,22 @@ export default function PostAdPage() {
                   color: "#10b981",
                   fontFamily: "monospace",
                   background: "rgba(16, 185, 129, 0.1)",
-                  padding: "0.4rem",
+                  padding: "0.4rem 1rem",
                   borderRadius: "6px",
                   border: "1px solid rgba(16, 185, 129, 0.2)",
-                  display: "inline-block"
+                  display: "inline-block",
+                  marginBottom: "0.5rem"
                 }}
               >
                 {currentOrderId}
               </div>
-              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.5rem 0 0 0", lineHeight: "1.4" }}>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0", lineHeight: "1.4" }}>
                 ⚠️ <strong>WARNING:</strong> You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.
               </p>
             </div>
 
             {/* Billing Details */}
-            <div className={styles.checkoutDetails} style={{ marginBottom: "1rem" }}>
+            <div className={styles.checkoutDetails} style={{ marginBottom: "1.25rem" }}>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Promotional Tier:</span>
                 <span className={styles.detailValue} style={{ textTransform: "capitalize" }}>
@@ -913,18 +896,74 @@ export default function PostAdPage() {
               </div>
             </div>
 
-            {/* Bank details fallback */}
-            <details style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "0.6rem 0.8rem", marginBottom: "1rem" }}>
-              <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: "600" }}>
-                Show Bank Transfer Details
-              </summary>
-              <div style={{ marginTop: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: "1.6" }}>
+            {/* Payment Mode Selector */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label 
+                style={{ 
+                  display: "block", 
+                  fontSize: "0.8rem", 
+                  color: "var(--text-muted)", 
+                  fontWeight: "600", 
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  marginBottom: "0.4rem" 
+                }}
+              >
+                Select Payment Method
+              </label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value as "qr" | "bank")}
+                className={styles.select}
+                style={{
+                  padding: "0.5rem var(--space-md)",
+                  fontSize: "0.9rem"
+                }}
+              >
+                <option value="qr">Pay using QR</option>
+                <option value="bank">Pay using bank details</option>
+              </select>
+            </div>
+
+            {/* Conditional Payment details render */}
+            {paymentMethod === "qr" ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem", margin: "1rem 0", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.03)", borderRadius: "8px", padding: "1rem" }}>
+                <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0", textAlign: "center", lineHeight: "1.4" }}>
+                  Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
+                </p>
+                <img
+                  src={`/api/payments/qr-code?token=${typeof window !== "undefined" ? localStorage.getItem("lankan_ads_token") || "" : ""}`}
+                  alt="LankaQR scan box"
+                  style={{
+                    width: "160px",
+                    height: "160px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(139, 92, 246, 0.2)",
+                    boxShadow: "0 0 20px rgba(139, 92, 246, 0.1)",
+                    objectFit: "contain",
+                    background: "#0d0d13"
+                  }}
+                />
+              </div>
+            ) : (
+              <div 
+                style={{ 
+                  background: "rgba(255, 255, 255, 0.02)", 
+                  border: "1px solid rgba(255, 255, 255, 0.05)", 
+                  borderRadius: "8px", 
+                  padding: "0.8rem 1rem", 
+                  margin: "1rem 0", 
+                  fontSize: "0.85rem", 
+                  color: "var(--text-secondary)", 
+                  lineHeight: "1.6" 
+                }}
+              >
                 <div><strong>Bank:</strong> Nations Trust Bank (NTB)</div>
                 <div><strong>Account Name:</strong> LankanAds</div>
                 <div><strong>Account Number:</strong> 100XXXXXXXXX</div>
                 <div><strong>Branch:</strong> Colombo Corporate Branch</div>
               </div>
-            </details>
+            )}
 
             {/* Manual Reference input for instant validation */}
             <div
