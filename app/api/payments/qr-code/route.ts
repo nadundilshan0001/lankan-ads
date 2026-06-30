@@ -18,8 +18,13 @@ export async function GET(request: Request) {
     if (authHeader?.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
     } else {
-      const cookieStore = await cookies();
-      token = cookieStore.get("admin_session")?.value;
+      const { searchParams } = new URL(request.url);
+      token = searchParams.get("token") || undefined;
+
+      if (!token) {
+        const cookieStore = await cookies();
+        token = cookieStore.get("admin_session")?.value;
+      }
     }
 
     if (!token) {

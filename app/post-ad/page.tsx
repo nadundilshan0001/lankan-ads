@@ -784,7 +784,7 @@ export default function PostAdPage() {
             {/* QR Scanner Mockup */}
             <div style={{ display: "flex", justifyContent: "center", margin: "1.25rem 0" }}>
               <img
-                src="/api/payments/qr-code"
+                src={`/api/payments/qr-code?token=${typeof window !== "undefined" ? localStorage.getItem("lankan_ads_token") || "" : ""}`}
                 alt="LankaQR scan box"
                 style={{
                   width: "160px",
