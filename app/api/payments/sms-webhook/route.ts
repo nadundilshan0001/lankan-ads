@@ -59,38 +59,93 @@ export async function POST(request: Request) {
 
     const parsedAmount = parseFloat(amountMatch[1].replace(/,/g, ""));
 
-    // Regex to find our unique 6-digit Order ID (e.g., LAD-123456)
+    // Standardize Sri Lankan phone numbers to 9 digits (e.g., +94778200302 -> 778200302, 0778200302 -> 778200302)
+    const get9DigitPhone = (num: string): string => {
+      const digits = num.replace(/\D/g, "");
+      if (digits.length >= 9) {
+        return digits.slice(-9);
+      }
+      return digits;
+    };
+
+    // 1. Try to find unique 6-digit Order ID (e.g., LAD-123456)
     const orderIdRegex = /(LAD-\d{6})/i;
     const orderMatch = cleanMessage.match(orderIdRegex);
+    let payment = null;
 
-    if (!orderMatch) {
-      console.log("[SMS Webhook] No matching Order ID (LAD-xxxxxx) found in SMS.");
-      return NextResponse.json({ message: "Ignored: No Order ID in message" }, { status: 200 });
+    if (orderMatch) {
+      const orderId = orderMatch[1].toUpperCase();
+      console.log(`[SMS Webhook] Found Order ID: ${orderId}, Amount: LKR ${parsedAmount}`);
+
+      const { data, error } = await supabaseAdmin
+        .from("payments")
+        .select("id, ad_id, status, amount")
+        .eq("payhere_order_id", orderId)
+        .maybeSingle();
+
+      if (!error && data) {
+        payment = data;
+      }
     }
 
-    const orderId = orderMatch[1].toUpperCase();
+    // 2. Fallback: If no Order ID found in message, match by Phone Number + Amount (created in last 1 hour)
+    if (!payment) {
+      console.log("[SMS Webhook] No Order ID matched in SMS. Attempting fallback match using Sender Phone + Amount...");
+      
+      // Extract sender phone number (e.g., "received from 0767770490")
+      const senderPhoneRegex = /(?:from|to)\s+(\+?94|0)?(7\d{8})/i;
+      const senderPhoneMatch = cleanMessage.match(senderPhoneRegex);
 
-    console.log(`[SMS Webhook] Match found! Order ID: ${orderId}, Amount: LKR ${parsedAmount}`);
+      if (!senderPhoneMatch) {
+        console.log("[SMS Webhook] Could not parse sender phone number from message.");
+        return NextResponse.json({ error: "Could not parse sender phone number" }, { status: 400 });
+      }
 
-    // 1. Look up the payment record by Order ID
-    const { data: payment, error: paymentLookupError } = await supabaseAdmin
-      .from("payments")
-      .select("id, ad_id, status, amount")
-      .eq("payhere_order_id", orderId)
-      .maybeSingle();
+      const senderPhone9 = get9DigitPhone(senderPhoneMatch[2]);
+      console.log(`[SMS Webhook] Extracted Sender Phone: 0${senderPhone9}, Amount: LKR ${parsedAmount}`);
 
-    if (paymentLookupError || !payment) {
-      console.error(`[SMS Webhook] Payment record not found for Order ID: ${orderId}`, paymentLookupError);
-      return NextResponse.json({ error: "Payment record not found" }, { status: 404 });
+      // Query pending payments created in the last 1 hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { data: pendingPayments, error: dbErr } = await supabaseAdmin
+        .from("payments")
+        .select("*, users!inner(phone_number)")
+        .eq("status", "pending")
+        .eq("amount", parsedAmount)
+        .gt("created_at", oneHourAgo);
+
+      if (dbErr) {
+        console.error("[SMS Webhook] Fallback database query error:", dbErr.message);
+        return NextResponse.json({ error: "Database query failed" }, { status: 500 });
+      }
+
+      // Find the payment record where the user's phone matches the sender's phone
+      const matchedPayment = pendingPayments?.find((pay: any) => {
+        const userPhone9 = get9DigitPhone(pay.users?.phone_number || "");
+        return userPhone9 === senderPhone9;
+      });
+
+      if (!matchedPayment) {
+        console.log(`[SMS Webhook] No matching pending payment found for phone 0${senderPhone9} and amount LKR ${parsedAmount} in the last hour.`);
+        return NextResponse.json({ message: "No matching pending transaction found" }, { status: 200 });
+      }
+
+      payment = {
+        id: matchedPayment.id,
+        ad_id: matchedPayment.ad_id,
+        status: matchedPayment.status,
+        amount: matchedPayment.amount
+      };
+      
+      console.log(`[SMS Webhook] Successful Fallback Match! Payment ID: ${payment.id}, Ad ID: ${payment.ad_id}`);
     }
 
     // If ad is already active or payment is completed, ignore
     if (payment.status === "completed") {
-      console.log(`[SMS Webhook] Payment for order ${orderId} has already been completed.`);
+      console.log("[SMS Webhook] Payment has already been completed.");
       return NextResponse.json({ message: "Already processed" }, { status: 200 });
     }
 
-    // 2. Mark payment as completed
+    // 3. Mark payment as completed
     const { error: paymentUpdateError } = await supabaseAdmin
       .from("payments")
       .update({
@@ -104,7 +159,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to update payment" }, { status: 500 });
     }
 
-    // 3. Activate the ad immediately
+    // 4. Activate the ad immediately
     const { error: adUpdateError } = await supabaseAdmin
       .from("ads")
       .update({ status: "active" })
@@ -119,7 +174,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Order ${orderId} completed successfully. Ad activated.`,
+      message: `Transaction processed successfully. Ad activated.`,
     });
   } catch (err: any) {
     console.error("[SMS Webhook] Unexpected error:", err);
