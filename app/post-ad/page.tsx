@@ -57,6 +57,7 @@ export default function PostAdPage() {
   const [verificationStepText, setVerificationStepText] = useState<string>("");
   const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); // Changed to 10 minutes (600s)
   const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
+  const [customAlert, setCustomAlert] = useState<{ title: string; message: string; isError?: boolean } | null>(null);
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -844,7 +845,7 @@ export default function PostAdPage() {
             {/* Crucial Instructions */}
             <div
               style={{
-                background: "rgba(139, 92, 246, 0.05)",
+                background: "transparent",
                 border: "1px dashed rgba(139, 92, 246, 0.3)",
                 borderRadius: "10px",
                 padding: "1rem",
@@ -963,10 +964,12 @@ export default function PostAdPage() {
 
                       setTimeout(() => {
                         setIsVerifyingReference(false);
-                        // 2. Alert the user that payment was not found
-                        alert("❌ Payment not received. Please make the payment.");
-                        // 3. Reset the 2-minute hidden cooldown back to 0
-                        setCheckoutOpenTime(Date.now());
+                        // 2. Open the custom alert modal
+                        setCustomAlert({
+                          title: "Verification Failed",
+                          message: "Payment not received. Please make the payment.",
+                          isError: true
+                        });
                       }, 2400);
 
                       return;
@@ -1094,6 +1097,69 @@ export default function PostAdPage() {
             <div className={styles.spinnerLarge} style={{ borderTopColor: "#10b981" }}></div>
             <h3 className={styles.loadingTitle} style={{ color: "#10b981" }}>Verifying Payment</h3>
             <p className={styles.loadingProgressText}>{verificationStepText}</p>
+          </div>
+        </div>
+      )}
+
+      {customAlert && (
+        <div className={styles.loadingOverlay} style={{ zIndex: 12000, background: "rgba(0, 0, 0, 0.95)" }}>
+          <div 
+            className={styles.loadingCard} 
+            style={{ 
+              maxWidth: "420px", 
+              padding: "2rem", 
+              border: customAlert.isError ? "1px solid rgba(239, 68, 68, 0.3)" : "1px solid rgba(139, 92, 246, 0.3)",
+              boxShadow: customAlert.isError ? "0 0 50px rgba(239, 68, 68, 0.15)" : "0 0 50px rgba(139, 92, 246, 0.15)",
+              textAlign: "center"
+            }}
+          >
+            <div 
+              style={{ 
+                fontSize: "3.5rem", 
+                marginBottom: "1rem",
+                color: customAlert.isError ? "#EF4444" : "#8B5CF6",
+                animation: "scaleIn 0.3s ease-out"
+              }}
+            >
+              {customAlert.isError ? "❌" : "✓"}
+            </div>
+            <h3 
+              className={styles.loadingTitle} 
+              style={{ 
+                color: customAlert.isError ? "#EF4444" : "var(--text-primary)",
+                fontSize: "1.3rem",
+                marginBottom: "0.75rem",
+                fontWeight: "700"
+              }}
+            >
+              {customAlert.title}
+            </h3>
+            <p 
+              className={styles.loadingProgressText} 
+              style={{ 
+                color: "var(--text-secondary)", 
+                lineHeight: "1.6",
+                fontSize: "0.95rem",
+                marginBottom: "1.5rem"
+              }}
+            >
+              {customAlert.message}
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ 
+                width: "100%", 
+                background: customAlert.isError ? "#EF4444" : "#8B5CF6",
+                borderColor: customAlert.isError ? "#EF4444" : "#8B5CF6"
+              }}
+              onClick={() => {
+                setCustomAlert(null);
+                setCheckoutOpenTime(Date.now()); // Reset 2-min hidden timer reference upon OK click
+              }}
+            >
+              OK
+            </button>
           </div>
         </div>
       )}
