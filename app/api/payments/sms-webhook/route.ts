@@ -37,6 +37,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Ignored: Non-bank sender" }, { status: 200 });
     }
 
+    // Security: Only accept incoming credits (received / added / deposited)
+    // Ignore any sent / debited alerts
+    const lowerMsg = cleanMessage.toLowerCase();
+    const isCredit = lowerMsg.includes("received") || lowerMsg.includes("added") || lowerMsg.includes("credited");
+    const isDebit = lowerMsg.includes("sent") || lowerMsg.includes("debited") || lowerMsg.includes("paid to");
+
+    if (isDebit || !isCredit) {
+      console.log("[SMS Webhook] Ignored outgoing/debit transfer SMS alert.");
+      return NextResponse.json({ message: "Ignored: Debit transaction alert" }, { status: 200 });
+    }
+
     // Regex to find amount (e.g., LKR 500.00, LKR 1,500.00, Rs. 500.00)
     const amountRegex = /(?:LKR|Rs\.?)\s*([\d,]+\.\d{2})/i;
     const amountMatch = cleanMessage.match(amountRegex);
