@@ -15,9 +15,9 @@ type RecoverTier = "standard" | "premium" | "platinum";
 type CpStep = "request" | "otp" | "newpw";
 
 const TIER_DETAILS = {
-  standard:  { displayName: "Standard Ad",  price: "Rs. 699",   color: "#a78bfa" },
-  premium:   { displayName: "Premium Ad",   price: "Rs. 1,399", color: "#f59e0b" },
-  platinum:  { displayName: "Platinum Ad",  price: "Rs. 6,000", color: "#ef4444" },
+  standard:  { displayName: "Standard Ad",  price: "Rs. 700",   color: "#a78bfa" },
+  premium:   { displayName: "Premium Ad",   price: "Rs. 1,400", color: "#f59e0b" },
+  platinum:  { displayName: "Platinum Ad",  price: "Rs. 5,000", color: "#ef4444" },
 };
 
 // Helper: format a district string for use in a URL segment
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                   🔥 Max Visibility
                 </div>
                 <h3 className={styles.tierName}>Platinum Ad</h3>
-                <div className={styles.tierPrice}>Rs. 6,000</div>
+                <div className={styles.tierPrice}>Rs. 5,000</div>
                 <p className={styles.tierDesc}>Top placement across all category and district pages. Maximum exposure for serious advertisers.</p>
                 <ul className={styles.tierFeatures}>
                   <li>✓ Priority top placement</li>
@@ -438,7 +438,7 @@ export default function ProfilePage() {
                   ⭐ Premium Reach
                 </div>
                 <h3 className={styles.tierName}>Premium Ad</h3>
-                <div className={styles.tierPrice}>Rs. 1,399</div>
+                <div className={styles.tierPrice}>Rs. 1,400</div>
                 <p className={styles.tierDesc}>Enhanced visibility with gold highlight and placement above standard listings.</p>
                 <ul className={styles.tierFeatures}>
                   <li>✓ Above standard placement</li>
@@ -459,7 +459,7 @@ export default function ProfilePage() {
                 )}
                 <h3 className={styles.tierName}>Standard Ad</h3>
                 <div className={styles.tierPrice}>
-                  {myAds.length === 0 ? <span style={{ color: "#10b981" }}>Free</span> : "Rs. 699"}
+                  {myAds.length === 0 ? <span style={{ color: "#10b981" }}>Free</span> : "Rs. 700"}
                 </div>
                 <p className={styles.tierDesc}>Standard placement in the listings directory. Perfect for getting started.</p>
                 <ul className={styles.tierFeatures}>
