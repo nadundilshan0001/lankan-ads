@@ -21,9 +21,23 @@ export async function POST(request: Request) {
     }
 
     const cleanRef = reference.trim();
-    if (cleanRef.length < 4 || cleanRef.length > 50) {
+    
+    // HIDDEN VALIDATION: Reject simple/obvious fake patterns
+    const isRepeated = /^(.)\1+$/.test(cleanRef); // e.g. "11111111"
+    const isSequential = "12345678901234567890".includes(cleanRef) || "98765432109876543210".includes(cleanRef);
+    const isTooShort = cleanRef.length < 8; // Sri Lankan bank CEFT/LANKAQR ref IDs are always at least 8-16 characters
+    const isCommonFake = /^(test|testing|admin|payhere|lankaqr|1234|abc|fake)/i.test(cleanRef);
+
+    if (isTooShort) {
       return NextResponse.json(
-        { error: "Please enter a valid Transaction Reference (4-50 characters)." },
+        { error: "Invalid reference number format. It must be at least 8 characters." },
+        { status: 400 }
+      );
+    }
+
+    if (isRepeated || isSequential || isCommonFake) {
+      return NextResponse.json(
+        { error: "Verification failed. Please enter the genuine transaction ID from your payment receipt." },
         { status: 400 }
       );
     }
@@ -91,7 +105,7 @@ export async function POST(request: Request) {
 
     if (paymentUpdateError) {
       console.error("[submit-reference] Failed to update payment record:", paymentUpdateError.message);
-      return NextResponse.json({ error: "Failed to process transaction." }, { status: 500 });
+      return NextResponse.json({ error: `Failed to process transaction: ${paymentUpdateError.message}` }, { status: 500 });
     }
 
     // 3. Activate the linked ad immediately (Optimistic live activation!)

@@ -55,6 +55,7 @@ export default function PostAdPage() {
   const [referenceError, setReferenceError] = useState<string>("");
   const [isVerifyingReference, setIsVerifyingReference] = useState<boolean>(false);
   const [verificationStepText, setVerificationStepText] = useState<string>("");
+  const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(120);
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -347,6 +348,7 @@ export default function PostAdPage() {
       setCurrentOrderId(generatedOrderId);
 
       // Open checkout modal and start status polling loop
+      setCheckoutSecondsLeft(120);
       setIsSubmitting(false);
       setIsCheckoutOpen(true);
       setIsPolling(true);
@@ -391,6 +393,28 @@ export default function PostAdPage() {
       if (intervalId) clearInterval(intervalId);
     };
   }, [isPolling, currentOrderId]);
+
+  // LankaQR Payment session countdown timer (2 minutes)
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+
+    if (isCheckoutOpen && checkoutSecondsLeft > 0) {
+      timerId = setInterval(() => {
+        setCheckoutSecondsLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (isCheckoutOpen && checkoutSecondsLeft === 0) {
+      // Session expired
+      setIsCheckoutOpen(false);
+      setIsPolling(false);
+      setPaymentReference("");
+      setReferenceError("");
+      alert("⏳ Payment Session Expired. You did not enter a reference code in time. Please try again.");
+    }
+
+    return () => {
+      if (timerId) clearInterval(timerId);
+    };
+  }, [isCheckoutOpen, checkoutSecondsLeft]);
 
   if (isAuthenticated === null) {
     return <div className="container" style={{ textAlign: "center", padding: "100px 0" }}>Loading...</div>;
@@ -781,6 +805,21 @@ export default function PostAdPage() {
               <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
                 Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
               </p>
+              <div 
+                style={{ 
+                  marginTop: "0.5rem", 
+                  fontSize: "0.8rem", 
+                  color: "#F59E0B", 
+                  background: "rgba(245, 158, 11, 0.08)", 
+                  border: "1px solid rgba(245, 158, 11, 0.15)",
+                  borderRadius: "6px",
+                  padding: "0.25rem 0.6rem",
+                  display: "inline-block",
+                  fontWeight: "600"
+                }}
+              >
+                ⏳ Session Expires In: {Math.floor(checkoutSecondsLeft / 60)}:{(checkoutSecondsLeft % 60).toString().padStart(2, "0")}
+              </div>
             </div>
 
             {/* QR Scanner Mockup */}
