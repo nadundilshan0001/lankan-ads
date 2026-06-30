@@ -55,7 +55,8 @@ export default function PostAdPage() {
   const [referenceError, setReferenceError] = useState<string>("");
   const [isVerifyingReference, setIsVerifyingReference] = useState<boolean>(false);
   const [verificationStepText, setVerificationStepText] = useState<string>("");
-  const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(120);
+  const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); // Changed to 10 minutes (600s)
+  const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -348,7 +349,8 @@ export default function PostAdPage() {
       setCurrentOrderId(generatedOrderId);
 
       // Open checkout modal and start status polling loop
-      setCheckoutSecondsLeft(120);
+      setCheckoutSecondsLeft(600); // 10 minutes visible countdown
+      setCheckoutOpenTime(Date.now()); // Hidden 2-minute validation timer reference
       setIsSubmitting(false);
       setIsCheckoutOpen(true);
       setIsPolling(true);
@@ -943,6 +945,15 @@ export default function PostAdPage() {
                       setReferenceError("Please enter the reference ID.");
                       return;
                     }
+
+                    // Hidden 2-minute validation (120 seconds)
+                    const secondsElapsed = Math.floor((Date.now() - checkoutOpenTime) / 1000);
+                    if (secondsElapsed < 120) {
+                      const secondsLeft = 120 - secondsElapsed;
+                      setReferenceError(`LankaQR ledger sync takes up to 2 minutes. Please wait ${secondsLeft} more seconds before verifying.`);
+                      return;
+                    }
+
                     setIsSubmitting(true);
                     setReferenceError("");
                     try {
