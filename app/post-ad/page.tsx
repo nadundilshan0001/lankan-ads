@@ -824,8 +824,14 @@ export default function PostAdPage() {
         <div className={styles.checkoutOverlay}>
           <div className={styles.checkoutModal} style={{ maxWidth: "520px" }}>
             <div className={styles.checkoutHeader} style={{ textAlign: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", paddingBottom: "1rem", marginBottom: "1rem" }}>
-              <h3 style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", margin: 0, fontFamily: "var(--font-display)" }}>
-                ලoකන්Ads Payment Gateway
+              <h3 style={{ margin: 0, fontFamily: "var(--font-display)", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "2px", lineHeight: "1" }}>
+                <span style={{ display: "inline-flex", alignItems: "flex-end", gap: "1px", lineHeight: "1" }}>
+                  <span style={{ fontSize: "2.45rem", fontWeight: "900", color: "var(--text-primary)", lineHeight: "0.85" }}>ල</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", margin: "0 1px", lineHeight: "1" }}>o</span>
+                  <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", lineHeight: "1" }}>කන්</span>
+                  <span style={{ fontSize: "1.35rem", fontWeight: "800", display: "inline-block", lineHeight: "1", background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Ads</span>
+                </span>
+                <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", marginLeft: "6px", lineHeight: "1" }}>Payment Gateway</span>
               </h3>
               
               <div 
