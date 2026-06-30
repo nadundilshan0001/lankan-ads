@@ -755,10 +755,13 @@ export default function PostAdPage() {
                     onClick={() => setSelectedTier(tier.name)}
                   >
                     {tier.name === "platinum" && (
-                      <span className={styles.tierPopular}>Max Visibility</span>
+                      <span className={styles.tierPopular} style={{ background: "#ef4444", color: "#fff" }}>🔥 Max Visibility</span>
+                    )}
+                    {tier.name === "premium" && (
+                      <span className={styles.tierPopular} style={{ background: "#fbbf24", color: "#000" }}>⭐ Premium Reach</span>
                     )}
                     {tier.name === "standard" && !hasPostedAds && (
-                      <span className={styles.tierPopular} style={{ background: "#10b981" }}>First Ad Free</span>
+                      <span className={styles.tierPopular} style={{ background: "#10b981", color: "#fff" }}>🎁 First Ad Free</span>
                     )}
                     <h3 className={styles.tierName}>{tier.displayName}</h3>
                     <div className={styles.tierPrice}>{priceFormatted}</div>
