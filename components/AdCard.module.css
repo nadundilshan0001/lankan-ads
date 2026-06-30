@@ -164,6 +164,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color var(--transition-fast);
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .titleLink:hover .title {
@@ -179,6 +181,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .meta {
