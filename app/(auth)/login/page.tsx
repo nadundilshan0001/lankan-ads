@@ -52,6 +52,8 @@ export default function LoginPage() {
         const data = await res.json();
         setLoading(false);
         if (res.ok && data.success) {
+          localStorage.removeItem("lankan_ads_admin");
+          localStorage.removeItem("lankan_ads_token_role");
           localStorage.setItem("lankan_ads_token", data.token);
           localStorage.setItem("lankan_ads_phone", data.user.phoneNumber);
           router.push("/post-ad");

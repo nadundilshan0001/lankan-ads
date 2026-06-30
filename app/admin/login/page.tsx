@@ -31,6 +31,8 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        localStorage.removeItem("lankan_ads_token");
+        localStorage.removeItem("lankan_ads_phone");
         // Since session is stored in an HttpOnly cookie, we don't store token in localStorage.
         // We store user info in localStorage only for client-side context if needed.
         localStorage.setItem("lankan_ads_admin", JSON.stringify(data.admin));

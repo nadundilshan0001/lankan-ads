@@ -128,6 +128,8 @@ export default function ProfilePage() {
   const handleSignOut = () => {
     localStorage.removeItem("lankan_ads_token");
     localStorage.removeItem("lankan_ads_phone");
+    localStorage.removeItem("lankan_ads_admin");
+    localStorage.removeItem("lankan_ads_token_role");
     router.push("/home");
   };
 

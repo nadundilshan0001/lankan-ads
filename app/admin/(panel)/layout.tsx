@@ -53,6 +53,8 @@ export default function AdminLayout({ children }: LayoutProps) {
       if (res.ok) {
         localStorage.removeItem("lankan_ads_admin");
         localStorage.removeItem("lankan_ads_token_role");
+        localStorage.removeItem("lankan_ads_token");
+        localStorage.removeItem("lankan_ads_phone");
         router.push("/admin/login");
         router.refresh();
       }
