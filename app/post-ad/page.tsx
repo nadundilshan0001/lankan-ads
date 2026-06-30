@@ -853,7 +853,7 @@ export default function PostAdPage() {
               }}
             >
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 0.5rem 0" }}>
-                Reference / Remarks Code to enter in your bank app:
+                Reference / Remarks / Description Code to enter in your bank app:
               </p>
               <div
                 style={{
@@ -872,7 +872,7 @@ export default function PostAdPage() {
                 {currentOrderId}
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.5rem 0 0 0", lineHeight: "1.4" }}>
-                ⚠️ <strong>CRITICAL:</strong> You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.
+                ⚠️ <strong>WARNING:</strong> You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.
               </p>
             </div>
 
@@ -946,10 +946,30 @@ export default function PostAdPage() {
                       return;
                     }
 
-                    // Hidden 2-minute validation (120 seconds) — silently ignore clicks
+                    // Hidden 2-minute validation (120 seconds) Cooldown Block
                     const secondsElapsed = Math.floor((Date.now() - checkoutOpenTime) / 1000);
                     if (secondsElapsed < 120) {
-                      return; // Do absolutely nothing
+                      // 1. Show fake loading spinner first
+                      setIsVerifyingReference(true);
+                      setVerificationStepText("Connecting to Nations Trust Bank Gateway...");
+                      
+                      setTimeout(() => {
+                        setVerificationStepText("Scanning LankaQR transaction ledger...");
+                      }, 800);
+
+                      setTimeout(() => {
+                        setVerificationStepText("Verifying account credit alerts...");
+                      }, 1600);
+
+                      setTimeout(() => {
+                        setIsVerifyingReference(false);
+                        // 2. Alert the user that payment was not found
+                        alert("❌ Payment not received. Please make the payment.");
+                        // 3. Reset the 2-minute hidden cooldown back to 0
+                        setCheckoutOpenTime(Date.now());
+                      }, 2400);
+
+                      return;
                     }
 
                     setIsSubmitting(true);
