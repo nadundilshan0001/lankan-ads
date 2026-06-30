@@ -53,6 +53,8 @@ export default function PostAdPage() {
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [paymentReference, setPaymentReference] = useState<string>("");
   const [referenceError, setReferenceError] = useState<string>("");
+  const [isVerifyingReference, setIsVerifyingReference] = useState<boolean>(false);
+  const [verificationStepText, setVerificationStepText] = useState<string>("");
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -903,6 +905,7 @@ export default function PostAdPage() {
                       return;
                     }
                     setIsSubmitting(true);
+                    setReferenceError("");
                     try {
                       const token = localStorage.getItem("lankan_ads_token");
                       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -919,19 +922,46 @@ export default function PostAdPage() {
                       const data = await res.json();
                       if (res.ok && data.success) {
                         setIsPolling(false);
-                        setIsCheckoutOpen(false);
-                        setIsSuccess(true);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        // Trigger the fake validation timeline
+                        setIsVerifyingReference(true);
+                        setIsSubmitting(false);
+
+                        // Stage 1
+                        setVerificationStepText("Connecting to Nations Trust Bank Gateway...");
+                        
+                        // Stage 2
+                        setTimeout(() => {
+                          setVerificationStepText("Reconciling transaction reference ID...");
+                        }, 800);
+
+                        // Stage 3
+                        setTimeout(() => {
+                          setVerificationStepText("Authenticating LankaQR payment ledger...");
+                        }, 1600);
+
+                        // Stage 4
+                        setTimeout(() => {
+                          setVerificationStepText("Securing publication activation...");
+                        }, 2400);
+
+                        // Complete
+                        setTimeout(() => {
+                          setIsVerifyingReference(false);
+                          setIsCheckoutOpen(false);
+                          setIsSuccess(true);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }, 3200);
+
                       } else {
+                        setIsSubmitting(false);
                         setReferenceError(data.error || "Failed to submit reference.");
                       }
                     } catch {
-                      setReferenceError("Network error. Please try again.");
-                    } finally {
                       setIsSubmitting(false);
+                      setReferenceError("Network error. Please try again.");
                     }
                   }}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isVerifyingReference}
                 >
                   Verify & Activate
                 </button>
@@ -986,6 +1016,16 @@ export default function PostAdPage() {
             <div className={styles.spinnerLarge}></div>
             <h3 className={styles.loadingTitle}>Processing Listing</h3>
             <p className={styles.loadingProgressText}>{submissionProgress}</p>
+          </div>
+        </div>
+      )}
+
+      {isVerifyingReference && (
+        <div className={styles.loadingOverlay} style={{ zIndex: 11000 }}>
+          <div className={styles.loadingCard} style={{ border: "1px solid rgba(16, 185, 129, 0.3)", boxShadow: "0 0 50px rgba(16, 185, 129, 0.15)" }}>
+            <div className={styles.spinnerLarge} style={{ borderTopColor: "#10b981" }}></div>
+            <h3 className={styles.loadingTitle} style={{ color: "#10b981" }}>Verifying Payment</h3>
+            <p className={styles.loadingProgressText}>{verificationStepText}</p>
           </div>
         </div>
       )}
