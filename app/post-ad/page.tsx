@@ -67,6 +67,12 @@ export default function PostAdPage() {
   } | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank" | "">("");
   const [paymentLanguage, setPaymentLanguage] = useState<"si" | "en">("si");
+  const [bankDetails, setBankDetails] = useState<{
+    bank: string;
+    accountName: string;
+    accountNumber: string;
+    branch: string;
+  } | null>(null);
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -94,6 +100,30 @@ export default function PostAdPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!isCheckoutOpen) return;
+
+    const fetchBankDetails = async () => {
+      try {
+        const token = localStorage.getItem("lankan_ads_token");
+        const headers: Record<string, string> = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch("/api/payments/bank-details", { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.bankDetails) {
+            setBankDetails(data.bankDetails);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch bank details dynamically:", err);
+      }
+    };
+
+    fetchBankDetails();
+  }, [isCheckoutOpen]);
 
   const checkFirstAdStatus = async (token: string) => {
     try {
@@ -1002,10 +1032,10 @@ export default function PostAdPage() {
               payBank: "බැංකු ගිණුම් විස්තර භාවිතයෙන් ගෙවන්න",
               qrSub:
                 "ඕනෑම ශ්‍රී ලාංකික බැංකු යෙදුමකින් (FriMi, Genie, Solo, Flash) QR කේතය ස්කෑන් කර ගෙවන්න.",
-              bankName: "බැංකුව: කොමර්ෂල් බැංකුව (Commercial Bank)",
-              accName: "ගිණුමේ නම: M M N Dilshan",
-              accNum: "ගිණුම් අංකය: 8010878374",
-              branch: "ශාඛාව: Badulla Second branch/ Mini Com",
+              bankName: bankDetails ? `බැංකුව: ${bankDetails.bank}` : "බැංකුව: තොරතුරු ලෝඩ් වෙමින්...",
+              accName: bankDetails ? `ගිණුමේ නම: ${bankDetails.accountName}` : "ගිණුමේ නම: තොරතුරු ලෝඩ් වෙමින්...",
+              accNum: bankDetails ? `ගිණුම් අංකය: ${bankDetails.accountNumber}` : "ගිණුම් අංකය: තොරතුරු ලෝඩ් වෙමින්...",
+              branch: bankDetails ? `ශාඛාව: ${bankDetails.branch}` : "ශාඛාව: තොරතුරු ලෝඩ් වෙමින්...",
               emptyPrompt:
                 "ගෙවීම සම්පූර්ණ කිරීම සඳහා ඉහතින් ගෙවීමේ ක්‍රමයක් තෝරන්න.",
               afterPay: "ගෙවීමෙන් පසු",
@@ -1028,15 +1058,15 @@ export default function PostAdPage() {
               tier: "Promotional Tier:",
               amount: "Total LKR Amount:",
               selectMethod: "Select Payment Method",
-              choosePlaceholder: "-- Select Payment Method --",
+              choosePlaceholder: "Select Payment Method",
               payQR: "Pay using QR",
               payBank: "Pay using bank details",
               qrSub:
                 "Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)",
-              bankName: "Bank: Commercial Bank",
-              accName: "Account Name: M M N Dilshan",
-              accNum: "Account Number: 8010878374",
-              branch: "Branch: Badulla Second branch/ Mini Com",
+              bankName: bankDetails ? `Bank: ${bankDetails.bank}` : "Bank: Loading details...",
+              accName: bankDetails ? `Account Name: ${bankDetails.accountName}` : "Account Name: Loading details...",
+              accNum: bankDetails ? `Account Number: ${bankDetails.accountNumber}` : "Account Number: Loading details...",
+              branch: bankDetails ? `Branch: ${bankDetails.branch}` : "Branch: Loading details...",
               emptyPrompt:
                 "Please choose a payment method above to complete your transaction.",
               afterPay: "After Payment",
