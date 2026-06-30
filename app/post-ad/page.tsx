@@ -59,6 +59,7 @@ export default function PostAdPage() {
   const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
   const [customAlert, setCustomAlert] = useState<{ title: string; message: string; isError?: boolean } | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank" | "">("");
+  const [paymentLanguage, setPaymentLanguage] = useState<"si" | "en">("si");
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -820,367 +821,462 @@ export default function PostAdPage() {
       )}
 
       {/* LankaQR & Bank Transfer Confirmation Modal */}
-      {isCheckoutOpen && (
-        <div className={styles.checkoutOverlay}>
-          <div className={styles.checkoutModal} style={{ maxWidth: "520px" }}>
-            <div className={styles.checkoutHeader} style={{ textAlign: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", paddingBottom: "1rem", marginBottom: "1rem" }}>
-              <h3 style={{ margin: 0, fontFamily: "var(--font-display)", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "2px", lineHeight: "1" }}>
-                <span style={{ display: "inline-flex", alignItems: "flex-end", gap: "1px", lineHeight: "1" }}>
-                  <span style={{ fontSize: "2.45rem", fontWeight: "900", color: "var(--text-primary)", lineHeight: "0.85" }}>ල</span>
-                  <span style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", margin: "0 1px", lineHeight: "1" }}>o</span>
-                  <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", lineHeight: "1" }}>කන්</span>
-                  <span style={{ fontSize: "1.35rem", fontWeight: "800", display: "inline-block", lineHeight: "1", background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Ads</span>
-                </span>
-                <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", marginLeft: "6px", lineHeight: "1" }}>Payment Gateway</span>
-              </h3>
-              
-              <div 
-                style={{ 
-                  marginTop: "0.6rem", 
-                  fontSize: "0.8rem", 
-                  color: "#F59E0B", 
-                  background: "rgba(245, 158, 11, 0.08)", 
-                  border: "1px solid rgba(245, 158, 11, 0.15)",
-                  borderRadius: "6px",
-                  padding: "0.25rem 0.6rem",
-                  display: "inline-block",
-                  fontWeight: "600"
-                }}
-              >
-                ⏳ Session Expires In: {Math.floor(checkoutSecondsLeft / 60)}:{(checkoutSecondsLeft % 60).toString().padStart(2, "0")}
-              </div>
-            </div>
+      {isCheckoutOpen && (() => {
+        const t = {
+          si: {
+            gatewayTitle: "ගෙවීම් ද්වාරය",
+            expiresIn: "⏳ සැසිය කල් ඉකුත් වීමට",
+            refLabel: "ඔබගේ බැංකු යෙදුමට (App) ඇතුළත් කළ යුතු යොමු / අදහස් / විස්තර කේතය (Reference Code):",
+            warning: "අවවාදයයි: ඔබ ගෙවීමේදී මෙම කේතයම යොමු/සටහන් (Reference/Remarks) ලෙස ඇතුළත් කළ යුතුය. එසේ නොමැති නම්, ඔබගේ දැන්වීම ස්වයංක්‍රීයව සක්‍රීය කළ නොහැක.",
+            tier: "ප්‍රවර්ධන මට්ටම (Tier):",
+            amount: "මුළු මුදල (LKR):",
+            selectMethod: "ගෙවීම් ක්‍රමය තෝරන්න",
+            choosePlaceholder: "-- ගෙවීම් ක්‍රමයක් තෝරන්න --",
+            payQR: "QR මඟින් ගෙවන්න (Pay using QR)",
+            payBank: "බැංකු තොරතුරු මඟින් ගෙවන්න (Pay using bank details)",
+            qrSub: "ඕනෑම ශ්‍රී ලාංකික බැංකු යෙදුමකින් (FriMi, Genie, Solo, Flash) ස්කෑන් කර ගෙවන්න",
+            bankName: "බැංකුව: නේෂන්ස් ට්‍රස්ට් බැංකුව (NTB)",
+            accName: "ගිණුම් නාමය: LankanAds",
+            accNum: "ගිණුම් අංකය: 100XXXXXXXXX",
+            branch: "ශාඛාව: කොළඹ ප්‍රධාන කාර්යාල ශාඛාව",
+            emptyPrompt: "ඔබගේ ගනුදෙනුව සම්පූර්ණ කිරීමට කරුණාකර ඉහතින් ගෙවීම් ක්‍රමයක් තෝරන්න.",
+            afterPay: "ගෙවීමෙන් පසුව",
+            enterRef: "ගෙවීම් යොමු අංකය (Reference ID) / ගනුදෙනු අංකය (Transaction ID) ඇතුළත් කරන්න:",
+            inputPlaceholder: "උදා: CEFT/2948274 හෝ බැංකු ගනුදෙනු අංකය",
+            verifyBtn: "තහවුරු කර සක්‍රීය කරන්න",
+            verifying: "තහවුරු කරමින්...",
+            awaiting: "ගෙවීම් ඇඟවීම් ලැබෙන තෙක් රැඳී සිටී... මුදල් හුවමාරුව අවසන් වූ වහාම දැන්වීම සක්‍රීය වනු ඇත.",
+            cancel: "ගෙවීම අවලංගු කරන්න",
+          },
+          en: {
+            gatewayTitle: "Payment Gateway",
+            expiresIn: "⏳ Session Expires In",
+            refLabel: "Reference / Remarks / Description Code to enter in your bank app:",
+            warning: "WARNING: You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.",
+            tier: "Promotional Tier:",
+            amount: "Total LKR Amount:",
+            selectMethod: "Select Payment Method",
+            choosePlaceholder: "-- Select Payment Method --",
+            payQR: "Pay using QR",
+            payBank: "Pay using bank details",
+            qrSub: "Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)",
+            bankName: "Bank: Nations Trust Bank (NTB)",
+            accName: "Account Name: LankanAds",
+            accNum: "Account Number: 100XXXXXXXXX",
+            branch: "Branch: Colombo Corporate Branch",
+            emptyPrompt: "Please choose a payment method above to complete your transaction.",
+            afterPay: "After Payment",
+            enterRef: "Enter Payment Reference ID / Transaction ID:",
+            inputPlaceholder: "e.g. CEFT/2948274 or bank trace ID",
+            verifyBtn: "Verify & Activate",
+            verifying: "Verifying...",
+            awaiting: "Awaiting payment alert… Ad will go live instantly once transfer completes.",
+            cancel: "Cancel Submission",
+          }
+        }[paymentLanguage];
 
-            {/* Essential Reference Box (Top Section) */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.01)",
-                border: "1px dashed rgba(139, 92, 246, 0.3)",
-                borderRadius: "10px",
-                padding: "1rem",
-                marginBottom: "1.25rem",
-                textAlign: "center"
-              }}
-            >
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 0.5rem 0" }}>
-                Reference / Remarks / Description Code to enter in your bank app:
-              </p>
+        return (
+          <div className={styles.checkoutOverlay}>
+            <div className={styles.checkoutModal} style={{ maxWidth: "520px" }}>
+              <div className={styles.checkoutHeader} style={{ textAlign: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", paddingBottom: "1rem", marginBottom: "1rem" }}>
+                <h3 style={{ margin: 0, fontFamily: "var(--font-display)", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "2px", lineHeight: "1" }}>
+                  <span style={{ display: "inline-flex", alignItems: "flex-end", gap: "1px", lineHeight: "1" }}>
+                    <span style={{ fontSize: "2.45rem", fontWeight: "900", color: "var(--text-primary)", lineHeight: "0.85" }}>ල</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", margin: "0 1px", lineHeight: "1" }}>o</span>
+                    <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", lineHeight: "1" }}>කන්</span>
+                    <span style={{ fontSize: "1.35rem", fontWeight: "800", display: "inline-block", lineHeight: "1", background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Ads</span>
+                  </span>
+                  <span style={{ fontSize: "1.35rem", fontWeight: "800", color: "var(--text-primary)", display: "inline-block", marginLeft: "6px", lineHeight: "1" }}>{t.gatewayTitle}</span>
+                </h3>
+
+                {/* Language Select Buttons */}
+                <div style={{ display: "flex", justifyContent: "center", gap: "8px", margin: "0.8rem 0 0.4rem 0" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentLanguage("si")}
+                    style={{
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.75rem",
+                      fontWeight: "700",
+                      borderRadius: "6px",
+                      border: "1px solid",
+                      borderColor: paymentLanguage === "si" ? "var(--color-primary-light)" : "rgba(255,255,255,0.08)",
+                      background: paymentLanguage === "si" ? "rgba(139,92,246,0.12)" : "transparent",
+                      color: paymentLanguage === "si" ? "var(--color-primary-light)" : "var(--text-muted)",
+                      cursor: "pointer",
+                      transition: "all var(--transition-fast)"
+                    }}
+                  >
+                    සිංහල
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentLanguage("en")}
+                    style={{
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.75rem",
+                      fontWeight: "700",
+                      borderRadius: "6px",
+                      border: "1px solid",
+                      borderColor: paymentLanguage === "en" ? "var(--color-primary-light)" : "rgba(255,255,255,0.08)",
+                      background: paymentLanguage === "en" ? "rgba(139,92,246,0.12)" : "transparent",
+                      color: paymentLanguage === "en" ? "var(--color-primary-light)" : "var(--text-muted)",
+                      cursor: "pointer",
+                      transition: "all var(--transition-fast)"
+                    }}
+                  >
+                    English
+                  </button>
+                </div>
+                
+                <div 
+                  style={{ 
+                    marginTop: "0.6rem", 
+                    fontSize: "0.8rem", 
+                    color: "#F59E0B", 
+                    background: "rgba(245, 158, 11, 0.08)", 
+                    border: "1px solid rgba(245, 158, 11, 0.15)",
+                    borderRadius: "6px",
+                    padding: "0.25rem 0.6rem",
+                    display: "inline-block",
+                    fontWeight: "600"
+                  }}
+                >
+                  {t.expiresIn}: {Math.floor(checkoutSecondsLeft / 60)}:{(checkoutSecondsLeft % 60).toString().padStart(2, "0")}
+                </div>
+              </div>
+
+              {/* Essential Reference Box (Top Section) */}
               <div
                 style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "800",
-                  letterSpacing: "0.05em",
-                  color: "#10b981",
-                  fontFamily: "monospace",
-                  background: "rgba(16, 185, 129, 0.1)",
-                  padding: "0.4rem 1rem",
-                  borderRadius: "6px",
-                  border: "1px solid rgba(16, 185, 129, 0.2)",
-                  display: "inline-block",
-                  marginBottom: "0.5rem"
+                  background: "rgba(255, 255, 255, 0.01)",
+                  border: "1px dashed rgba(139, 92, 246, 0.3)",
+                  borderRadius: "10px",
+                  padding: "1rem",
+                  marginBottom: "1.25rem",
+                  textAlign: "center"
                 }}
               >
-                {currentOrderId}
-              </div>
-              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0", lineHeight: "1.4" }}>
-                ⚠️ <strong>WARNING:</strong> You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.
-              </p>
-            </div>
-
-            {/* Billing Details */}
-            <div className={styles.checkoutDetails} style={{ marginBottom: "1.25rem" }}>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Promotional Tier:</span>
-                <span className={styles.detailValue} style={{ textTransform: "capitalize" }}>
-                  {activeTier?.displayName}
-                </span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Total LKR Amount:</span>
-                <span className={styles.detailValue} style={{ color: "#eb5757", fontWeight: "700" }}>
-                  {activeTier?.priceFormatted}
-                </span>
-              </div>
-            </div>
-
-            {/* Payment Mode Selector */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label 
-                style={{ 
-                  display: "block", 
-                  fontSize: "0.8rem", 
-                  color: "var(--text-muted)", 
-                  fontWeight: "600", 
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  marginBottom: "0.4rem" 
-                }}
-              >
-                Select Payment Method
-              </label>
-              <select
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value as "qr" | "bank" | "")}
-                className={styles.select}
-                style={{
-                  padding: "0.5rem var(--space-md)",
-                  fontSize: "0.9rem"
-                }}
-              >
-                <option value="">-- Select Payment Method --</option>
-                <option value="qr">Pay using QR</option>
-                <option value="bank">Pay using bank details</option>
-              </select>
-            </div>
-
-            {/* Conditional Payment details render */}
-            {paymentMethod === "qr" && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem", margin: "1rem 0", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.03)", borderRadius: "8px", padding: "1rem" }}>
-                <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0", textAlign: "center", lineHeight: "1.4" }}>
-                  Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
+                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 0.5rem 0", lineHeight: "1.4" }}>
+                  {t.refLabel}
                 </p>
-                <img
-                  src={`/api/payments/qr-code?token=${typeof window !== "undefined" ? localStorage.getItem("lankan_ads_token") || "" : ""}`}
-                  alt="LankaQR scan box"
+                <div
                   style={{
-                    width: "160px",
-                    height: "160px",
-                    borderRadius: "12px",
-                    border: "1px solid rgba(139, 92, 246, 0.2)",
-                    boxShadow: "0 0 20px rgba(139, 92, 246, 0.1)",
-                    objectFit: "contain",
-                    background: "#0d0d13"
+                    fontSize: "1.5rem",
+                    fontWeight: "800",
+                    letterSpacing: "0.05em",
+                    color: "#10b981",
+                    fontFamily: "monospace",
+                    background: "rgba(16, 185, 129, 0.1)",
+                    padding: "0.4rem 1rem",
+                    borderRadius: "6px",
+                    border: "1px solid rgba(16, 185, 129, 0.2)",
+                    display: "inline-block",
+                    marginBottom: "0.5rem"
                   }}
-                />
+                >
+                  {currentOrderId}
+                </div>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0", lineHeight: "1.4" }}>
+                  ⚠️ {t.warning}
+                </p>
               </div>
-            )}
-            {paymentMethod === "bank" && (
-              <div 
-                style={{ 
-                  background: "rgba(255, 255, 255, 0.02)", 
-                  border: "1px solid rgba(255, 255, 255, 0.05)", 
-                  borderRadius: "8px", 
-                  padding: "0.8rem 1rem", 
-                  margin: "1rem 0", 
-                  fontSize: "0.85rem", 
-                  color: "var(--text-secondary)", 
-                  lineHeight: "1.6" 
-                }}
-              >
-                <div><strong>Bank:</strong> Nations Trust Bank (NTB)</div>
-                <div><strong>Account Name:</strong> LankanAds</div>
-                <div><strong>Account Number:</strong> 100XXXXXXXXX</div>
-                <div><strong>Branch:</strong> Colombo Corporate Branch</div>
-              </div>
-            )}
-            {paymentMethod === "" && (
-              <div 
-                style={{ 
-                  textAlign: "center", 
-                  padding: "1.5rem", 
-                  border: "1px dashed rgba(255,255,255,0.05)", 
-                  borderRadius: "8px", 
-                  background: "rgba(255,255,255,0.01)", 
-                  color: "var(--text-muted)", 
-                  fontSize: "0.85rem", 
-                  margin: "1rem 0" 
-                }}
-              >
-                Please choose a payment method above to complete your transaction.
-              </div>
-            )}
 
-            {/* Manual Reference input for instant validation */}
-            <div
-              style={{
-                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-                paddingTop: "1.25rem",
-                marginTop: "1.5rem",
-                marginBottom: "1rem"
-              }}
-            >
-              <h4
-                style={{
-                  fontSize: "0.8rem",
-                  color: "var(--color-primary-light)",
-                  fontWeight: "700",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  margin: "0 0 0.6rem 0",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px"
-                }}
-              >
-                <span>✓</span> After Payment
-              </h4>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.85rem",
-                  color: "var(--text-secondary)",
-                  fontWeight: "600",
-                  marginBottom: "0.4rem"
-                }}
-              >
-                Enter Payment Reference ID / Transaction ID:
-              </label>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <input
-                  type="text"
-                  placeholder="e.g. CEFT/2948274 or bank trace ID"
-                  className={styles.input}
-                  style={{ flex: 1, margin: 0, padding: "0.5rem" }}
-                  value={paymentReference}
-                  onChange={(e) => {
-                    setPaymentReference(e.target.value);
-                    setReferenceError("");
+              {/* Billing Details */}
+              <div className={styles.checkoutDetails} style={{ marginBottom: "1.25rem" }}>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>{t.tier}</span>
+                  <span className={styles.detailValue} style={{ textTransform: "capitalize" }}>
+                    {activeTier?.displayName}
+                  </span>
+                </div>
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>{t.amount}</span>
+                  <span className={styles.detailValue} style={{ color: "#eb5757", fontWeight: "700" }}>
+                    {activeTier?.priceFormatted}
+                  </span>
+                </div>
+              </div>
+
+              {/* Payment Mode Selector */}
+              <div style={{ marginBottom: "1.25rem" }}>
+                <label 
+                  style={{ 
+                    display: "block", 
+                    fontSize: "0.8rem", 
+                    color: "var(--text-muted)", 
+                    fontWeight: "600", 
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    marginBottom: "0.4rem" 
                   }}
-                />
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ padding: "0 1.25rem", whiteSpace: "nowrap" }}
-                  onClick={async () => {
-                    if (!paymentReference.trim()) {
-                      setReferenceError("Please enter the reference ID.");
-                      return;
-                    }
+                >
+                  {t.selectMethod}
+                </label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value as "qr" | "bank" | "")}
+                  className={styles.select}
+                  style={{
+                    padding: "0.5rem var(--space-md)",
+                    fontSize: "0.9rem"
+                  }}
+                >
+                  <option value="">{t.choosePlaceholder}</option>
+                  <option value="qr">{t.payQR}</option>
+                  <option value="bank">{t.payBank}</option>
+                </select>
+              </div>
 
-                    // Hidden 2-minute validation (120 seconds) Cooldown Block
-                    const secondsElapsed = Math.floor((Date.now() - checkoutOpenTime) / 1000);
-                    if (secondsElapsed < 120) {
-                      // 1. Show fake loading spinner first
-                      setIsVerifyingReference(true);
-                      setVerificationStepText("Connecting to Nations Trust Bank Gateway...");
-                      
-                      setTimeout(() => {
-                        setVerificationStepText("Scanning LankaQR transaction ledger...");
-                      }, 800);
+              {/* Conditional Payment details render */}
+              {paymentMethod === "qr" && (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem", margin: "1rem 0", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.03)", borderRadius: "8px", padding: "1rem" }}>
+                  <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0", textAlign: "center", lineHeight: "1.4" }}>
+                    {t.qrSub}
+                  </p>
+                  <img
+                    src={`/api/payments/qr-code?token=${typeof window !== "undefined" ? localStorage.getItem("lankan_ads_token") || "" : ""}`}
+                    alt="LankaQR scan box"
+                    style={{
+                      width: "160px",
+                      height: "160px",
+                      borderRadius: "12px",
+                      border: "1px solid rgba(139, 92, 246, 0.2)",
+                      boxShadow: "0 0 20px rgba(139, 92, 246, 0.1)",
+                      objectFit: "contain",
+                      background: "#0d0d13"
+                    }}
+                  />
+                </div>
+              )}
+              {paymentMethod === "bank" && (
+                <div 
+                  style={{ 
+                    background: "rgba(255, 255, 255, 0.02)", 
+                    border: "1px solid rgba(255, 255, 255, 0.05)", 
+                    borderRadius: "8px", 
+                    padding: "0.8rem 1rem", 
+                    margin: "1rem 0", 
+                    fontSize: "0.85rem", 
+                    color: "var(--text-secondary)", 
+                    lineHeight: "1.6" 
+                  }}
+                >
+                  <div><strong>{t.bankName}</strong></div>
+                  <div><strong>{t.accName}</strong></div>
+                  <div><strong>{t.accNum}</strong></div>
+                  <div><strong>{t.branch}</strong></div>
+                </div>
+              )}
+              {paymentMethod === "" && (
+                <div 
+                  style={{ 
+                    textAlign: "center", 
+                    padding: "1.5rem", 
+                    border: "1px dashed rgba(255,255,255,0.05)", 
+                    borderRadius: "8px", 
+                    background: "rgba(255,255,255,0.01)", 
+                    color: "var(--text-muted)", 
+                    fontSize: "0.85rem", 
+                    margin: "1rem 0" 
+                  }}
+                >
+                  {t.emptyPrompt}
+                </div>
+              )}
 
-                      setTimeout(() => {
-                        setVerificationStepText("Verifying account credit alerts...");
-                      }, 1600);
+              {/* Manual Reference input for instant validation */}
+              <div
+                style={{
+                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                  paddingTop: "1.25rem",
+                  marginTop: "1.5rem",
+                  marginBottom: "1rem"
+                }}
+              >
+                <h4
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "var(--color-primary-light)",
+                    fontWeight: "700",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    margin: "0 0 0.6rem 0",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  <span>✓</span> {t.afterPay}
+                </h4>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    color: "var(--text-secondary)",
+                    fontWeight: "600",
+                    marginBottom: "0.4rem"
+                  }}
+                >
+                  {t.enterRef}
+                </label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    type="text"
+                    placeholder={t.inputPlaceholder}
+                    className={styles.input}
+                    style={{ flex: 1, margin: 0, padding: "0.5rem" }}
+                    value={paymentReference}
+                    onChange={(e) => {
+                      setPaymentReference(e.target.value);
+                      setReferenceError("");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ padding: "0 1.25rem", whiteSpace: "nowrap" }}
+                    onClick={async () => {
+                      if (!paymentReference.trim()) {
+                        setReferenceError(paymentLanguage === "si" ? "කරුණාකර යොමු අංකය ඇතුළත් කරන්න." : "Please enter the reference ID.");
+                        return;
+                      }
 
-                      setTimeout(() => {
-                        setIsVerifyingReference(false);
-                        // 2. Open the custom alert modal
-                        setCustomAlert({
-                          title: "Verification Failed",
-                          message: "Payment not received. Please make the payment.",
-                          isError: true
-                        });
-                      }, 2400);
-
-                      return;
-                    }
-
-                    setIsSubmitting(true);
-                    setReferenceError("");
-                    try {
-                      const token = localStorage.getItem("lankan_ads_token");
-                      const headers: Record<string, string> = { "Content-Type": "application/json" };
-                      if (token) headers["Authorization"] = `Bearer ${token}`;
-
-                      const res = await fetch("/api/payments/submit-reference", {
-                        method: "POST",
-                        headers,
-                        body: JSON.stringify({
-                          orderId: currentOrderId,
-                          reference: paymentReference,
-                        }),
-                      });
-                      const data = await res.json();
-                      if (res.ok && data.success) {
-                        setIsPolling(false);
-                        // Trigger the fake validation timeline
+                      // Hidden 2-minute validation (120 seconds) Cooldown Block
+                      const secondsElapsed = Math.floor((Date.now() - checkoutOpenTime) / 1000);
+                      if (secondsElapsed < 120) {
+                        // 1. Show fake loading spinner first
                         setIsVerifyingReference(true);
-                        setIsSubmitting(false);
-
-                        // Stage 1
-                        setVerificationStepText("Connecting to Nations Trust Bank Gateway...");
+                        setVerificationStepText(paymentLanguage === "si" ? "නේෂන්ස් ට්‍රස්ට් බැංකු ගේට්වේ වෙත සම්බන්ධ වෙමින්..." : "Connecting to Nations Trust Bank Gateway...");
                         
-                        // Stage 2
                         setTimeout(() => {
-                          setVerificationStepText("Reconciling transaction reference ID...");
+                          setVerificationStepText(paymentLanguage === "si" ? "ලංකාQR ගනුදෙනු ලෙජරය ස්කෑන් කරමින්..." : "Scanning LankaQR transaction ledger...");
                         }, 800);
 
-                        // Stage 3
                         setTimeout(() => {
-                          setVerificationStepText("Authenticating LankaQR payment ledger...");
+                          setVerificationStepText(paymentLanguage === "si" ? "ගිණුමේ තැන්පතු ඇඟවීම් සත්‍යාපනය කරමින්..." : "Verifying account credit alerts...");
                         }, 1600);
 
-                        // Stage 4
-                        setTimeout(() => {
-                          setVerificationStepText("Securing publication activation...");
-                        }, 2400);
-
-                        // Complete
                         setTimeout(() => {
                           setIsVerifyingReference(false);
-                          setIsCheckoutOpen(false);
-                          setIsSuccess(true);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }, 3200);
+                          // 2. Open the custom alert modal
+                          setCustomAlert({
+                            title: paymentLanguage === "si" ? "සත්‍යාපනය අසාර්ථකයි" : "Verification Failed",
+                            message: paymentLanguage === "si" ? "ගෙවීම ලැබී නොමැත. කරුණාකර ගෙවීම සිදු කරන්න." : "Payment not received. Please make the payment.",
+                            isError: true
+                          });
+                        }, 2400);
 
-                      } else {
-                        setIsSubmitting(false);
-                        setReferenceError(data.error || "Failed to submit reference.");
+                        return;
                       }
-                    } catch {
-                      setIsSubmitting(false);
-                      setReferenceError("Network error. Please try again.");
-                    }
-                  }}
-                  disabled={isSubmitting || isVerifyingReference}
-                >
-                  Verify & Activate
-                </button>
+
+                      setIsSubmitting(true);
+                      setReferenceError("");
+                      try {
+                        const token = localStorage.getItem("lankan_ads_token");
+                        const headers: Record<string, string> = { "Content-Type": "application/json" };
+                        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                        const res = await fetch("/api/payments/submit-reference", {
+                          method: "POST",
+                          headers,
+                          body: JSON.stringify({
+                            orderId: currentOrderId,
+                            reference: paymentReference,
+                          }),
+                        });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          setIsPolling(false);
+                          // Trigger the fake validation timeline
+                          setIsVerifyingReference(true);
+                          setIsSubmitting(false);
+
+                          // Stage 1
+                          setVerificationStepText(paymentLanguage === "si" ? "නේෂන්ස් ට්‍රස්ට් බැංකු ගේට්වේ වෙත සම්බන්ධ වෙමින්..." : "Connecting to Nations Trust Bank Gateway...");
+                          
+                          // Stage 2
+                          setTimeout(() => {
+                            setVerificationStepText(paymentLanguage === "si" ? "ගනුදෙනු යොමු අංකය සැසඳීම සිදු කරමින්..." : "Reconciling transaction reference ID...");
+                          }, 800);
+
+                          // Stage 3
+                          setTimeout(() => {
+                            setVerificationStepText(paymentLanguage === "si" ? "ලංකාQR ගෙවීම් පද්ධතිය තහවුරු කරමින්..." : "Authenticating LankaQR payment ledger...");
+                          }, 1600);
+
+                          // Stage 4
+                          setTimeout(() => {
+                            setVerificationStepText(paymentLanguage === "si" ? "දැන්වීම සක්‍රීය කිරීම සිදු කරමින්..." : "Securing publication activation...");
+                          }, 2400);
+
+                          // Complete
+                          setTimeout(() => {
+                            setIsVerifyingReference(false);
+                            setIsCheckoutOpen(false);
+                            setIsSuccess(true);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }, 3200);
+
+                        } else {
+                          setIsSubmitting(false);
+                          setReferenceError(data.error || (paymentLanguage === "si" ? "යොමු අංකය ඉදිරිපත් කිරීම අසාර්ථකයි." : "Failed to submit reference."));
+                        }
+                      } catch {
+                        setIsSubmitting(false);
+                        setReferenceError(paymentLanguage === "si" ? "ජාල දෝෂයකි. කරුණාකර නැවත උත්සාහ කරන්න." : "Network error. Please try again.");
+                      }
+                    }}
+                    disabled={isSubmitting || isVerifyingReference}
+                  >
+                    {isSubmitting ? t.verifying : t.verifyBtn}
+                  </button>
+                </div>
+                {referenceError && (
+                  <p style={{ fontSize: "0.8rem", color: "#EF4444", margin: "0.4rem 0 0 0" }}>{referenceError}</p>
+                )}
               </div>
-              {referenceError && (
-                <p style={{ fontSize: "0.8rem", color: "#EF4444", margin: "0.4rem 0 0 0" }}>{referenceError}</p>
-              )}
-            </div>
 
-            {/* Auto status verify spinner (backup) */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                padding: "0.6rem",
-                background: "rgba(255, 255, 255, 0.01)",
-                border: "1px solid rgba(255, 255, 255, 0.03)",
-                borderRadius: "8px",
-                marginBottom: "1rem"
-              }}
-            >
-              <div className={styles.spinnerMiniInline}></div>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                Awaiting payment alert… Ad will go live instantly once transfer completes.
-              </span>
-            </div>
-
-            <div className={styles.payBtnGroup}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setIsCheckoutOpen(false);
-                  setIsPolling(false);
-                  setPaymentReference("");
-                  setReferenceError("");
-                  setPaymentMethod("");
+              {/* Auto status verify spinner (backup) */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  padding: "0.6rem",
+                  background: "rgba(255, 255, 255, 0.01)",
+                  border: "1px solid rgba(255, 255, 255, 0.03)",
+                  borderRadius: "8px",
+                  marginBottom: "1rem"
                 }}
               >
-                Cancel Submission
-              </button>
+                <div className={styles.spinnerMiniInline}></div>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  {t.awaiting}
+                </span>
+              </div>
+
+              <div className={styles.payBtnGroup}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ width: "100%" }}
+                  onClick={() => {
+                    setIsCheckoutOpen(false);
+                    setIsPolling(false);
+                    setPaymentReference("");
+                    setReferenceError("");
+                    setPaymentMethod("");
+                  }}
+                >
+                  {t.cancel}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {isSubmitting && (
         <div className={styles.loadingOverlay}>
