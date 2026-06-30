@@ -784,7 +784,7 @@ export default function PostAdPage() {
             {/* QR Scanner Mockup */}
             <div style={{ display: "flex", justifyContent: "center", margin: "1.25rem 0" }}>
               <img
-                src="/lanka-qr-placeholder.png"
+                src="/api/payments/qr-code"
                 alt="LankaQR scan box"
                 style={{
                   width: "160px",
