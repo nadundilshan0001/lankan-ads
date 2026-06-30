@@ -10,7 +10,8 @@ import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 function generateOrderId(): string {
-  return `LAD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const randomDigits = Math.floor(100000 + Math.random() * 900000);
+  return `LAD-${randomDigits}`;
 }
 
 export async function POST(request: Request) {

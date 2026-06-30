@@ -48,6 +48,10 @@ export default function PostAdPage() {
   const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); // default to true, check on mount
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
+  // LankaQR Polling states
+  const [currentOrderId, setCurrentOrderId] = useState<string>("");
+  const [isPolling, setIsPolling] = useState<boolean>(false);
+
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
     const adminTokenRole = localStorage.getItem("lankan_ads_token_role");
@@ -190,8 +194,8 @@ export default function PostAdPage() {
       // First standard ad is free — post directly
       executeDirectPost();
     } else {
-      // Paid tier — open confirmation modal before redirecting to PayHere
-      setIsCheckoutOpen(true);
+      // Paid tier — initiate LankaQR checkout flow
+      executeLankaQRCheckout();
     }
   };
 
@@ -272,8 +276,8 @@ export default function PostAdPage() {
     }
   };
 
-  // Used for paid tiers — uploads images, creates ad as 'pending', then redirects to PayHere
-  const executePayHereCheckout = async () => {
+  // Used for paid tiers — uploads images, creates ad as 'pending', then opens LankaQR checkout modal
+  const executeLankaQRCheckout = async () => {
     setIsSubmitting(true);
     setError("");
     setSubmissionProgress("Uploading photos...");
@@ -315,9 +319,7 @@ export default function PostAdPage() {
       const adData = await adRes.json();
       if (!adRes.ok) throw new Error(adData.error || "Failed to create advertisement");
 
-      setSubmissionProgress("Redirecting to payment...");
-
-      // 3. Get signed PayHere checkout params
+      // 3. Get Order ID and initialize pending payment row
       const tierPrices: Record<string, number> = { standard: 500, premium: 1500, platinum: 3000 };
       const amount = tierPrices[selectedTier] || 500;
 
@@ -335,30 +337,52 @@ export default function PostAdPage() {
       const payData = await payRes.json();
       if (!payRes.ok) throw new Error(payData.error || "Failed to initiate payment");
 
-      const { checkout } = payData;
+      const generatedOrderId = payData.checkout?.order_id;
+      setCurrentOrderId(generatedOrderId);
 
-      // 4. Auto-submit a hidden form to PayHere's hosted checkout page
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = checkout.action;
-
-      Object.entries(checkout).forEach(([key, value]) => {
-        if (key === "action") return;
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = String(value);
-        form.appendChild(input);
-      });
-
-      document.body.appendChild(form);
-      form.submit(); // Browser navigates to PayHere
+      // Open checkout modal and start status polling loop
+      setIsSubmitting(false);
+      setIsCheckoutOpen(true);
+      setIsPolling(true);
     } catch (err: any) {
       setIsSubmitting(false);
       setError(err.message || "An error occurred. Please try again.");
       setIsCheckoutOpen(false);
     }
   };
+
+  // Poll payment status every 3 seconds while LankaQR checkout modal is open
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isPolling && currentOrderId) {
+      const pollStatus = async () => {
+        try {
+          const res = await fetch(`/api/payments/status?order_id=${currentOrderId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === "completed") {
+              setIsPolling(false);
+              setIsCheckoutOpen(false);
+              setIsSuccess(true);
+              // Clean up local forms and trigger success screen
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }
+        } catch (err) {
+          console.error("Error polling payment status:", err);
+        }
+      };
+
+      // Run immediately first
+      pollStatus();
+      intervalId = setInterval(pollStatus, 3000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isPolling, currentOrderId]);
 
   if (isAuthenticated === null) {
     return <div className="container" style={{ textAlign: "center", padding: "100px 0" }}>Loading...</div>;
@@ -738,64 +762,133 @@ export default function PostAdPage() {
         </form>
       )}
 
-      {/* PayHere Checkout Confirmation Modal */}
+      {/* LankaQR & Bank Transfer Confirmation Modal */}
       {isCheckoutOpen && (
         <div className={styles.checkoutOverlay}>
-          <div className={styles.checkoutModal}>
+          <div className={styles.checkoutModal} style={{ maxWidth: "520px" }}>
             <div className={styles.checkoutHeader}>
-              <div className={styles.payhereLogo}>
-                Pay<span>Here</span>
+              <div className={styles.payhereLogo} style={{ color: "var(--color-primary)" }}>
+                LANKA<span>QR</span>
               </div>
               <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
-                Secure Payment — Sri Lanka's #1 Payment Gateway
+                Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
               </p>
             </div>
 
-            <div className={styles.checkoutDetails}>
+            {/* QR Scanner Mockup */}
+            <div style={{ display: "flex", justifyContent: "center", margin: "1.25rem 0" }}>
+              <img
+                src="/lanka-qr-placeholder.png"
+                alt="LankaQR scan box"
+                style={{
+                  width: "160px",
+                  height: "160px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(139, 92, 246, 0.2)",
+                  boxShadow: "0 0 20px rgba(139, 92, 246, 0.1)",
+                  objectFit: "contain",
+                  background: "#0d0d13"
+                }}
+              />
+            </div>
+
+            {/* Crucial Instructions */}
+            <div
+              style={{
+                background: "rgba(139, 92, 246, 0.05)",
+                border: "1px dashed rgba(139, 92, 246, 0.3)",
+                borderRadius: "10px",
+                padding: "1rem",
+                marginBottom: "1rem",
+                textAlign: "center"
+              }}
+            >
+              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 0.5rem 0" }}>
+                Reference / Remarks Code to enter in your bank app:
+              </p>
+              <div
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: "800",
+                  letterSpacing: "0.05em",
+                  color: "#10b981",
+                  fontFamily: "monospace",
+                  background: "rgba(16, 185, 129, 0.1)",
+                  padding: "0.4rem",
+                  borderRadius: "6px",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                  display: "inline-block"
+                }}
+              >
+                {currentOrderId}
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.5rem 0 0 0", lineHeight: "1.4" }}>
+                ⚠️ <strong>CRITICAL:</strong> You MUST enter this exact code as the reference/remarks in your payment. Otherwise, your ad cannot activate automatically.
+              </p>
+            </div>
+
+            {/* Billing Details */}
+            <div className={styles.checkoutDetails} style={{ marginBottom: "1rem" }}>
               <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Merchant:</span>
-                <span className={styles.detailValue}>Lankan Ads (PVT) Ltd</span>
+                <span className={styles.detailLabel}>Promotional Tier:</span>
+                <span className={styles.detailValue} style={{ textTransform: "capitalize" }}>
+                  {activeTier?.displayName}
+                </span>
               </div>
               <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Ad Tier:</span>
-                <span className={styles.detailValue}>{activeTier?.displayName} Promotion</span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.detailLabel}>Ad Duration:</span>
-                <span className={styles.detailValue}>7 Days</span>
-              </div>
-              <div className={styles.detailRow} style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "8px", marginTop: "8px" }}>
-                <span className={styles.detailLabel} style={{ fontWeight: "700" }}>Total Amount:</span>
-                <span className={styles.detailValue} style={{ fontSize: "16px", color: "#eb5757", fontWeight: "800" }}>
+                <span className={styles.detailLabel}>Total LKR Amount:</span>
+                <span className={styles.detailValue} style={{ color: "#eb5757", fontWeight: "700" }}>
                   {activeTier?.priceFormatted}
                 </span>
               </div>
             </div>
 
+            {/* Bank details fallback */}
+            <details style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "0.6rem 0.8rem", marginBottom: "1rem" }}>
+              <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: "600" }}>
+                Show Bank Transfer Details
+              </summary>
+              <div style={{ marginTop: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: "1.6" }}>
+                <div><strong>Bank:</strong> Nations Trust Bank (NTB)</div>
+                <div><strong>Account Name:</strong> LankanAds</div>
+                <div><strong>Account Number:</strong> 100XXXXXXXXX</div>
+                <div><strong>Branch:</strong> Colombo Corporate Branch</div>
+              </div>
+            </details>
+
+            {/* Auto status verify spinner */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                padding: "0.75rem",
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
+                borderRadius: "8px",
+                marginBottom: "1rem"
+              }}
+            >
+              <div className={styles.spinnerMiniInline}></div>
+              <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                Awaiting payment alert… Ad will go live instantly.
+              </span>
+            </div>
+
             <div className={styles.payBtnGroup}>
               <button
                 type="button"
-                className="btn btn-primary btn-lg"
-                style={{ width: "100%", background: "#2196f3", borderColor: "#2196f3" }}
-                onClick={executePayHereCheckout}
-                disabled={isSubmitting}
-                id="payhere-confirm-btn"
-              >
-                {isSubmitting ? "Preparing payment..." : `Pay ${activeTier?.priceFormatted} via PayHere`}
-              </button>
-              <button
-                type="button"
                 className="btn btn-secondary"
-                onClick={() => setIsCheckoutOpen(false)}
-                disabled={isSubmitting}
+                style={{ width: "100%" }}
+                onClick={() => {
+                  setIsCheckoutOpen(false);
+                  setIsPolling(false);
+                }}
               >
-                Cancel
+                Cancel Submission
               </button>
             </div>
-
-            <p className={styles.testPaymentNote}>
-              You will be redirected to PayHere's secure payment page. Your ad goes live immediately after payment confirmation.
-            </p>
           </div>
         </div>
       )}
