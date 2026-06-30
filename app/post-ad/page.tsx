@@ -58,7 +58,7 @@ export default function PostAdPage() {
   const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); // Changed to 10 minutes (600s)
   const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
   const [customAlert, setCustomAlert] = useState<{ title: string; message: string; isError?: boolean } | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank">("qr");
+  const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank" | "">("");
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -363,6 +363,7 @@ export default function PostAdPage() {
       setCheckoutSecondsLeft(600); // 10 minutes visible countdown
       setCheckoutOpenTime(Date.now()); // Hidden 2-minute validation timer reference
       setIsSubmitting(false);
+      setPaymentMethod("");
       setIsCheckoutOpen(true);
       setIsPolling(true);
     } catch (err: any) {
@@ -913,20 +914,21 @@ export default function PostAdPage() {
               </label>
               <select
                 value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value as "qr" | "bank")}
+                onChange={(e) => setPaymentMethod(e.target.value as "qr" | "bank" | "")}
                 className={styles.select}
                 style={{
                   padding: "0.5rem var(--space-md)",
                   fontSize: "0.9rem"
                 }}
               >
+                <option value="">-- Select Payment Method --</option>
                 <option value="qr">Pay using QR</option>
                 <option value="bank">Pay using bank details</option>
               </select>
             </div>
 
             {/* Conditional Payment details render */}
-            {paymentMethod === "qr" ? (
+            {paymentMethod === "qr" && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem", margin: "1rem 0", background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.03)", borderRadius: "8px", padding: "1rem" }}>
                 <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0", textAlign: "center", lineHeight: "1.4" }}>
                   Scan to Pay with any Sri Lankan Banking App (FriMi, Genie, Solo, Flash)
@@ -945,7 +947,8 @@ export default function PostAdPage() {
                   }}
                 />
               </div>
-            ) : (
+            )}
+            {paymentMethod === "bank" && (
               <div 
                 style={{ 
                   background: "rgba(255, 255, 255, 0.02)", 
@@ -962,6 +965,22 @@ export default function PostAdPage() {
                 <div><strong>Account Name:</strong> LankanAds</div>
                 <div><strong>Account Number:</strong> 100XXXXXXXXX</div>
                 <div><strong>Branch:</strong> Colombo Corporate Branch</div>
+              </div>
+            )}
+            {paymentMethod === "" && (
+              <div 
+                style={{ 
+                  textAlign: "center", 
+                  padding: "1.5rem", 
+                  border: "1px dashed rgba(255,255,255,0.05)", 
+                  borderRadius: "8px", 
+                  background: "rgba(255,255,255,0.01)", 
+                  color: "var(--text-muted)", 
+                  fontSize: "0.85rem", 
+                  margin: "1rem 0" 
+                }}
+              >
+                Please choose a payment method above to complete your transaction.
               </div>
             )}
 
@@ -1131,6 +1150,7 @@ export default function PostAdPage() {
                   setIsPolling(false);
                   setPaymentReference("");
                   setReferenceError("");
+                  setPaymentMethod("");
                 }}
               >
                 Cancel Submission
