@@ -84,19 +84,19 @@ export async function POST(request: Request) {
       .digest("hex")
       .toUpperCase();
 
-    // Create a pending payment record in the database
+    // Create a pending payment record in the database matching our schema
     const { error: paymentError } = await supabaseAdmin.from("payments").insert({
       ad_id: adId,
       user_id: payload.userId,
       payhere_order_id: orderId,
-      amount: parseFloat(formattedAmount),
-      currency,
+      tier_purchased: tier,
+      amount_lkr: parseFloat(formattedAmount),
       status: "pending",
     });
 
     if (paymentError) {
       console.error("[payment/create] DB error:", paymentError.message);
-      return NextResponse.json({ error: "Failed to create payment record." }, { status: 500 });
+      return NextResponse.json({ error: `Failed to create payment record: ${paymentError.message}` }, { status: 500 });
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";

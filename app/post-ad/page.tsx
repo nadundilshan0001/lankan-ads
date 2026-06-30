@@ -273,7 +273,9 @@ export default function PostAdPage() {
       setIsSuccess(true);
     } catch (err: any) {
       setIsSubmitting(false);
-      setError(err.message || "An error occurred during submission.");
+      const errorMsg = err.message || "An error occurred during submission.";
+      setError(errorMsg);
+      alert(`⚠️ ERROR: ${errorMsg}`);
       setIsCheckoutOpen(false);
     }
   };
@@ -348,7 +350,9 @@ export default function PostAdPage() {
       setIsPolling(true);
     } catch (err: any) {
       setIsSubmitting(false);
-      setError(err.message || "An error occurred. Please try again.");
+      const errorMsg = err.message || "An error occurred. Please try again.";
+      setError(errorMsg);
+      alert(`⚠️ ERROR: ${errorMsg}`);
       setIsCheckoutOpen(false);
     }
   };
