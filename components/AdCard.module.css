@@ -13,6 +13,8 @@
   animation: fadeInUp 0.5s ease-out forwards;
   opacity: 0;
   margin-top: 10px; /* Space for overlapping top badges */
+  height: 145px; /* Enforced uniform height */
+  overflow: hidden;
 }
 
 .card:hover {
@@ -90,9 +92,9 @@
 /* Image Area (Left side) */
 .imageWrapper {
   position: relative;
-  width: 160px;
-  min-width: 160px;
-  aspect-ratio: 4 / 3;
+  width: 180px;
+  min-width: 180px;
+  height: 100%;
   overflow: hidden;
   background: var(--bg-secondary);
   border-radius: var(--radius-xl) 0 0 var(--radius-xl);
@@ -231,12 +233,13 @@
   .card {
     flex-direction: row;
     margin-top: 8px;
+    height: 110px; /* Uniform mobile height */
   }
 
   .imageWrapper {
     width: 110px;
     min-width: 110px;
-    aspect-ratio: 4 / 3;
+    height: 100%;
     border-radius: var(--radius-xl) 0 0 var(--radius-xl);
   }
 

@@ -234,12 +234,17 @@
 
 .adGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-lg);
 }
 
-.adGrid > article:first-child {
-  grid-column: span 2;
+@media (min-width: 1200px) {
+  .adGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .adGrid > article:first-child {
+    grid-column: span 2;
+  }
 }
 
 /* ===== PAGINATION ===== */
@@ -379,11 +384,5 @@
     display: flex !important;
   }
 
-  .adGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .adGrid > article:first-child {
-    grid-column: span 1;
-  }
+  /* adGrid handles 1 column by default now */
 }
