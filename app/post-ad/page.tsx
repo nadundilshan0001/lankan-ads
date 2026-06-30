@@ -993,16 +993,32 @@ export default function PostAdPage() {
             {/* Manual Reference input for instant validation */}
             <div
               style={{
-                borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-                paddingTop: "1rem",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                paddingTop: "1.25rem",
+                marginTop: "1.5rem",
                 marginBottom: "1rem"
               }}
             >
+              <h4
+                style={{
+                  fontSize: "0.8rem",
+                  color: "var(--color-primary-light)",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  margin: "0 0 0.6rem 0",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <span>✓</span> After Payment
+              </h4>
               <label
                 style={{
                   display: "block",
                   fontSize: "0.85rem",
-                  color: "var(--text-primary)",
+                  color: "var(--text-secondary)",
                   fontWeight: "600",
                   marginBottom: "0.4rem"
                 }}
