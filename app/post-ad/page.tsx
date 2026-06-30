@@ -329,8 +329,8 @@ export default function PostAdPage() {
       if (!adRes.ok) throw new Error(adData.error || "Failed to create advertisement");
 
       // 3. Get Order ID and initialize pending payment row
-      const tierPrices: Record<string, number> = { standard: 500, premium: 1500, platinum: 3000 };
-      const amount = tierPrices[selectedTier] || 500;
+      const tierPrices: Record<string, number> = { standard: 700, premium: 1400, platinum: 5000 };
+      const amount = tierPrices[selectedTier] || 700;
 
       const payRes = await fetch("/api/payments/create", {
         method: "POST",

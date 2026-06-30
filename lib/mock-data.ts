@@ -304,7 +304,7 @@ export const MOCK_FAQS: FAQ[] = [
     id: "faq-2",
     questionEn: "What are the ad pricing tiers on Lankan Ads?",
     answerEn:
-      "Lankan Ads offers three tiers: Standard (Rs. 699 for 7 days in normal feed), Premium (Rs. 1,399 with 24 hours in the premium spotlight then 6 days as standard), and Platinum (Rs. 6,000 with 3 days in the top spotlight then 4 days as standard).",
+      "Lankan Ads offers three tiers: Standard (Rs. 700 for 7 days in normal feed), Premium (Rs. 1,400 with 24 hours in the premium spotlight then 6 days as standard), and Platinum (Rs. 5,000 with 3 days in the top spotlight then 4 days as standard).",
     displayOrder: 2,
   },
   {

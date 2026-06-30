@@ -241,8 +241,8 @@ export const TIERS: TierInfo[] = [
   {
     name: "standard",
     displayName: "Standard",
-    price: 699,
-    priceFormatted: "Rs. 699",
+    price: 700,
+    priceFormatted: "Rs. 700",
     topLayerDuration: "N/A",
     totalDuration: 7,
     description:
@@ -258,8 +258,8 @@ export const TIERS: TierInfo[] = [
   {
     name: "premium",
     displayName: "Premium",
-    price: 1399,
-    priceFormatted: "Rs. 1,399",
+    price: 1400,
+    priceFormatted: "Rs. 1,400",
     topLayerDuration: "24 Hours",
     totalDuration: 7,
     description:
@@ -276,8 +276,8 @@ export const TIERS: TierInfo[] = [
   {
     name: "platinum",
     displayName: "Platinum",
-    price: 6000,
-    priceFormatted: "Rs. 6,000",
+    price: 5000,
+    priceFormatted: "Rs. 5,000",
     topLayerDuration: "3 Days (72h)",
     totalDuration: 7,
     description:
