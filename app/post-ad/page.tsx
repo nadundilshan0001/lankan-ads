@@ -1005,7 +1005,7 @@ export default function PostAdPage() {
               bankName: "බැංකුව: කොමර්ෂල් බැංකුව (Commercial Bank)",
               accName: "ගිණුමේ නම: M M N Dilshan",
               accNum: "ගිණුම් අංකය: 8010878374",
-              branch: "ශාඛාව: බදුල්ල දෙවන ශාඛාව (Badulla Second branch)",
+              branch: "ශාඛාව: Badulla Second branch/ Mini Com",
               emptyPrompt:
                 "ගෙවීම සම්පූර්ණ කිරීම සඳහා ඉහතින් ගෙවීමේ ක්‍රමයක් තෝරන්න.",
               afterPay: "ගෙවීමෙන් පසු",
@@ -1036,7 +1036,7 @@ export default function PostAdPage() {
               bankName: "Bank: Commercial Bank",
               accName: "Account Name: M M N Dilshan",
               accNum: "Account Number: 8010878374",
-              branch: "Branch: Badulla Second branch",
+              branch: "Branch: Badulla Second branch/ Mini Com",
               emptyPrompt:
                 "Please choose a payment method above to complete your transaction.",
               afterPay: "After Payment",
