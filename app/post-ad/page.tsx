@@ -946,12 +946,10 @@ export default function PostAdPage() {
                       return;
                     }
 
-                    // Hidden 2-minute validation (120 seconds)
+                    // Hidden 2-minute validation (120 seconds) — silently ignore clicks
                     const secondsElapsed = Math.floor((Date.now() - checkoutOpenTime) / 1000);
                     if (secondsElapsed < 120) {
-                      const secondsLeft = 120 - secondsElapsed;
-                      setReferenceError(`LankaQR ledger sync takes up to 2 minutes. Please wait ${secondsLeft} more seconds before verifying.`);
-                      return;
+                      return; // Do absolutely nothing
                     }
 
                     setIsSubmitting(true);
