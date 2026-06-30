@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
     // 2. Read the private QR code file
     // We store this file inside a private "secure-assets" folder
-    const qrPath = path.join(process.cwd(), "secure-assets", "lanka-qr.png");
+    const qrPath = path.join(process.cwd(), "secure-assets", "lanka-qr.jpeg");
 
     if (!fs.existsSync(qrPath)) {
       return new NextResponse("QR Code Asset not found", { status: 404 });
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     // 3. Return the image with correct headers
     return new Response(fileBuffer, {
       headers: {
-        "Content-Type": "image/png",
+        "Content-Type": "image/jpeg",
         "Cache-Control": "private, max-age=3600",
       },
     });
