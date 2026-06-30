@@ -14,7 +14,6 @@
   opacity: 0;
   margin-top: 10px; /* Space for overlapping top badges */
   height: 145px; /* Enforced uniform height */
-  overflow: hidden;
 }
 
 .card:hover {
