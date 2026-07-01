@@ -23,6 +23,13 @@ export default function AdminUsersManagementPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [isChangeLoading, setIsChangeLoading] = useState(false);
+  const [changeError, setChangeError] = useState("");
+  const [changeSuccess, setChangeSuccess] = useState("");
+
   const fetchAdmins = async () => {
     try {
       const res = await fetch("/api/admin/admins");
@@ -96,6 +103,59 @@ export default function AdminUsersManagementPage() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangeError("");
+    setChangeSuccess("");
+
+    if (newPassword.length < 6) {
+      setChangeError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setChangeError("New passwords do not match.");
+      return;
+    }
+
+    setIsChangeLoading(true);
+
+    try {
+      const adminDataStr = localStorage.getItem("lankan_ads_admin");
+      if (!adminDataStr) {
+        setChangeError("Session expired. Please log in again.");
+        return;
+      }
+      const adminData = JSON.parse(adminDataStr);
+      const adminId = adminData.id;
+
+      if (!adminId) {
+        setChangeError("Unable to retrieve admin ID.");
+        return;
+      }
+
+      const res = await fetch(`/api/admin/admins/${adminId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setChangeSuccess("Password updated successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      } else {
+        setChangeError(data.error || "Failed to update password.");
+      }
+    } catch {
+      setChangeError("Network error occurred.");
+    } finally {
+      setIsChangeLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loader}>
@@ -158,53 +218,123 @@ export default function AdminUsersManagementPage() {
         </section>
 
         {}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Provision New Administrator</h2>
-          <form onSubmit={handleCreateAdmin} className={styles.form}>
-            <div className={styles.fieldGroup}>
-              <label htmlFor="adminEmail" className={styles.label}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="adminEmail"
-                required
-                className={styles.input}
-                placeholder="newadmin@lankanads.lk"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitLoading}
-              />
-            </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>Provision New Administrator</h2>
+            <form onSubmit={handleCreateAdmin} className={styles.form}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="adminEmail" className={styles.label}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="adminEmail"
+                  required
+                  className={styles.input}
+                  placeholder="newadmin@lankanads.lk"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitLoading}
+                />
+              </div>
 
-            <div className={styles.fieldGroup}>
-              <label htmlFor="adminPassword" className={styles.label}>
-                Temp Password
-              </label>
-              <input
-                type="password"
-                id="adminPassword"
-                required
-                className={styles.input}
-                placeholder="••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isSubmitLoading}
-              />
-            </div>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="adminPassword" className={styles.label}>
+                  Temp Password
+                </label>
+                <input
+                  type="password"
+                  id="adminPassword"
+                  required
+                  className={styles.input}
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitLoading}
+                />
+              </div>
 
-            <button type="submit" className={styles.submitBtn} disabled={isSubmitLoading}>
-              {isSubmitLoading ? (
-                <span className={styles.btnContent}>
-                  <span className={styles.spinnerMini}></span>
-                  <span>Provisioning Account...</span>
-                </span>
-              ) : (
-                "Authorize Admin Account"
-              )}
-            </button>
-          </form>
-        </section>
+              <button type="submit" className={styles.submitBtn} disabled={isSubmitLoading}>
+                {isSubmitLoading ? (
+                  <span className={styles.btnContent}>
+                    <span className={styles.spinnerMini}></span>
+                    <span>Provisioning Account...</span>
+                  </span>
+                ) : (
+                  "Authorize Admin Account"
+                )}
+              </button>
+            </form>
+          </section>
+
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>Change My Password</h2>
+            
+            {changeError && <div className={styles.errorBox} style={{ marginBottom: "16px" }}>{changeError}</div>}
+            {changeSuccess && <div className={styles.successBox} style={{ marginBottom: "16px" }}>{changeSuccess}</div>}
+
+            <form onSubmit={handleChangePassword} className={styles.form}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="currentPassword" className={styles.label}>
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  required
+                  className={styles.input}
+                  placeholder="••••••••••••"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  disabled={isChangeLoading}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="newPassword" className={styles.label}>
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  required
+                  className={styles.input}
+                  placeholder="••••••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={isChangeLoading}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor="confirmNewPassword" className={styles.label}>
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmNewPassword"
+                  required
+                  className={styles.input}
+                  placeholder="••••••••••••"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  disabled={isChangeLoading}
+                />
+              </div>
+
+              <button type="submit" className={styles.submitBtn} disabled={isChangeLoading}>
+                {isChangeLoading ? (
+                  <span className={styles.btnContent}>
+                    <span className={styles.spinnerMini}></span>
+                    <span>Updating Password...</span>
+                  </span>
+                ) : (
+                  "Update Password"
+                )}
+              </button>
+            </form>
+          </section>
+        </div>
       </div>
     </div>
   );
