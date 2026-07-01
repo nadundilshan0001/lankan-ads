@@ -118,6 +118,66 @@ export default function PostAdPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const queryParams = new URLSearchParams(window.location.search);
+    const initialTier = queryParams.get("tier");
+    if (initialTier && ["platinum", "premium", "standard"].includes(initialTier)) {
+      setSelectedTier(initialTier as "platinum" | "premium" | "standard");
+    }
+
+    const resumeAdId = queryParams.get("adId");
+    const resumeTier = queryParams.get("tier");
+    const token = localStorage.getItem("lankan_ads_token");
+
+    if (resumeAdId && resumeTier && token) {
+      const resumePayment = async () => {
+        setIsSubmitting(true);
+        try {
+          const tierPrices: Record<string, number> = {
+            standard: 700,
+            premium: 1400,
+            platinum: 5000,
+          };
+          const amount = tierPrices[resumeTier] || 700;
+
+          const payRes = await fetch("/api/payments/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              adId: resumeAdId,
+              tier: resumeTier,
+              amount,
+              phone: localStorage.getItem("lankan_ads_phone") || "",
+            }),
+          });
+
+          const payData = await payRes.json();
+          if (!payRes.ok) throw new Error(payData.error || "Failed to initiate payment");
+
+          const generatedOrderId = payData.checkout?.order_id;
+          setCurrentOrderId(generatedOrderId);
+          setSelectedTier(resumeTier as "platinum" | "premium" | "standard");
+          
+          setCheckoutSecondsLeft(600);
+          setCheckoutOpenTime(Date.now());
+          setIsSubmitting(false);
+          setPaymentMethod("");
+          setIsCheckoutOpen(true);
+          setIsPolling(true);
+        } catch (err: any) {
+          setIsSubmitting(false);
+          setError(err.message || "Failed to initiate recovery payment.");
+        }
+      };
+
+      resumePayment();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!isCheckoutOpen) return;
 
     const fetchBankDetails = async () => {

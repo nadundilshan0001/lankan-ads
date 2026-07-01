@@ -171,12 +171,12 @@ export default function ProfilePage() {
       const res = await fetch(`/api/ads?id=${recoverAdId}`, {
         method: "PATCH",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "active", adTier: recoverTier }),
+        body: JSON.stringify({ status: "draft", adTier: recoverTier }),
       });
       const data = await res.json();
       if (data.success) {
-        fetchMyAds(token);
         setRecoverAdId(null);
+        router.push(`/post-ad?adId=${recoverAdId}&tier=${recoverTier}`);
       } else {
         setActionError(data.error || "Failed to restore ad. Please try again.");
       }
@@ -430,7 +430,7 @@ export default function ProfilePage() {
                   <li>✓ 7-day spotlight duration</li>
                   <li>✓ Featured in search results</li>
                 </ul>
-                <Link href="/post-ad" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                <Link href="/post-ad?tier=platinum" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
                   Post Platinum Ad
                 </Link>
               </div>
@@ -448,7 +448,7 @@ export default function ProfilePage() {
                   <li>✓ 3-day spotlight duration</li>
                   <li>✓ Visible in search results</li>
                 </ul>
-                <Link href="/post-ad" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                <Link href="/post-ad?tier=premium" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
                   Post Premium Ad
                 </Link>
               </div>
@@ -470,7 +470,7 @@ export default function ProfilePage() {
                   <li>✓ No spotlight duration</li>
                   {myAds.length === 0 && <li>✓ <strong>Free for first ad</strong></li>}
                 </ul>
-                <Link href="/post-ad" className="btn btn-secondary" style={{ width: "100%", justifyContent: "center" }}>
+                <Link href="/post-ad?tier=standard" className="btn btn-secondary" style={{ width: "100%", justifyContent: "center" }}>
                   Post Standard Ad
                 </Link>
               </div>
@@ -530,7 +530,7 @@ export default function ProfilePage() {
                       <div className={styles.adActions} style={{ flexDirection: "column", gap: "0.5rem" }}>
                         <button
                           className="btn btn-primary btn-sm"
-                          onClick={() => { setRecoverAdId(ad.id); setRecoverTier("standard"); }}
+                          onClick={() => { setRecoverAdId(ad.id); setRecoverTier(ad.adTier); }}
                           id={`recover-ad-${ad.id}`}
                         >
                           ↺ Recover
