@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const cleanSender = sender.trim().toUpperCase();
     const cleanMessage = message.trim();
 
-    console.log(`[SMS Webhook] Received SMS from: ${cleanSender}. Msg: "${cleanMessage}"`);
+    console.log(`[SMS Webhook] Received SMS from: ${cleanSender}`);
 
     
     const isAuthorizedSender =

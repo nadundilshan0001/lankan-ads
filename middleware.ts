@@ -87,8 +87,6 @@ export async function middleware(request: NextRequest) {
 
     const [header, payloadStr, signature] = parts;
     const secret = process.env.JWT_SECRET;
-    console.log("DEBUG [middleware.ts] JWT_SECRET:", secret ? secret.slice(0, 5) + "... (len: " + secret.length + ")" : "undefined");
-
     if (!secret) {
       throw new Error("JWT_SECRET environment variable is missing on server");
     }
