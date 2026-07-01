@@ -2,6 +2,9 @@
 
 
 
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Ad } from "@/lib/types";
@@ -15,6 +18,7 @@ interface AdCardProps {
 }
 
 export default function AdCard({ ad, variant = "default" }: AdCardProps) {
+  const [imgFailed, setImgFailed] = useState(false);
   const category = getCategoryBySlug(ad.category);
   const adUrl = `/${ad.category}/${ad.district.toLowerCase()}/${ad.slug}`;
 
@@ -59,8 +63,7 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
 
       {}
       <Link href={adUrl} className={styles.imageWrapper}>
-        {ad.images && ad.images.length > 0 ? (
-          
+        {ad.images && ad.images.length > 0 && !imgFailed ? (
           <Image
             src={ad.images[0].cloudinaryUrl}
             alt={ad.titleEn}
@@ -69,6 +72,7 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
             className={styles.adImage}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={ad.adTier === "platinum"}
+            onError={() => setImgFailed(true)}
           />
         ) : (
           <div className={styles.imagePlaceholder}>

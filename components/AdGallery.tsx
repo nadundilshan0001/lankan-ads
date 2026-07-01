@@ -48,19 +48,20 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxOpen, handlePrev, handleNext, handleClose]);
 
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const hasImages = images && images.length > 0;
   const currentImage = hasImages ? images[activeIdx] : null;
+  const isImageFailed = currentImage ? failedImages[currentImage.id] : false;
 
   return (
     <div className={styles.gallery}>
       {}
       <div
         className={styles.mainImage}
-        onClick={() => hasImages && setLightboxOpen(true)}
-        style={{ cursor: hasImages ? "zoom-in" : "default" }}
+        onClick={() => hasImages && !isImageFailed && setLightboxOpen(true)}
+        style={{ cursor: hasImages && !isImageFailed ? "zoom-in" : "default" }}
       >
-        {currentImage ? (
-          
+        {currentImage && !isImageFailed ? (
           <Image
             src={currentImage.cloudinaryUrl}
             alt={`${titleEn} - view ${activeIdx + 1}`}
@@ -69,6 +70,7 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
             className={styles.mainImg}
             sizes="(max-width: 768px) 100vw, 800px"
             priority
+            onError={() => setFailedImages((prev) => ({ ...prev, [currentImage.id]: true }))}
           />
         ) : (
           <div className={styles.imagePlaceholder}>
@@ -84,23 +86,32 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
       {}
       {hasImages && images.length > 1 && (
         <div className={styles.thumbnails}>
-          {images.map((img, idx) => (
-            <div
-              key={img.id}
-              className={`${styles.thumbnail} ${idx === activeIdx ? styles.activeThumbnail : ""}`}
-              onClick={() => setActiveIdx(idx)}
-            >
-              {}
-              <Image
-                src={img.cloudinaryUrl}
-                alt={`${titleEn} thumbnail ${idx + 1}`}
-                width={100}
-                height={75}
-                className={styles.thumbImg}
-                sizes="100px"
-              />
-            </div>
-          ))}
+          {images.map((img, idx) => {
+            const isThumbFailed = failedImages[img.id];
+            return (
+              <div
+                key={img.id}
+                className={`${styles.thumbnail} ${idx === activeIdx ? styles.activeThumbnail : ""}`}
+                onClick={() => setActiveIdx(idx)}
+              >
+                {!isThumbFailed ? (
+                  <Image
+                    src={img.cloudinaryUrl}
+                    alt={`${titleEn} thumbnail ${idx + 1}`}
+                    width={100}
+                    height={75}
+                    className={styles.thumbImg}
+                    sizes="100px"
+                    onError={() => setFailedImages((prev) => ({ ...prev, [img.id]: true }))}
+                  />
+                ) : (
+                  <div className={styles.placeholderIcon} style={{ fontSize: "1.5rem" }}>
+                    {categoryIcon || ""}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
