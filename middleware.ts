@@ -2,19 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 
-function base64UrlToArrayBuffer(base64url: string): ArrayBuffer {
-  const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = base64.length % 4;
-  const padded = pad ? base64 + "=".repeat(4 - pad) : base64;
-  const binary = atob(padded);
-  const buffer = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    buffer[i] = binary.charCodeAt(i);
-  }
-  return buffer.buffer;
-}
-
-
 async function verifySignature(
   header: string,
   payload: string,
@@ -22,11 +9,9 @@ async function verifySignature(
   secret: string
 ): Promise<boolean> {
   try {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(secret);
-    const messageData = encoder.encode(`${header}.${payload}`);
+    const keyData = Buffer.from(secret);
+    const messageData = Buffer.from(`${header}.${payload}`);
 
-    
     const cryptoKey = await crypto.subtle.importKey(
       "raw",
       keyData,
@@ -35,16 +20,16 @@ async function verifySignature(
       ["verify"]
     );
 
-    const signatureBytes = base64UrlToArrayBuffer(signatureBase64Url);
+    const signatureBytes = Buffer.from(signatureBase64Url, "base64url");
 
-    
     return await crypto.subtle.verify(
       "HMAC",
       cryptoKey,
       signatureBytes,
       messageData
     );
-  } catch {
+  } catch (err: any) {
+    console.error("ERROR inside verifySignature:", err);
     return false;
   }
 }
@@ -57,6 +42,7 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set("x-pathname", pathname);
 
   
+
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next({
       request: {
@@ -101,6 +87,7 @@ export async function middleware(request: NextRequest) {
 
     const [header, payloadStr, signature] = parts;
     const secret = process.env.JWT_SECRET;
+    console.log("DEBUG [middleware.ts] JWT_SECRET:", secret ? secret.slice(0, 5) + "... (len: " + secret.length + ")" : "undefined");
 
     if (!secret) {
       throw new Error("JWT_SECRET environment variable is missing on server");
