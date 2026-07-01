@@ -11,7 +11,7 @@ interface ListingsFilterProps {
 }
 
 export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
-  // Filter States
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
@@ -24,27 +24,27 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
   const [sortBy, setSortBy] = useState("latest");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Pagination State
+  
   const [currentPage, setCurrentPage] = useState(1);
   const adsPerPage = 100;
 
-  // Reset page when filters change
+  
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, selectedSubCategory, selectedDistrict, selectedTiers, sortBy]);
 
-  // Get subcategories of active category
+  
   const activeCategory = useMemo(() => {
     return CATEGORIES.find((cat) => cat.slug === selectedCategory);
   }, [selectedCategory]);
 
-  // Reset subcategory if parent category is changed
+  
   const handleCategoryChange = (slug: string) => {
     setSelectedCategory(slug);
-    setSelectedSubCategory(""); // Reset sub-cat selection
+    setSelectedSubCategory(""); 
   };
 
-  // Toggle tiers checkboxes
+  
   const handleTierToggle = (tierName: string) => {
     if (selectedTiers.includes(tierName)) {
       if (selectedTiers.length > 1) {
@@ -55,7 +55,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     }
   };
 
-  // Clear all filters
+  
   const handleClearFilters = () => {
     setSearchQuery("");
     setSelectedCategory("");
@@ -65,11 +65,11 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     setSortBy("latest");
   };
 
-  // Filter & Sort Logic
+  
   const processedAds = useMemo(() => {
-    // 1. Filter
+    
     const filtered = initialAds.filter((ad) => {
-      // Full-text Search Match (En & Si)
+      
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         const titleMatch = ad.titleEn.toLowerCase().includes(query) || (ad.titleSi && ad.titleSi.toLowerCase().includes(query));
@@ -78,22 +78,22 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
         if (!titleMatch && !descMatch && !cityMatch) return false;
       }
 
-      // Category match
+      
       if (selectedCategory && ad.category !== selectedCategory) {
         return false;
       }
 
-      // Subcategory match
+      
       if (selectedSubCategory && ad.subCategory !== selectedSubCategory) {
         return false;
       }
 
-      // District match
+      
       if (selectedDistrict && ad.district.toLowerCase() !== selectedDistrict.toLowerCase()) {
         return false;
       }
 
-      // Ad tier match
+      
       if (!selectedTiers.includes(ad.adTier)) {
         return false;
       }
@@ -101,16 +101,16 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
       return true;
     });
 
-    // 2. Sort (Prioritize Platinum and Premium, then apply secondary sorting)
+    
     const tierWeight = { platinum: 1, premium: 2, standard: 3 };
     
     return filtered.sort((a, b) => {
-      // Spotlight weight remains dominant
+      
       if (a.adTier !== b.adTier) {
         return tierWeight[a.adTier] - tierWeight[b.adTier];
       }
 
-      // Apply secondary sort options inside same tiers
+      
       if (sortBy === "popular") {
         return b.viewCount - a.viewCount;
       }
@@ -131,12 +131,12 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
         return getPrice(b) - getPrice(a);
       }
 
-      // Default: Latest (created_at desc)
+      
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [initialAds, searchQuery, selectedCategory, selectedSubCategory, selectedDistrict, selectedTiers, sortBy]);
 
-  // Compute total pages and paginated slice of ads
+  
   const totalPages = Math.ceil(processedAds.length / adsPerPage) || 1;
   const paginatedAds = useMemo(() => {
     const startIndex = (currentPage - 1) * adsPerPage;
@@ -145,9 +145,9 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
 
   return (
     <div className={styles.container}>
-      {/* ===== FILTER SIDEBAR (LEFT) ===== */}
+      {}
       <aside className={`${styles.sidebar} ${showMobileFilters ? styles.sidebarOpen : ""}`}>
-        {/* Results Metadata & Sort (Moved to left sidebar) */}
+        {}
         <div className={styles.sidebarResultsHeader}>
           <div className={styles.resultCount}>
             Showing <span className={styles.resultCountHighlight}>{processedAds.length}</span> active listing{processedAds.length !== 1 ? "s" : ""}
@@ -175,7 +175,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           </button>
         </div>
 
-        {/* 1. Keyword Search */}
+        {}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Search keyword</label>
           <input
@@ -187,7 +187,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           />
         </div>
 
-        {/* 2. Category Dropdown */}
+        {}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Category</label>
           <select
@@ -204,7 +204,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           </select>
         </div>
 
-        {/* 3. Sub-Category (Conditional) */}
+        {}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Service Type</label>
           <select
@@ -222,7 +222,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           </select>
         </div>
 
-        {/* 4. District Select */}
+        {}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>District Location</label>
           <select
@@ -239,7 +239,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
           </select>
         </div>
 
-        {/* 5. Tiers Checkboxes */}
+        {}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Visibility Tiers</label>
           <div className={styles.checkboxList}>
@@ -258,7 +258,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
         </div>
       </aside>
 
-      {/* ===== CATALOG PANEL (RIGHT) ===== */}
+      {}
       <main className={styles.mainContent}>
         <button
           className={styles.mobileFilterToggle}
@@ -270,7 +270,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
 
 
 
-        {/* Grid / Empty State */}
+        {}
         {paginatedAds.length > 0 ? (
           <>
             <div className={styles.adGrid}>
@@ -279,7 +279,7 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {}
             {totalPages >= 1 && (
               <div className={styles.pagination}>
                 <button

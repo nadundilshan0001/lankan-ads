@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: Ads Listing & Creation (Connected to DB)
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabase, supabaseAdmin } from "@/lib/db/supabase";
@@ -9,10 +9,11 @@ import { mapDbAd } from "@/lib/db/queries";
 import { verifyToken } from "@/lib/auth";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
 import { cookies } from "next/headers";
+import { rateLimit } from "@/lib/rateLimit";
 
 function sanitizeInput(val: any): string {
   if (typeof val !== "string") return "";
-  // Strip HTML tags to prevent XSS
+  
   return val.replace(/<\/?[^>]+(>|$)/g, "").trim();
 }
 
@@ -29,7 +30,7 @@ async function parseToken(authHeader: string | null) {
       const cookieStore = await cookies();
       token = cookieStore.get("admin_session")?.value;
     } catch {
-      // ignore
+      
     }
   }
 
@@ -46,7 +47,7 @@ async function parseToken(authHeader: string | null) {
   return null;
 }
 
-// GET handler: lists active or pending ads from database
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -61,14 +62,14 @@ export async function GET(request: Request) {
     let query;
 
     if (userPayload?.userId) {
-      // Authenticated view: retrieve user's own ads across all statuses
+      
       query = supabaseAdmin
         .from("ads")
         .select("*, ad_images(*)")
         .eq("user_id", userPayload.userId)
         .order("created_at", { ascending: false });
     } else {
-      // Public directory view: list active/pending ads based on search parameters
+      
       query = status === "active"
         ? supabase.from("ads").select("*, ad_images(*)")
         : supabaseAdmin.from("ads").select("*, ad_images(*)");
@@ -108,7 +109,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST handler: creates a new ad in the database
+
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization");
@@ -119,6 +120,18 @@ export async function POST(request: Request) {
         { error: "Unauthorized. Please provide a valid authorization token." },
         { status: 401 }
       );
+    }
+
+    
+    if (auth.role !== "admin") {
+      const rlKey = `create-ad:${auth.userId}`;
+      const rl = await rateLimit(rlKey, 5, 60 * 60 * 1000);
+      if (!rl.allowed) {
+        return NextResponse.json(
+          { error: `Too many ad postings. Please try again in ${rl.retryAfterSeconds} seconds.` },
+          { status: 429 }
+        );
+      }
     }
 
     const body = await request.json();
@@ -136,11 +149,11 @@ export async function POST(request: Request) {
       availabilityHours,
       role,
       adTier,
-      images, // Cloudinary URLs array
-      paymentPending, // true when PayHere payment is about to happen
+      images, 
+      paymentPending, 
     } = body;
 
-    // Check mandatory fields
+    
     if (
       !category ||
       !titleEn ||
@@ -162,7 +175,7 @@ export async function POST(request: Request) {
 
     let dbUserId;
     if (auth.role === "admin") {
-      // Look up target user profile
+      
       const { data: user, error: userError } = await supabaseAdmin
         .from("users")
         .select("id")
@@ -174,7 +187,7 @@ export async function POST(request: Request) {
       }
 
       if (!user) {
-        // Auto-provision unverified user account so listing can be created
+        
         const { data: newUser, error: createError } = await supabaseAdmin
           .from("users")
           .insert({
@@ -196,7 +209,7 @@ export async function POST(request: Request) {
         dbUserId = user.id;
       }
     } else {
-      // Regular user
+      
       const { data: user, error: userError } = await supabaseAdmin
         .from("users")
         .select("id")
@@ -215,7 +228,7 @@ export async function POST(request: Request) {
     const userId = dbUserId;
 
 
-    // 1. Sanitize string inputs to prevent HTML tag injection (XSS)
+    
     const sanitizedTitleEn = sanitizeInput(titleEn);
     const sanitizedTitleSi = sanitizeInput(titleSi || "");
     const sanitizedDescriptionEn = sanitizeInput(descriptionEn);
@@ -224,7 +237,7 @@ export async function POST(request: Request) {
     const sanitizedPriceRange = sanitizeInput(priceRange || "");
     const sanitizedAvailabilityHours = sanitizeInput(availabilityHours || "");
 
-    // 2. Enforce length constraints
+    
     if (sanitizedTitleEn.length < 5 || sanitizedTitleEn.length > 100) {
       return NextResponse.json(
         { error: "English Title must be between 5 and 100 characters long." },
@@ -260,7 +273,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Validate Sri Lankan Phone Numbers (Primary & Whatsapp)
+    
     const phoneParts = contactNumber.split("|");
     const primaryPhone = phoneParts[0];
     const whatsappPhone = phoneParts[1] || primaryPhone;
@@ -279,7 +292,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Enforce valid Category and Subcategory matching
+    
     const matchedCategory = CATEGORIES.find((c) => c.slug === category || c.id === category);
     if (!matchedCategory) {
       return NextResponse.json(
@@ -300,7 +313,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Enforce valid Gay category roles
+    
     if (matchedCategory.slug === "gay" || matchedCategory.id === "gay") {
       if (!role || !["Top", "Bottom", "50/50"].includes(role)) {
         return NextResponse.json(
@@ -310,7 +323,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 6. Enforce valid District matching
+    
     let matchedDistrict: any = DISTRICTS.find(
       (d) => d.toLowerCase() === district.toLowerCase()
     );
@@ -324,7 +337,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 7. Validate Ad Tier values
+    
     if (adTier && !["platinum", "premium", "standard"].includes(adTier)) {
       return NextResponse.json(
         { error: "Invalid ad tier selected." },
@@ -332,7 +345,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Auto-generate clean SEO slug from Title + City
+    
     let cleanTitle = sanitizedTitleEn
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
@@ -350,12 +363,12 @@ export async function POST(request: Request) {
       
     const slug = `${cleanTitle}-${cleanCity}-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 1. Insert Ad Row
+    
     const { data: adRow, error: adError } = await supabaseAdmin
       .from("ads")
       .insert({
         user_id: dbUserId,
-        category: matchedCategory.slug, // ensure consistent slug notation
+        category: matchedCategory.slug, 
         sub_category: subCategory || "",
         title_en: sanitizedTitleEn,
         title_si: sanitizedTitleSi,
@@ -369,8 +382,8 @@ export async function POST(request: Request) {
         price_range: sanitizedPriceRange,
         availability_hours: role ? JSON.stringify({ role, hours: sanitizedAvailabilityHours }) : sanitizedAvailabilityHours,
         ad_tier: adTier || "standard",
-        // Paid tier ads start as 'pending' until PayHere webhook confirms payment
-        // Free ads (standard first-time / admin) go live immediately
+        
+        
         status: paymentPending ? "pending" : "active",
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       })
@@ -384,16 +397,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Insert Images if any are provided
+    
     if (images && images.length > 0) {
-      // SECURITY: Validate image count and Cloudinary URL origin before DB insert
+      
       const MAX_IMAGES = 5;
       const safeImages = images.slice(0, MAX_IMAGES);
 
       const imageRows = safeImages
         .map((img: any) => {
           const cloudinaryUrl = typeof img === "string" ? img : img.cloudinaryUrl;
-          // Reject any URL not from our Cloudinary account
+          
           if (
             typeof cloudinaryUrl !== "string" ||
             !cloudinaryUrl.startsWith("https://res.cloudinary.com/")
@@ -419,8 +432,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Insert Payment Row — only for free ads (first standard ad, admin posts)
-    // Paid tier ads: the PayHere webhook creates the payment record after real payment
+    
+    
     if (!paymentPending) {
       const { count: adsCount } = await supabaseAdmin
         .from("ads")
@@ -470,7 +483,7 @@ export async function POST(request: Request) {
   }
 }
 
-// PATCH handler: update ad status (soft-delete or restore)
+
 export async function PATCH(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -497,7 +510,7 @@ export async function PATCH(request: Request) {
       userId = user.id;
     }
 
-    // Verify ownership
+    
     const { data: existing } = await supabaseAdmin
       .from("ads")
       .select("id, user_id")
@@ -511,7 +524,7 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { status, adTier } = body;
 
-    // SECURITY: Users may only set safe status values — block self-approval
+    
     const USER_SAFE_STATUSES = ["draft", "paused"];
     if (status && !USER_SAFE_STATUSES.includes(status)) {
       return NextResponse.json(
@@ -520,7 +533,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    // Validate adTier if provided
+    
     if (adTier && !["platinum", "premium", "standard"].includes(adTier)) {
       return NextResponse.json(
         { error: "Invalid ad tier value." },
@@ -547,7 +560,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-// DELETE handler: permanently delete an ad and its images
+
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -574,7 +587,7 @@ export async function DELETE(request: Request) {
       userId = user.id;
     }
 
-    // Verify ownership
+    
     const { data: existing } = await supabaseAdmin
       .from("ads")
       .select("id, user_id")
@@ -585,11 +598,11 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Ad not found or unauthorized." }, { status: 403 });
     }
 
-    // Delete images first (FK constraint)
+    
     await supabaseAdmin.from("ad_images").delete().eq("ad_id", adId);
-    // Delete payments associated
+    
     await supabaseAdmin.from("payments").delete().eq("ad_id", adId);
-    // Delete the ad
+    
     const { error: deleteError } = await supabaseAdmin.from("ads").delete().eq("id", adId);
 
     if (deleteError) {

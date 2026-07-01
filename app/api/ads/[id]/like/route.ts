@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(
   request: Request,
@@ -7,6 +8,18 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    
+    
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
+    const rlKey = `like:${id}:${ip}`;
+    const rl = await rateLimit(rlKey, 10, 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Too many attempts. Please try again in ${rl.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const action = body?.action || "like";
 
@@ -14,7 +27,7 @@ export async function POST(
       return NextResponse.json({ error: "Invalid action." }, { status: 400 });
     }
 
-    // 1. Fetch current ad data to retrieve current like counts
+    
     const { data: ad, error: fetchError } = await supabaseAdmin
       .from("ads")
       .select("like_count")
@@ -25,11 +38,11 @@ export async function POST(
       return NextResponse.json({ error: fetchError?.message || "Ad not found." }, { status: 404 });
     }
 
-    // 2. Calculate new likes value
+    
     const currentLikes = ad.like_count || 0;
     const newLikes = action === "like" ? currentLikes + 1 : Math.max(0, currentLikes - 1);
 
-    // 3. Update database
+    
     const { error: updateError } = await supabaseAdmin
       .from("ads")
       .update({ like_count: newLikes })

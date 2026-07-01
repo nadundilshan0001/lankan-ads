@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — FAQ Page
-// ============================================================
+
+
+
 
 import type { Metadata } from "next";
 import { SITE_CONFIG } from "@/lib/constants";

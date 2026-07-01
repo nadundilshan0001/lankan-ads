@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Report Ad Button with Modal
-// ============================================================
+
+
+
 
 import { useState } from "react";
 import styles from "./ReportAdButton.module.css";

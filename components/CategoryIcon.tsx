@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — Category Icon Component
-// Custom high-fidelity SVGs for each classified category
-// ============================================================
+
+
+
+
 
 import React from "react";
 
@@ -26,7 +26,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
 
   switch (slug) {
     case "girls-personal":
-      // Elegant female profile icon
+      
       return (
         <svg {...props}>
           <path d="M12 2a5 5 0 0 0-5 5v3a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z" />
@@ -37,7 +37,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "boys-personal":
-      // Elegant male profile icon
+      
       return (
         <svg {...props}>
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -46,7 +46,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "shemale-personal":
-      // Transgender symbol
+      
       return (
         <svg {...props}>
           <circle cx="12" cy="12" r="4" />
@@ -57,7 +57,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "marriage-proposals":
-      // Two intertwined wedding rings
+      
       return (
         <svg {...props}>
           <circle cx="9" cy="14" r="5" />
@@ -67,7 +67,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
 
     case "live-cam":
     case "live-cam-show":
-      // Video camera
+      
       return (
         <svg {...props}>
           <path d="M23 7l-7 5 7 5V7z" />
@@ -76,7 +76,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "spa-wellness":
-      // Lotus flower outline
+      
       return (
         <svg {...props}>
           <path d="M12 3c-1.2 2.5-3.6 4.5-6 6.5C4 11 3 13 3 15a9 9 0 0 0 18 0c0-2-1-4-3-5.5-2.4-2-4.8-4-6-6.5z" />
@@ -86,7 +86,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "cuckold-couples":
-      // Two people silhouette with a mutual overlay/heart
+      
       return (
         <svg {...props}>
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -97,7 +97,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     case "gay":
-      // Intertwined double male gender symbols
+      
       return (
         <svg {...props}>
           <circle cx="8" cy="14" r="4" />
@@ -108,7 +108,7 @@ export default function CategoryIcon({ slug, className, size = 18 }: CategoryIco
       );
 
     default:
-      // Fallback search/tag icon
+      
       return (
         <svg {...props}>
           <circle cx="11" cy="11" r="8" />

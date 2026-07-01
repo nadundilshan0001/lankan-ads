@@ -1,8 +1,6 @@
-/* ============================================================
-   Lankan Ads — Home Page Styles
-   ============================================================ */
 
-/* ===== HERO ===== */
+
+
 .hero {
   position: relative;
   min-height: 85vh;
@@ -162,7 +160,7 @@
   background: var(--border-default);
 }
 
-/* ===== AD SECTIONS ===== */
+
 .adSection {
   padding: var(--space-3xl) 0;
   position: relative;
@@ -194,7 +192,7 @@
   position: relative;
 }
 
-/* Platinum section background */
+
 .platinumSection {
   background: linear-gradient(180deg,
     rgba(229, 231, 235, 0.02) 0%,
@@ -203,7 +201,7 @@
   border-top: 1px solid rgba(229, 231, 235, 0.06);
 }
 
-/* Premium section background */
+
 .premiumSection {
   background: linear-gradient(180deg,
     rgba(245, 158, 11, 0.02) 0%,
@@ -216,7 +214,7 @@
   border-top: 1px solid var(--border-subtle);
 }
 
-/* ===== CATEGORIES ===== */
+
 .categoriesSection {
   padding: var(--space-3xl) 0;
   background: var(--bg-secondary);
@@ -312,7 +310,7 @@
   transform: translateX(3px);
 }
 
-/* ===== PRICING ===== */
+
 .pricingSection {
   padding: var(--space-3xl) 0;
 }
@@ -428,7 +426,7 @@
   width: 100%;
 }
 
-/* ===== DISTRICTS ===== */
+
 .districtsSection {
   padding: var(--space-3xl) 0;
   background: var(--bg-secondary);
@@ -460,7 +458,7 @@
   transform: translateY(-1px);
 }
 
-/* ===== FAQ ===== */
+
 .faqSection {
   padding: var(--space-3xl) 0;
 }
@@ -527,7 +525,7 @@
   margin-top: var(--space-xl);
 }
 
-/* ===== CTA ===== */
+
 .ctaSection {
   padding: var(--space-3xl) 0;
 }
@@ -569,7 +567,7 @@
   z-index: 1;
 }
 
-/* ===== RESPONSIVE ===== */
+
 @media (max-width: 768px) {
   .hero {
     min-height: 70vh;

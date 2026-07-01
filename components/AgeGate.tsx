@@ -1,9 +1,9 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Age Verification Gate (18+)
-// Stores confirmation in a cookie for 24 hours
-// ============================================================
+
+
+
+
 
 import { useState, useEffect } from "react";
 import styles from "./AgeGate.module.css";
@@ -12,7 +12,7 @@ export default function AgeGate() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Check if already verified
+    
     const verified = document.cookie
       .split("; ")
       .find((row) => row.startsWith("age_verified="))
@@ -20,13 +20,13 @@ export default function AgeGate() {
 
     if (verified !== "true") {
       setVisible(true);
-      // Prevent scrolling while gate is shown
+      
       document.body.style.overflow = "hidden";
     }
   }, []);
 
   const handleConfirm = () => {
-    // Set cookie for 24 hours
+    
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
     document.cookie = `age_verified=true; expires=${expires}; path=/; SameSite=Strict`;
     document.body.style.overflow = "";
@@ -34,7 +34,7 @@ export default function AgeGate() {
   };
 
   const handleDecline = () => {
-    // Redirect to a safe page (Google)
+    
     window.location.href = "https://www.google.com";
   };
 
@@ -43,12 +43,12 @@ export default function AgeGate() {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
       <div className={styles.card}>
-        {/* Logo / Branding */}
+        {}
         <div className={styles.logo}>
           <span className={styles.logoIcon}>🔞</span>
         </div>
 
-        {/* Warning Badge */}
+        {}
         <div className={styles.warningBadge}>Adults Only — 18+</div>
 
         <h1 className={styles.title} id="age-gate-title">

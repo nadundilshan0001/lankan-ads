@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Category Page (Dynamic SSR)
-// ============================================================
+
+
+
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: PageProps) {
       <div className="container">
         <Breadcrumbs items={[{ label: category.name, href: `/${category.slug}` }]} />
 
-        {/* Header */}
+        {}
         <section className={styles.header}>
           <div className={styles.headerContent}>
             <span className={styles.headerIcon}>
@@ -72,7 +72,7 @@ export default async function CategoryPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Sub-categories */}
+        {}
         {category.subCategories.length > 0 && (
           <section className={styles.subCategories} id="sub-categories">
             <h2 className={styles.subTitle}>Browse by Type</h2>
@@ -92,7 +92,7 @@ export default async function CategoryPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Ads by tier */}
+        {}
         {platinumAds.length > 0 && (
           <section className={styles.tierSection}>
             <div className={styles.tierHeader}>

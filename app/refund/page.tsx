@@ -1,12 +1,15 @@
-// ============================================================
-// Lankan Ads — Refund & Cancellation Policy Page
-// ============================================================
+
+
+
+
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = {
   title: "Refund & Cancellation Policy | Lankan Ads",
   description:
     "Read the Refund, Return, and Cancellation Policy for Lankan Ads.",
   robots: { index: true, follow: true },
+  alternates: { canonical: `${SITE_CONFIG.url}/refund` },
 };
 
 export default function RefundPage() {

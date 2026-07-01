@@ -34,7 +34,7 @@
   transform: scale(0.9);
 }
 
-/* Liked state */
+
 .liked {
   border-color: rgba(239, 68, 68, 0.3);
   background: rgba(239, 68, 68, 0.05);
@@ -47,7 +47,7 @@
   color: #ef4444;
 }
 
-/* Saved state */
+
 .saved {
   border-color: rgba(245, 158, 11, 0.3);
   background: rgba(245, 158, 11, 0.05);
@@ -60,7 +60,7 @@
   color: #f59e0b;
 }
 
-/* Share success state */
+
 .shareSuccess {
   border-color: rgba(16, 185, 129, 0.3);
   background: rgba(16, 185, 129, 0.05);

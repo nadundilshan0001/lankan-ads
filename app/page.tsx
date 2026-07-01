@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Root Search & Catalog Browse Page (SSR)
-// ============================================================
+
+
+
 
 import React from "react";
 import { generateHomeMetadata } from "@/lib/seo/meta-tags";
@@ -15,10 +15,10 @@ export default async function BrowsePage() {
 
   return (
     <div className="container" style={{ paddingTop: "var(--space-xl)" }}>
-      {/* Dynamic SEO Breadcrumbs */}
+      {}
       <Breadcrumbs items={[]} />
 
-      {/* Directory Title */}
+      {}
       <header style={{ marginBottom: "var(--space-md)" }}>
         <h1 style={{ fontSize: "var(--text-3xl)", fontWeight: "800", marginBottom: "0.25rem" }}>
           Browse Classified Ads
@@ -28,7 +28,7 @@ export default async function BrowsePage() {
         </p>
       </header>
 
-      {/* Filters and Listings */}
+      {}
       <ListingsFilter initialAds={allAds} />
     </div>
   );

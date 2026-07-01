@@ -1,6 +1,4 @@
-/* ============================================================
-   Lankan Ads — Redesigned Horizontal Ad Card Styles
-   ============================================================ */
+
 
 .card {
   position: relative;
@@ -12,8 +10,8 @@
   transition: all var(--transition-base);
   animation: fadeInUp 0.5s ease-out forwards;
   opacity: 0;
-  margin-top: 10px; /* Space for overlapping top badges */
-  height: 145px; /* Enforced uniform height */
+  margin-top: 10px; 
+  height: 145px; 
 }
 
 .card:hover {
@@ -21,7 +19,7 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Tier-specific border styling */
+
 .platinum {
   border: 2px solid #ef4444 !important;
 }
@@ -46,7 +44,7 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Overlapping Top Badges */
+
 .topBadges {
   position: absolute;
   top: -10px;
@@ -88,7 +86,7 @@
   color: #e5e7eb;
 }
 
-/* Image Area (Left side) */
+
 .imageWrapper {
   position: relative;
   width: 180px;
@@ -139,7 +137,7 @@
   backdrop-filter: blur(4px);
 }
 
-/* Content Area (Right side) */
+
 .content {
   flex: 1;
   padding: 0.5rem 0.875rem;
@@ -199,7 +197,7 @@
   gap: 0.25rem;
 }
 
-/* Footer & Stats */
+
 .footer {
   display: flex;
   align-items: center;
@@ -219,7 +217,7 @@
   font-weight: 600;
 }
 
-/* Keyframe local animations */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -231,12 +229,12 @@
   }
 }
 
-/* ===== RESPONSIVE ===== */
+
 @media (max-width: 768px) {
   .card {
     flex-direction: row;
     margin-top: 8px;
-    height: 110px; /* Uniform mobile height */
+    height: 110px; 
   }
 
   .imageWrapper {

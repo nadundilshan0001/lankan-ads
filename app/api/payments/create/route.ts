@@ -1,13 +1,14 @@
-// ============================================================
-// Lankan Ads — API Route: Create PayHere Payment Order
-// Generates the signed payment parameters for the PayHere checkout
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { rateLimit } from "@/lib/rateLimit";
 
 function generateOrderId(): string {
   const randomDigits = Math.floor(100000 + Math.random() * 900000);
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Authenticate the user making the request
+    
     const authHeader = request.headers.get("authorization");
     let token: string | undefined;
 
@@ -46,7 +47,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid session. Please log in again." }, { status: 401 });
     }
 
-    // Verify the ad belongs to this user and is in a payable state
+    
+    const rlKey = `create-payment:${payload.userId}`;
+    const rl = await rateLimit(rlKey, 10, 10 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Too many payment orders generated. Please try again in ${rl.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
+    
     const { data: ad, error: adError } = await supabaseAdmin
       .from("ads")
       .select("id, status, ad_tier, user_id")
@@ -70,7 +81,7 @@ export async function POST(request: Request) {
     const orderId = generateOrderId();
     const formattedAmount = parseFloat(amount).toFixed(2);
 
-    // Generate PayHere hash: MD5(merchant_id + order_id + amount + currency + MD5(secret).toUpperCase())
+    
     const hashedSecret = crypto
       .createHash("md5")
       .update(merchantSecret)
@@ -84,7 +95,7 @@ export async function POST(request: Request) {
       .digest("hex")
       .toUpperCase();
 
-    // Create a pending payment record in the database matching our schema
+    
     const { error: paymentError } = await supabaseAdmin.from("payments").insert({
       ad_id: adId,
       user_id: payload.userId,
@@ -104,7 +115,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      // PayHere form parameters
+      
       checkout: {
         action: isProduction
           ? "https://www.payhere.lk/pay/checkout"

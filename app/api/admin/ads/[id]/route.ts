@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Ad Actions (by ID)
-// POST: approve | deactivate | delete
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";

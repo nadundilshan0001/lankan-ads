@@ -1,6 +1,4 @@
-/* ============================================================
-   Lankan Ads — Report Ad Button & Modal Styles
-   ============================================================ */
+
 
 .triggerBtn {
   background: none;
@@ -19,7 +17,7 @@
   color: #EF4444;
 }
 
-/* ---- Overlay ---- */
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -55,7 +53,7 @@
   to   { transform: translateY(0);    opacity: 1; }
 }
 
-/* ---- Header ---- */
+
 .modalHeader {
   display: flex;
   align-items: center;
@@ -92,7 +90,7 @@
   line-height: 1.5;
 }
 
-/* ---- Form ---- */
+
 .form {
   display: flex;
   flex-direction: column;
@@ -203,7 +201,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* ---- Done State ---- */
+
 .doneState {
   display: flex;
   flex-direction: column;

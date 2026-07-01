@@ -11,7 +11,7 @@ async function parseToken(authHeader: string | null) {
       const cookieStore = await cookies();
       token = cookieStore.get("admin_session")?.value;
     } catch {
-      // ignore
+      
     }
   }
 
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // Retrieve bank details from server-side environment variables securely
+    
     const bankName = process.env.BANK_NAME || "";
     const bankAccountName = process.env.BANK_ACCOUNT_NAME || "";
     const bankAccountNum = process.env.BANK_ACCOUNT_NUM || "";

@@ -1,6 +1,4 @@
-/* ============================================================
-   Lankan Ads — User Profile Dashboard Styles
-   ============================================================ */
+
 
 .container {
   max-width: 900px;
@@ -11,7 +9,7 @@
   gap: var(--space-xl);
 }
 
-/* ===== PROFILE HEADER ===== */
+
 .profileCard {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -88,7 +86,7 @@
   gap: var(--space-sm);
 }
 
-/* ===== TAB NAVIGATION ===== */
+
 .tabNav {
   display: flex;
   gap: 0;
@@ -153,7 +151,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== MY ADS LIST ===== */
+
 .adsList {
   display: flex;
   flex-direction: column;
@@ -286,7 +284,7 @@
   gap: var(--space-sm);
 }
 
-/* ===== COUNTDOWN ===== */
+
 .countdown {
   display: flex;
   align-items: center;
@@ -363,7 +361,7 @@
   margin: 0;
 }
 
-/* ===== NEW AD TAB ===== */
+
 .newAdSection {
   display: flex;
   flex-direction: column;
@@ -461,7 +459,7 @@
   color: var(--text-secondary);
 }
 
-/* ===== RECOVER TAB ===== */
+
 .recoverSection {
   display: flex;
   flex-direction: column;
@@ -580,7 +578,7 @@
   margin: 0;
 }
 
-/* ===== RESPONSIVE ===== */
+
 @media (max-width: 768px) {
   .tabNav {
     gap: 0.25rem;
@@ -628,14 +626,14 @@
   }
 }
 
-/* ===== STATUS DELETED BADGE ===== */
+
 .statusDeleted {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ===== DELETE BUTTON ===== */
+
 .deleteBtn {
   background: rgba(239, 68, 68, 0.1) !important;
   color: #ef4444 !important;
@@ -648,7 +646,7 @@
   border-color: rgba(239, 68, 68, 0.5) !important;
 }
 
-/* ===== PERMANENT DELETE BUTTON ===== */
+
 .permDeleteBtn {
   background: rgba(239, 68, 68, 0.15) !important;
   color: #f87171 !important;
@@ -661,7 +659,7 @@
   border-color: #ef4444 !important;
 }
 
-/* ===== MODAL OVERLAY ===== */
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -680,7 +678,7 @@
   to   { opacity: 1; }
 }
 
-/* ===== CONFIRM DIALOG MODAL ===== */
+
 .confirmModal {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -728,7 +726,7 @@
   margin-top: var(--space-sm);
 }
 
-/* ===== RECOVER MODAL ===== */
+
 .recoverModal {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);

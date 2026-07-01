@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Users Management
-// GET: paginated users list
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -16,8 +16,8 @@ export async function GET(request: Request) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(50, parseInt(searchParams.get("limit") || "25"));
     const search = searchParams.get("search")?.trim() || "";
-    const status = searchParams.get("status") || ""; // "active" | "inactive"
-    const verified = searchParams.get("verified") || ""; // "true" | "false"
+    const status = searchParams.get("status") || ""; 
+    const verified = searchParams.get("verified") || ""; 
     const offset = (page - 1) * limit;
 
     let query = supabaseAdmin
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const { data, error, count } = await query;
     if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
 
-    // Fetch ad counts for each user
+    
     const userIds = (data || []).map((u: any) => u.id);
     const adCounts: Record<string, number> = {};
     if (userIds.length > 0) {
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       id: u.id,
       phoneNumber: u.phone_number,
       isVerified: u.is_verified,
-      isActive: u.is_active !== false, // default true if column doesn't exist yet
+      isActive: u.is_active !== false, 
       languagePreference: u.language_preference,
       createdAt: u.created_at,
       adCount: adCounts[u.id] || 0,

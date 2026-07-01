@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Payments
-// GET: paginated payments + revenue stats
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     const { data, error, count } = await query;
     if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
 
-    // Revenue aggregates
+    
     const { data: allCompleted } = await supabaseAdmin
       .from("payments")
       .select("amount_lkr, created_at, tier_purchased")

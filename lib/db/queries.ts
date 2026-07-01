@@ -1,6 +1,6 @@
 import { supabase, supabaseAdmin } from "./supabase";
 import { Ad, AdImage, AdTier, AdStatus, User } from "@/lib/types";
-// Helper: map database fields (snake_case) to client interface (camelCase)
+
 export function mapDbAd(dbAd: any): Ad {
   let role: string | undefined = undefined;
   let availabilityHours = dbAd.availability_hours || "";
@@ -11,7 +11,7 @@ export function mapDbAd(dbAd: any): Ad {
       role = parsed.role;
       availabilityHours = parsed.hours || "";
     } catch (e) {
-      // ignore
+      
     }
   }
 
@@ -52,7 +52,7 @@ export function mapDbAd(dbAd: any): Ad {
   };
 }
 
-// 1. Get ads by tier
+
 export async function getAdsByTier(tier: AdTier): Promise<Ad[]> {
   const { data, error } = await supabase
     .from("ads")
@@ -68,7 +68,7 @@ export async function getAdsByTier(tier: AdTier): Promise<Ad[]> {
   return (data || []).map(mapDbAd);
 }
 
-// 2. Get ads by category
+
 export async function getAdsByCategory(categorySlug: string): Promise<Ad[]> {
   const { data, error } = await supabase
     .from("ads")
@@ -84,10 +84,10 @@ export async function getAdsByCategory(categorySlug: string): Promise<Ad[]> {
   return (data || []).map(mapDbAd);
 }
 
-// 3. Get ads by district
+
 export async function getAdsByDistrict(district: string): Promise<Ad[]> {
-  // In our URL handling, district parameters are lowercase-dashed, but database stores standard names (e.g. "Colombo")
-  // So we fetch all and filter or query directly using ilike
+  
+  
   const { data, error } = await supabase
     .from("ads")
     .select("*, ad_images(*)")
@@ -103,7 +103,7 @@ export async function getAdsByDistrict(district: string): Promise<Ad[]> {
 }
 
 export async function getAdBySlug(slug: string): Promise<Ad | null> {
-  // Use admin client so the owner can always view their own ad
+  
   const { data, error } = await supabaseAdmin
     .from("ads")
     .select("*, ad_images(*)")
@@ -116,7 +116,7 @@ export async function getAdBySlug(slug: string): Promise<Ad | null> {
   }
   
   if (data) {
-    // Increment view count in the background using admin client (bypasses RLS write restrictions)
+    
     supabaseAdmin
       .from("ads")
       .update({ view_count: (data.view_count || 0) + 1 })
@@ -129,7 +129,7 @@ export async function getAdBySlug(slug: string): Promise<Ad | null> {
   return data ? mapDbAd(data) : null;
 }
 
-// 5. Get ads by category and subcategory
+
 export async function getAdsByCategoryAndSubcategory(category: string, subCategory: string): Promise<Ad[]> {
   const { data, error } = await supabase
     .from("ads")
@@ -146,7 +146,7 @@ export async function getAdsByCategoryAndSubcategory(category: string, subCatego
   return (data || []).map(mapDbAd);
 }
 
-// 6. Get ads by category and district
+
 export async function getAdsByCategoryAndDistrict(category: string, district: string): Promise<Ad[]> {
   const { data, error } = await supabase
     .from("ads")
@@ -163,7 +163,7 @@ export async function getAdsByCategoryAndDistrict(category: string, district: st
   return (data || []).map(mapDbAd);
 }
 
-// 7. Get all ads (any status)
+
 export async function getAllActiveAdsCount(): Promise<number> {
   const { count, error } = await supabase
     .from("ads")
@@ -173,7 +173,7 @@ export async function getAllActiveAdsCount(): Promise<number> {
   return count || 0;
 }
 
-// 8. Get FAQs with fallback to mock data if DB is empty
+
 export async function getFaqs(): Promise<any[]> {
   try {
     const { data, error } = await supabase
@@ -200,7 +200,7 @@ export async function getFaqs(): Promise<any[]> {
   }
 }
 
-// 9. Get all active ads ordered by tier weight and then date
+
 export async function getAllActiveAds(): Promise<Ad[]> {
   const { data, error } = await supabase
     .from("ads")
@@ -215,7 +215,7 @@ export async function getAllActiveAds(): Promise<Ad[]> {
   
   const mapped = (data || []).map(mapDbAd);
   
-  // Sort by tier weight (platinum = 1, premium = 2, standard = 3)
+  
   const tierWeight = { platinum: 1, premium: 2, standard: 3 };
   return mapped.sort((a, b) => tierWeight[a.adTier] - tierWeight[b.adTier]);
 }

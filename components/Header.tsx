@@ -1,10 +1,11 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Header Component
-// ============================================================
+
+
+
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/constants";
 import CategoryIcon from "./CategoryIcon";
@@ -31,11 +32,14 @@ export default function Header() {
         <div className={styles.container}>
           <Link href="/" className={styles.logo} aria-label="Lankan Ads Home">
             <div className={styles.logoIconContainer}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {}
+              <Image
                 src="/logo/logo-dark-mode.svg"
                 alt="Lankan Ads Logo"
+                width={36}
+                height={36}
                 className={styles.logoImage}
+                priority
               />
             </div>
             <span className={styles.logoText}>

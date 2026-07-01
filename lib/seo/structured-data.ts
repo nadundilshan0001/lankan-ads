@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Schema.org Structured Data Generators
-// ============================================================
+
+
+
 
 import { SITE_CONFIG } from "../constants";
 import type { Ad, Category, FAQ } from "../types";

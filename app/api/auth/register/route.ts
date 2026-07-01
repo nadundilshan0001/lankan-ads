@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Sri Lankan mobile number format validation
+    
     const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
     if (!phoneRegex.test(phoneNumber.trim())) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
 
 
-    // Check if user already exists
+    
     const { data: existingUser, error: checkError } = await supabaseAdmin
       .from("users")
       .select("id, is_verified")
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
     }
 
-    // SECURITY: Hash password with PBKDF2-SHA512 + random salt (replaces insecure SHA-256)
+    
     const salt = generateSalt();
     const passwordHash = hashPassword(password, salt);
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       } else {
-        // Update password hash and salt for unverified user re-registering
+        
         const { error: updateError } = await supabaseAdmin
           .from("users")
           .update({
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         }
       }
     } else {
-      // Create new unverified user
+      
       const { error: insertError } = await supabaseAdmin
         .from("users")
         .insert({
@@ -98,16 +98,16 @@ export async function POST(request: Request) {
       }
     }
 
-    // Generate and store a real 6-digit OTP for this phone number
+    
     const otpCode = crypto.randomInt(100000, 999999).toString();
-    otpStore.set(phoneNumber.trim(), {
+    await otpStore.set(phoneNumber.trim(), {
       otpCode,
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), 
       used: false,
       attempts: 0,
     });
 
-    // Send OTP via Notify.lk SMS gateway
+    
     const smsResult = await sendOtpSms(phoneNumber.trim(), otpCode);
 
     const response: Record<string, unknown> = {
@@ -116,9 +116,9 @@ export async function POST(request: Request) {
     };
 
     if (!smsResult.success) {
-      // SMS failed — log for admin, but still allow dev bypass
+      
       console.error("[register] SMS dispatch failed:", smsResult.error);
-      // In development: expose OTP so testing is still possible
+      
       if (process.env.NODE_ENV !== "production") {
         response.testOtpCode = otpCode;
         response.smsError = smsResult.error;

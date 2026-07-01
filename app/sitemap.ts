@@ -1,15 +1,15 @@
-// ============================================================
-// Lankan Ads — Dynamic XML Sitemap
-// ============================================================
+
+
+
 
 import type { MetadataRoute } from "next";
 import { SITE_CONFIG, CATEGORIES, DISTRICTS } from "@/lib/constants";
-import { supabase } from "@/lib/db/supabase";
+import { supabaseAdmin } from "@/lib/db/supabase";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_CONFIG.url;
 
-  // Static pages
+  
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Category pages
+  
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
     url: `${baseUrl}/${cat.slug}`,
     lastModified: new Date(),
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  // Sub-category pages
+  
   const subCategoryPages: MetadataRoute.Sitemap = CATEGORIES.flatMap((cat) =>
     cat.subCategories.map((sub) => ({
       url: `${baseUrl}/${cat.slug}/${sub.slug}`,
@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  // Category × District pages (programmatic SEO)
+  
   const categoryDistrictPages: MetadataRoute.Sitemap = CATEGORIES.flatMap(
     (cat) =>
       DISTRICTS.map((district) => ({
@@ -60,10 +60,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
   );
 
-  // Individual ad pages from database
+  
   let adPages: MetadataRoute.Sitemap = [];
   try {
-    const { data: dbAds } = await supabase
+    const { data: dbAds } = await supabaseAdmin
       .from("ads")
       .select("slug, category, district, created_at, ad_tier")
       .eq("status", "active");

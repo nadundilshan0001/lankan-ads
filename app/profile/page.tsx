@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — User Profile Dashboard
-// ============================================================
+
+
+
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -20,12 +20,12 @@ const TIER_DETAILS = {
   platinum:  { displayName: "Platinum Ad",  price: "Rs. 5,000", color: "#ef4444" },
 };
 
-// Helper: format a district string for use in a URL segment
+
 function slugifyDistrict(district: string): string {
   return district.toLowerCase().replace(/\s+/g, "-");
 }
 
-// Hook: live countdown to an expiry date
+
 function useCountdown(expiresAt: string) {
   const calcRemaining = useCallback(() => {
     const diff = new Date(expiresAt).getTime() - Date.now();
@@ -47,7 +47,7 @@ function useCountdown(expiresAt: string) {
   return remaining;
 }
 
-// Sub-component: countdown badge for one ad
+
 function AdCountdown({ expiresAt }: { expiresAt: string }) {
   const r = useCountdown(expiresAt);
   if (!r) return <span className={styles.countdownExpired}>Expired</span>;
@@ -71,23 +71,23 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("my-ads");
 
-  // Delete confirm dialog state
+  
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
-  // Recover: tier selection modal
+  
   const [recoverAdId, setRecoverAdId] = useState<string | null>(null);
   const [recoverTier, setRecoverTier] = useState<RecoverTier>("standard");
   const [isRecovering, setIsRecovering] = useState(false);
 
-  // Permanent delete confirm in recover tab
+  
   const [permDeleteId, setPermDeleteId] = useState<string | null>(null);
   const [isPermDeleting, setIsPermDeleting] = useState(false);
 
-  // Error state for failed operations
+  
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // ── Change Password state ──
+  
   const [cpStep, setCpStep] = useState<CpStep>("request");
   const [cpOtp, setCpOtp] = useState(["" ,"", "", "", "", ""]);
   const [cpNewPw, setCpNewPw] = useState("");
@@ -111,7 +111,7 @@ export default function ProfilePage() {
     fetchMyAds(token);
   }, [router]);
 
-  const fetchMyAds = async (token: string) => {
+  async function fetchMyAds(token: string) {
     try {
       const res = await fetch("/api/ads", {
         headers: { "Authorization": `Bearer ${token}` },
@@ -123,7 +123,7 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   const handleSignOut = () => {
     localStorage.removeItem("lankan_ads_token");
@@ -133,8 +133,8 @@ export default function ProfilePage() {
     router.push("/home");
   };
 
-  // ── Soft-delete (move to Recover) ──
-  // Uses status="draft" which is the DB-valid soft-delete value
+  
+  
   const handleSoftDelete = async (adId: string) => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token) return;
@@ -161,7 +161,7 @@ export default function ProfilePage() {
     }
   };
 
-  // ── Recover: set active with new tier ──
+  
   const handleRecover = async () => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token || !recoverAdId) return;
@@ -188,7 +188,7 @@ export default function ProfilePage() {
     }
   };
 
-  // ── Permanent delete ──
+  
   const handlePermanentDelete = async (adId: string) => {
     const token = localStorage.getItem("lankan_ads_token");
     if (!token) return;
@@ -226,7 +226,7 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      {/* ===== PROFILE HEADER CARD ===== */}
+      {}
       <section className={styles.profileCard}>
         <div className={styles.userInfo}>
           <span className={styles.phoneLabel}>Registered Account</span>
@@ -251,7 +251,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* ===== ACTION ERROR BANNER ===== */}
+      {}
       {actionError && (
         <div
           style={{
@@ -276,7 +276,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* ===== TAB NAVIGATION ===== */}
+      {}
       <nav className={styles.tabNav} role="tablist" aria-label="Profile sections">
         <button
           id="tab-my-ads"
@@ -325,9 +325,9 @@ export default function ProfilePage() {
         </button>
       </nav>
 
-      {/* ===== TAB PANELS ===== */}
+      {}
 
-      {/* MY ADVERTISEMENTS */}
+      {}
       {activeTab === "my-ads" && (
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-my-ads">
           {liveAds.length > 0 ? (
@@ -343,7 +343,7 @@ export default function ProfilePage() {
                   <div key={ad.id} className={styles.adItem} id={`my-ad-${ad.id}`}>
                     <div className={styles.adImageContainer}>
                       {ad.images && ad.images.length > 0 ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                        
                         <img src={ad.images[0].cloudinaryUrl} alt={ad.titleEn} className={styles.adImage} />
                       ) : (
                         <div className={styles.placeholderImage}>No Photo</div>
@@ -405,7 +405,7 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {/* NEW ADVERTISEMENT */}
+      {}
       {activeTab === "new-ad" && (
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-new-ad">
           <div className={styles.newAdSection}>
@@ -479,7 +479,7 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {/* RECOVER */}
+      {}
       {activeTab === "recover" && (
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-recover">
           <div className={styles.recoverSection}>
@@ -505,7 +505,7 @@ export default function ProfilePage() {
                     <div key={ad.id} className={styles.deletedAdItem}>
                       <div className={styles.adImageContainer}>
                         {ad.images && ad.images.length > 0 ? (
-                          // eslint-disable-next-line @next/next/no-img-element
+                          
                           <img src={ad.images[0].cloudinaryUrl} alt={ad.titleEn} className={styles.adImage} />
                         ) : (
                           <div className={styles.placeholderImage}>No Photo</div>
@@ -552,7 +552,7 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {/* CHANGE PASSWORD */}
+      {}
       {activeTab === "change-password" && (
         <section className={styles.tabPanel} role="tabpanel" aria-labelledby="tab-change-password">
           <div style={{ maxWidth: "460px", margin: "0 auto" }}>
@@ -565,7 +565,7 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* Step progress bar */}
+            {}
             <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
               {(["request", "otp", "newpw"] as CpStep[]).map((s, i) => (
                 <div key={s} style={{
@@ -577,7 +577,7 @@ export default function ProfilePage() {
               ))}
             </div>
 
-            {/* Errors / Success */}
+            {}
             {cpError && (
               <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171", borderRadius: "var(--radius-lg)", padding: "0.65rem 1rem", fontSize: "var(--text-sm)", marginBottom: "1rem", textAlign: "center" }}>
                 ⚠️ {cpError}
@@ -594,7 +594,7 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Step 1: Request OTP */}
+            {}
             {cpStep === "request" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
                 <p style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)", textAlign: "center", padding: "1rem", background: "rgba(255,255,255,0.02)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)" }}>
@@ -630,13 +630,13 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Step 2: Verify OTP */}
+            {}
             {cpStep === "otp" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
                 <p style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)", textAlign: "center" }}>
                   Enter the 6-digit code sent to your number
                 </p>
-                {/* OTP boxes */}
+                {}
                 <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
                   {cpOtp.map((digit, i) => (
                     <input
@@ -693,7 +693,7 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Step 3: New Password */}
+            {}
             {cpStep === "newpw" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -762,7 +762,7 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {/* ===== DELETE CONFIRM MODAL ===== */}
+      {}
       {deleteConfirmId && (
         <div className={styles.modalOverlay} onClick={() => setDeleteConfirmId(null)}>
           <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
@@ -791,7 +791,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* ===== PERMANENT DELETE CONFIRM MODAL ===== */}
+      {}
       {permDeleteId && (
         <div className={styles.modalOverlay} onClick={() => setPermDeleteId(null)}>
           <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
@@ -820,7 +820,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* ===== RECOVER TIER SELECTION MODAL ===== */}
+      {}
       {recoverAdId && (
         <div className={styles.modalOverlay} onClick={() => setRecoverAdId(null)}>
           <div className={styles.recoverModal} onClick={(e) => e.stopPropagation()}>

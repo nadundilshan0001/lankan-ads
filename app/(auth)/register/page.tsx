@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Register Page (Client Component)
-// ============================================================
+
+
+
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -12,22 +12,22 @@ import styles from "../auth.module.css";
 export default function RegisterPage() {
   const router = useRouter();
   
-  // States
+  
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   
-  // Validation / Feedback States
+  
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Handle phone submission (moves to OTP)
+  
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // Basic Sri Lankan Phone number regex validation (+94 or 0 followed by 9 digits)
+    
     const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
     if (!phoneRegex.test(phoneNumber)) {
       setError("Please enter a valid Sri Lankan mobile number (e.g. 0771234567).");
@@ -60,7 +60,7 @@ export default function RegisterPage() {
       });
   };
 
-  // Handle individual digit input for OTP
+  
   const handleOtpChange = (element: HTMLInputElement, index: number) => {
     if (isNaN(Number(element.value))) return;
 
@@ -68,13 +68,13 @@ export default function RegisterPage() {
     newOtp[index] = element.value;
     setOtpCode(newOtp);
 
-    // Auto-focus next input
+    
     if (element.value !== "" && element.nextSibling) {
       (element.nextSibling as HTMLInputElement).focus();
     }
   };
 
-  // Handle OTP verification submit
+  
   const handleOtpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

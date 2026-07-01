@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Users Management (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./page.module.css";
@@ -24,7 +24,7 @@ export default function AdminUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filters
+  
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [verified, setVerified] = useState("");
@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
         </div>
       </header>
 
-      {/* Filter Bar */}
+      {}
       <section className={styles.filters}>
         <input
           type="text"
@@ -149,7 +149,7 @@ export default function AdminUsersPage() {
         </div>
       </section>
 
-      {/* Table */}
+      {}
       {isLoading ? (
         <div className={styles.loader}>
           <div className={styles.spinner}></div>
@@ -248,7 +248,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <footer className={styles.pagination}>
           <button

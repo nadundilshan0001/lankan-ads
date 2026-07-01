@@ -1,4 +1,4 @@
-/* Authentication Pages CSS (Glassmorphism + Sleek Modern Dark Theme) */
+
 
 .wrapper {
   min-height: calc(100vh - 200px);
@@ -113,7 +113,7 @@
   color: var(--text-muted);
 }
 
-/* OTP Code Input Group */
+
 .otpGroup {
   display: flex;
   gap: var(--space-sm);

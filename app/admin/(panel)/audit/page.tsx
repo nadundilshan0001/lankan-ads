@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Audit Log Viewer (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./page.module.css";
@@ -26,7 +26,7 @@ export default function AdminAuditLogsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filters
+  
   const [search, setSearch] = useState("");
   const [action, setAction] = useState("");
   const [targetType, setTargetType] = useState("");
@@ -73,7 +73,7 @@ export default function AdminAuditLogsPage() {
         </div>
       </header>
 
-      {/* Filter Bar */}
+      {}
       <section className={styles.filters}>
         <input
           type="text"
@@ -115,7 +115,7 @@ export default function AdminAuditLogsPage() {
         </div>
       </section>
 
-      {/* Table */}
+      {}
       {isLoading ? (
         <div className={styles.loader}>
           <div className={styles.spinner}></div>
@@ -170,7 +170,7 @@ export default function AdminAuditLogsPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <footer className={styles.pagination}>
           <button

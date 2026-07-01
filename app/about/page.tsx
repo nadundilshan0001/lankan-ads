@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — About Page (SSR / Static)
-// ============================================================
+
+
+
 
 import type { Metadata } from "next";
 import { SITE_CONFIG } from "@/lib/constants";

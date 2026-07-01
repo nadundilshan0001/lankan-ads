@@ -4,16 +4,16 @@ const ITERATIONS = 100000;
 const KEY_LENGTH = 64;
 const DIGEST = "sha512";
 
-// SECURITY: Never fall back to a hardcoded secret — throw at startup if missing.
+
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
+if (!JWT_SECRET || (process.env.NODE_ENV === "production" && JWT_SECRET.length < 32)) {
   throw new Error(
-    "FATAL: JWT_SECRET environment variable is not set. " +
-    "Add JWT_SECRET to .env.local before starting the server."
+    "FATAL: JWT_SECRET environment variable is not set or is insecure. " +
+    "It must be configured and be at least 32 characters long for production security."
   );
 }
 
-// Token lifetime: 24 hours
+
 const JWT_EXPIRY_SECONDS = 24 * 60 * 60;
 
 export interface TokenPayload {
@@ -24,23 +24,17 @@ export interface TokenPayload {
   exp?: number;
 }
 
-/**
- * Generate a cryptographically secure random salt (hex representation)
- */
+
 export function generateSalt(): string {
   return crypto.randomBytes(16).toString("hex");
 }
 
-/**
- * PBKDF2 password hashing using SHA-512
- */
+
 export function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, DIGEST).toString("hex");
 }
 
-/**
- * Generate an HMAC-SHA256 signed JWT session token with expiry
- */
+
 export function signToken(payload: TokenPayload): string {
   const payloadWithExp: TokenPayload = {
     ...payload,
@@ -53,9 +47,7 @@ export function signToken(payload: TokenPayload): string {
   return `${signatureSrc}.${signature}`;
 }
 
-/**
- * Verify HMAC-SHA256 JWT signature and expiry, return payload if valid
- */
+
 export function verifyToken(token: string): TokenPayload | null {
   try {
     const parts = token.split(".");
@@ -67,7 +59,7 @@ export function verifyToken(token: string): TokenPayload | null {
       .update(signatureSrc)
       .digest("base64url");
 
-    // Timing-safe comparison (guards against length mismatch crash too)
+    
     const sigBuf = Buffer.from(signature);
     const expBuf = Buffer.from(expectedSignature);
     if (
@@ -81,7 +73,7 @@ export function verifyToken(token: string): TokenPayload | null {
       Buffer.from(payloadStr, "base64url").toString("utf8")
     );
 
-    // Enforce token expiry
+    
     if (parsed.exp && Math.floor(Date.now() / 1000) > parsed.exp) {
       return null;
     }
@@ -92,9 +84,7 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-/**
- * Verify administrative authentication claim from request headers
- */
+
 export function verifyAdminRequest(req: Request): TokenPayload | null {
   try {
     const authHeader = req.headers.get("authorization");

@@ -1,14 +1,15 @@
-// ============================================================
-// Lankan Ads — Terms of Service Page
-// ============================================================
 
-import { generateHomeMetadata } from "@/lib/seo/meta-tags";
+
+
+
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = {
   title: "Terms of Service | Lankan Ads",
   description:
     "Read the Terms of Service for Lankan Ads — Sri Lanka's classified ads platform for personal services, wellness, and more.",
   robots: { index: true, follow: true },
+  alternates: { canonical: `${SITE_CONFIG.url}/terms` },
 };
 
 export default function TermsPage() {

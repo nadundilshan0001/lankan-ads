@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Auth Login
-// Sets HttpOnly admin_session cookie on successful login
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -30,9 +30,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Rate limit: 5 attempts per email per 15 min
+    
     const rlKey = `admin-login:${email.trim().toLowerCase()}`;
-    const rl = rateLimit(rlKey, 5, 15 * 60 * 1000);
+    const rl = await rateLimit(rlKey, 5, 15 * 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: `Too many attempts. Try again in ${rl.retryAfterSeconds} seconds.` },
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password — PBKDF2 with SHA-256 upgrade path for legacy accounts
+    
     let isValid = false;
     if (!admin.salt) {
       const legacyHash = crypto.createHash("sha256").update(password).digest("hex");
@@ -77,20 +77,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update last login
+    
     await supabaseAdmin
       .from("admin_users")
       .update({ last_login: new Date().toISOString() })
       .eq("id", admin.id);
 
-    // Sign JWT token
+    
     const token = signToken({
       userId: admin.id,
       email: admin.email,
       role: "admin",
     });
 
-    // Set HttpOnly cookie (XSS-proof)
+    
     const response = NextResponse.json({
       success: true,
       admin: { id: admin.id, email: admin.email },
@@ -101,10 +101,10 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 24 * 60 * 60, // 24 hours
+      maxAge: 24 * 60 * 60, 
     });
 
-    // Log successful login
+    
     await logAdminAction({
       adminId: admin.id,
       adminEmail: admin.email,

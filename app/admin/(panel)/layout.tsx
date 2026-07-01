@@ -1,9 +1,9 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Dashboard Shell Layout
-// Sidebar Navigation + Header Actions
-// ============================================================
+
+
+
+
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -76,12 +76,12 @@ export default function AdminLayout({ children }: LayoutProps) {
 
   return (
     <div className={styles.adminLayout}>
-      {/* Sidebar navigation */}
+      {}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <Link href="/" className={styles.logo}>
             <div className={styles.logoIconContainer}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {}
               <img
                 src="/logo/logo-dark-mode.svg"
                 alt="Lankan Ads Logo"
@@ -137,7 +137,7 @@ export default function AdminLayout({ children }: LayoutProps) {
         </div>
       </aside>
 
-      {/* Main content frame */}
+      {}
       <div className={styles.mainContainer}>
         <header className={styles.header}>
           <div className={styles.breadcrumb}>

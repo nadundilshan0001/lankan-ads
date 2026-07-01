@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: Auth Login (Connected to DB)
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -11,7 +11,7 @@ import crypto from "crypto";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { phoneNumber, password } = body; // phoneNumber can be an email for admin users
+    const { phoneNumber, password } = body; 
 
     if (!phoneNumber || !password) {
       return NextResponse.json(
@@ -40,9 +40,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // SECURITY: Rate limit — 5 attempts per identifier per 15 minutes
+    
     const rlKey = `login:${phoneNumber.trim().toLowerCase()}`;
-    const rl = rateLimit(rlKey, 5, 15 * 60 * 1000);
+    const rl = await rateLimit(rlKey, 5, 15 * 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: `Too many login attempts. Please try again in ${rl.retryAfterSeconds} seconds.` },
@@ -51,9 +51,9 @@ export async function POST(request: Request) {
     }
 
     if (isEmail) {
-      // --------------------------------------------------------
-      // ADMIN AUTHENTICATION
-      // --------------------------------------------------------
+      
+      
+      
       const { data: admin, error: fetchError } = await supabaseAdmin
         .from("admin_users")
         .select("id, email, password_hash, salt")
@@ -67,10 +67,10 @@ export async function POST(request: Request) {
         );
       }
 
-      // Password verification with backward-compatible legacy SHA-256 fallback
+      
       let isValid = false;
       if (!admin.salt) {
-        // Upgrade legacy hash: verify SHA-256 then re-hash with PBKDF2
+        
         const legacyHash = crypto.createHash("sha256").update(password).digest("hex");
         if (legacyHash === admin.password_hash) {
           isValid = true;
@@ -92,10 +92,10 @@ export async function POST(request: Request) {
         );
       }
 
-      // Reset rate limit on successful login
-      resetRateLimit(rlKey);
+      
+      await resetRateLimit(rlKey);
 
-      // Record last login
+      
       await supabaseAdmin
         .from("admin_users")
         .update({ last_login: new Date().toISOString() })
@@ -118,9 +118,9 @@ export async function POST(request: Request) {
         },
       });
     } else {
-      // --------------------------------------------------------
-      // USER AUTHENTICATION
-      // --------------------------------------------------------
+      
+      
+      
       const { data: user, error: fetchError } = await supabaseAdmin
         .from("users")
         .select("id, phone_number, password_hash, salt, is_verified")
@@ -134,10 +134,10 @@ export async function POST(request: Request) {
         );
       }
 
-      // Password verification — upgrade SHA-256 → PBKDF2 on first login
+      
       let isValid = false;
       if (!user.salt) {
-        // Legacy SHA-256 path — verify then upgrade
+        
         const legacyHash = crypto.createHash("sha256").update(password).digest("hex");
         if (legacyHash === user.password_hash) {
           isValid = true;
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
         );
       }
 
-      // Check if account is verified
+      
       if (!user.is_verified) {
         return NextResponse.json(
           { error: "Please verify your mobile number first.", requiresVerification: true },
@@ -167,8 +167,8 @@ export async function POST(request: Request) {
         );
       }
 
-      // Reset rate limit on successful login
-      resetRateLimit(rlKey);
+      
+      await resetRateLimit(rlKey);
 
       const token = signToken({
         userId: user.id,

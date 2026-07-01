@@ -1,4 +1,4 @@
-/* Ad Posting Form Page CSS */
+
 
 .container {
   max-width: 800px;
@@ -160,7 +160,7 @@
   margin-top: 0.25rem;
 }
 
-/* Category Grid Selector */
+
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -203,7 +203,7 @@
   color: var(--text-primary);
 }
 
-/* Sub-category selector radio list */
+
 .subCategoryList {
   display: flex;
   flex-direction: column;
@@ -236,7 +236,7 @@
   accent-color: var(--color-primary-light);
 }
 
-/* Role selector options */
+
 .roleSelectionGrid {
   display: flex;
   gap: var(--space-sm);
@@ -288,7 +288,7 @@
   color: var(--text-muted);
 }
 
-/* Image Upload Area */
+
 .imageUploadArea {
   display: flex;
   flex-direction: column;
@@ -383,7 +383,7 @@
   background: #dc2626;
 }
 
-/* Tier Selector Grid */
+
 .tierGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -469,8 +469,8 @@
   font-weight: bold;
 }
 
-/* Pay Checkout Simulation Modal */
-/* LankaQR Checkout Modal Overlay & Card styling */
+
+
 .checkoutOverlay {
   position: fixed;
   top: 0;
@@ -573,7 +573,7 @@
   margin-top: var(--space-sm);
 }
 
-/* Success State */
+
 .successCard {
   text-align: center;
   padding: var(--space-2xl) 0;
@@ -630,7 +630,7 @@
   }
 }
 
-/* Submission Loading Overlay */
+
 .loadingOverlay {
   position: fixed;
   top: 0;

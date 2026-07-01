@@ -1,4 +1,4 @@
-/* Lankan Ads — Ad Gallery CSS Module */
+
 
 .gallery {
   display: flex;
@@ -86,7 +86,7 @@
   object-fit: cover;
 }
 
-/* Lightbox Modal styles */
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -191,7 +191,7 @@
   to { opacity: 1; }
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 768px) {
   .gallery {
     position: static;

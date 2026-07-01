@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Storage Health Dashboard (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
@@ -94,7 +94,7 @@ export default function AdminStoragePage() {
       {error && <div className={styles.errorBox}>{error}</div>}
 
       <div className={styles.grid}>
-        {/* Cloudinary Stats */}
+        {}
         <section className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.cardTitle}>Cloudinary Asset CDN</h2>
@@ -107,7 +107,7 @@ export default function AdminStoragePage() {
             <div className={styles.cardError}>{cloudinary.error}</div>
           ) : (
             <div className={styles.cardBody}>
-              {/* Storage usage bar */}
+              {}
               <div className={styles.metricGroup}>
                 <div className={styles.metricLabelRow}>
                   <span>Storage Used</span>
@@ -124,7 +124,7 @@ export default function AdminStoragePage() {
                 <span className={styles.metricSubText}>{cloudinary?.storage?.usedPercent || 0}% space consumed</span>
               </div>
 
-              {/* Bandwidth usage bar */}
+              {}
               <div className={styles.metricGroup}>
                 <div className={styles.metricLabelRow}>
                   <span>Bandwidth Used (Rolling 30 Days)</span>
@@ -141,7 +141,7 @@ export default function AdminStoragePage() {
                 <span className={styles.metricSubText}>{cloudinary?.bandwidth?.usedPercent || 0}% monthly limit consumed</span>
               </div>
 
-              {/* Other details */}
+              {}
               <div className={styles.detailedGrid}>
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Hosted Resources</span>
@@ -168,7 +168,7 @@ export default function AdminStoragePage() {
           )}
         </section>
 
-        {/* Supabase Database Stats */}
+        {}
         <section className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.cardTitle}>Supabase Database</h2>
@@ -176,7 +176,7 @@ export default function AdminStoragePage() {
           </div>
 
           <div className={styles.cardBody}>
-            {/* Row Counts */}
+            {}
             <h3 className={styles.subTitle}>Database Table Volumes</h3>
             <div className={styles.tableList}>
               <div className={styles.tableItem}>
@@ -201,7 +201,7 @@ export default function AdminStoragePage() {
               </div>
             </div>
 
-            {/* Ads breakdown */}
+            {}
             <h3 className={styles.subTitle} style={{ marginTop: "24px" }}>Listing Status Distribution</h3>
             <div className={styles.breakdownGrid}>
               {supabase?.adsBreakdown &&

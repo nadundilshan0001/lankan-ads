@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Account Management CRUD (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
@@ -60,7 +60,7 @@ export default function AdminUsersManagementPage() {
         setSuccess(`Administrator account ${email} created successfully.`);
         setEmail("");
         setPassword("");
-        fetchAdmins(); // reload listing
+        fetchAdmins(); 
       } else {
         setError(data.error || "Failed to create administrator account.");
       }
@@ -116,7 +116,7 @@ export default function AdminUsersManagementPage() {
       {success && <div className={styles.successBox}>{success}</div>}
 
       <div className={styles.splitGrid}>
-        {/* Admin List */}
+        {}
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Active Administrators</h2>
           <div className={styles.tableWrapper}>
@@ -157,7 +157,7 @@ export default function AdminUsersManagementPage() {
           </div>
         </section>
 
-        {/* Add Admin Form */}
+        {}
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Provision New Administrator</h2>
           <form onSubmit={handleCreateAdmin} className={styles.form}>

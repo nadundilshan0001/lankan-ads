@@ -1,14 +1,62 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+
+function base64UrlToArrayBuffer(base64url: string): ArrayBuffer {
+  const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = base64.length % 4;
+  const padded = pad ? base64 + "=".repeat(4 - pad) : base64;
+  const binary = atob(padded);
+  const buffer = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    buffer[i] = binary.charCodeAt(i);
+  }
+  return buffer.buffer;
+}
+
+
+async function verifySignature(
+  header: string,
+  payload: string,
+  signatureBase64Url: string,
+  secret: string
+): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const messageData = encoder.encode(`${header}.${payload}`);
+
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+
+    const signatureBytes = base64UrlToArrayBuffer(signatureBase64Url);
+
+    
+    return await crypto.subtle.verify(
+      "HMAC",
+      cryptoKey,
+      signatureBytes,
+      messageData
+    );
+  } catch {
+    return false;
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Create request headers and inject pathname
+  
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
-  // If not admin, proceed with header passed to downstream
+  
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next({
       request: {
@@ -17,7 +65,7 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // Allow the login page through
+  
   if (pathname === "/admin/login") {
     return NextResponse.next({
       request: {
@@ -26,7 +74,18 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // Read admin session cookie
+  
+  const allowedIpsStr = process.env.ADMIN_IP_ALLOWLIST;
+  if (allowedIpsStr) {
+    const allowedIps = allowedIpsStr.split(",").map((ip) => ip.trim());
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || (request as any).ip || "unknown";
+    if (clientIp && !allowedIps.includes(clientIp)) {
+      console.warn(`[Security Block] Admin access attempt blocked for unauthorized IP: ${clientIp}`);
+      return new NextResponse("Access Denied: Unauthorized IP address.", { status: 403 });
+    }
+  }
+
+  
   const sessionCookie = request.cookies.get("admin_session")?.value;
 
   if (!sessionCookie) {
@@ -35,13 +94,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify JWT structure (full crypto verification happens inside API routes)
+  
   try {
     const parts = sessionCookie.split(".");
     if (parts.length !== 3) throw new Error("Invalid token structure");
 
-    const base64Url = parts[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const [header, payloadStr, signature] = parts;
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      throw new Error("JWT_SECRET environment variable is missing on server");
+    }
+
+    const isSignatureValid = await verifySignature(header, payloadStr, signature, secret);
+    if (!isSignatureValid) {
+      throw new Error("Invalid token signature");
+    }
+
+    const base64 = payloadStr.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
@@ -50,7 +120,7 @@ export function middleware(request: NextRequest) {
     );
     const payload = JSON.parse(jsonPayload);
 
-    // Check role and expiry
+    
     if (payload.role !== "admin") throw new Error("Not admin");
     if (payload.exp && Date.now() / 1000 > payload.exp)
       throw new Error("Token expired");
@@ -60,12 +130,12 @@ export function middleware(request: NextRequest) {
         headers: requestHeaders,
       },
     });
-  } catch {
-    // Invalid or expired token — redirect to login
+  } catch (err: any) {
+    console.error("[Admin Guard] Cryptographic verification failed:", err?.message || err);
+    
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     const response = NextResponse.redirect(loginUrl);
-    // Clear the bad cookie
     response.cookies.delete("admin_session");
     return response;
   }

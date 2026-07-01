@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Ad Creation & Posting Page (Client Component)
-// ============================================================
+
+
+
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,11 +14,11 @@ import styles from "./page.module.css";
 export default function PostAdPage() {
   const router = useRouter();
 
-  // Auth state
+  
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userPhone, setUserPhone] = useState<string>("");
 
-  // Form states
+  
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [role, setRole] = useState<string>("");
@@ -33,24 +33,24 @@ export default function PostAdPage() {
   const [city, setCity] = useState<string>("");
   const [availabilityHours, setAvailabilityHours] = useState<string>("");
 
-  // Image Upload State
+  
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
-  // Tier selection
+  
   const [selectedTier, setSelectedTier] = useState<
     "standard" | "premium" | "platinum"
   >("standard");
 
-  // Modals / Progress states
+  
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submissionProgress, setSubmissionProgress] = useState<string>("");
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); // default to true, check on mount
+  const [hasPostedAds, setHasPostedAds] = useState<boolean>(true); 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  // LankaQR Polling states
+  
   const [currentOrderId, setCurrentOrderId] = useState<string>("");
   const [isPolling, setIsPolling] = useState<boolean>(false);
   const [paymentReference, setPaymentReference] = useState<string>("");
@@ -58,7 +58,7 @@ export default function PostAdPage() {
   const [isVerifyingReference, setIsVerifyingReference] =
     useState<boolean>(false);
   const [verificationStepText, setVerificationStepText] = useState<string>("");
-  const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); // Changed to 10 minutes (600s)
+  const [checkoutSecondsLeft, setCheckoutSecondsLeft] = useState<number>(600); 
   const [checkoutOpenTime, setCheckoutOpenTime] = useState<number>(0);
   const [customAlert, setCustomAlert] = useState<{
     title: string;
@@ -73,6 +73,22 @@ export default function PostAdPage() {
     accountNumber: string;
     branch: string;
   } | null>(null);
+
+  async function checkFirstAdStatus(token: string) {
+    try {
+      const res = await fetch("/api/ads", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data.success && data.ads) {
+        setHasPostedAds(data.ads.length > 0);
+      }
+    } catch (err) {
+      console.error("Failed to check first ad status:", err);
+    }
+  }
 
   useEffect(() => {
     const adminDataStr = localStorage.getItem("lankan_ads_admin");
@@ -125,23 +141,7 @@ export default function PostAdPage() {
     fetchBankDetails();
   }, [isCheckoutOpen]);
 
-  const checkFirstAdStatus = async (token: string) => {
-    try {
-      const res = await fetch("/api/ads", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (data.success && data.ads) {
-        setHasPostedAds(data.ads.length > 0);
-      }
-    } catch (err) {
-      console.error("Failed to check first ad status:", err);
-    }
-  };
-
-  // Handle image selection simulation
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -171,7 +171,7 @@ export default function PostAdPage() {
     setUploadedImages(newImages);
   };
 
-  // Form submission handler
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -251,13 +251,13 @@ export default function PostAdPage() {
     }
 
     if (isAdmin) {
-      // Admin bypasses payment — post directly
+      
       executeDirectPost();
     } else if (selectedTier === "standard" && !hasPostedAds) {
-      // First standard ad is free — post directly
+      
       executeDirectPost();
     } else {
-      // Paid tier — initiate LankaQR checkout flow
+      
       executeLankaQRCheckout();
     }
   };
@@ -296,8 +296,8 @@ export default function PostAdPage() {
     return data.secure_url;
   };
 
-  // Real PayHere & Cloudinary & Database execution
-  // Used for free ads and admin — creates ad directly and marks as success
+  
+  
   const executeDirectPost = async () => {
     setIsSubmitting(true);
     setError("");
@@ -356,21 +356,21 @@ export default function PostAdPage() {
     }
   };
 
-  // Used for paid tiers — uploads images, creates ad as 'pending', then opens LankaQR checkout modal
+  
   const executeLankaQRCheckout = async () => {
     setIsSubmitting(true);
     setError("");
     setSubmissionProgress("Uploading photos...");
 
     try {
-      // 1. Upload images first
+      
       const cloudinaryUrls = await Promise.all(
         uploadedImages.map((base64) => uploadImageToCloudinary(base64)),
       );
 
       setSubmissionProgress("Creating your listing...");
 
-      // 2. Create the ad in DB (status: pending until payment confirmed)
+      
       const token = localStorage.getItem("lankan_ads_token");
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -394,7 +394,7 @@ export default function PostAdPage() {
           role: selectedCategory === "gay" ? role : undefined,
           adTier: selectedTier,
           images: cloudinaryUrls,
-          paymentPending: true, // signal to route that payment is coming
+          paymentPending: true, 
         }),
       });
 
@@ -402,7 +402,7 @@ export default function PostAdPage() {
       if (!adRes.ok)
         throw new Error(adData.error || "Failed to create advertisement");
 
-      // 3. Get Order ID and initialize pending payment row
+      
       const tierPrices: Record<string, number> = {
         standard: 700,
         premium: 1400,
@@ -428,9 +428,9 @@ export default function PostAdPage() {
       const generatedOrderId = payData.checkout?.order_id;
       setCurrentOrderId(generatedOrderId);
 
-      // Open checkout modal and start status polling loop
-      setCheckoutSecondsLeft(600); // 10 minutes visible countdown
-      setCheckoutOpenTime(Date.now()); // Hidden 2-minute validation timer reference
+      
+      setCheckoutSecondsLeft(600); 
+      setCheckoutOpenTime(Date.now()); 
       setIsSubmitting(false);
       setPaymentMethod("");
       setIsCheckoutOpen(true);
@@ -448,7 +448,7 @@ export default function PostAdPage() {
     }
   };
 
-  // Poll payment status every 3 seconds while LankaQR checkout modal is open
+  
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
@@ -464,7 +464,7 @@ export default function PostAdPage() {
               setIsPolling(false);
               setIsCheckoutOpen(false);
               setIsSuccess(true);
-              // Clean up local forms and trigger success screen
+              
               window.scrollTo({ top: 0, behavior: "smooth" });
             }
           }
@@ -473,7 +473,7 @@ export default function PostAdPage() {
         }
       };
 
-      // Run immediately first
+      
       pollStatus();
       intervalId = setInterval(pollStatus, 3000);
     }
@@ -483,7 +483,7 @@ export default function PostAdPage() {
     };
   }, [isPolling, currentOrderId]);
 
-  // LankaQR Payment session countdown timer (2 minutes)
+  
   useEffect(() => {
     let timerId: NodeJS.Timeout;
 
@@ -492,7 +492,7 @@ export default function PostAdPage() {
         setCheckoutSecondsLeft((prev) => prev - 1);
       }, 1000);
     } else if (isCheckoutOpen && checkoutSecondsLeft === 0) {
-      // Session expired
+      
       setIsCheckoutOpen(false);
       setIsPolling(false);
       setPaymentReference("");
@@ -543,9 +543,9 @@ export default function PostAdPage() {
     );
   }
 
-  // Get active category details
+  
   const activeCategory = CATEGORIES.find((c) => c.id === selectedCategory);
-  // Get active tier details
+  
   const activeTier = TIERS.find((t) => t.name === selectedTier);
 
   return (
@@ -596,7 +596,7 @@ export default function PostAdPage() {
             >
               <button
                 onClick={() => {
-                  // Reset form
+                  
                   setSelectedCategory("");
                   setSelectedSubCategory("");
                   setRole("");
@@ -625,7 +625,7 @@ export default function PostAdPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className={styles.formCard}>
-          {/* SECTION 1: Category Selection */}
+          {}
           <div className={styles.formSection}>
             <h2 className={styles.sectionTitle}>
               <span className={styles.sectionStep}>1</span> Category &amp;
@@ -644,7 +644,7 @@ export default function PostAdPage() {
                     }`}
                     onClick={() => {
                       setSelectedCategory(cat.id);
-                      setSelectedSubCategory(""); // Reset subcategory when category changes
+                      setSelectedSubCategory(""); 
                     }}
                   >
                     <span className={styles.categoryIcon}>
@@ -679,7 +679,7 @@ export default function PostAdPage() {
                         type="radio"
                         name="subcategory"
                         checked={selectedSubCategory === sub.id}
-                        onChange={() => {}} // handled by click event
+                        onChange={() => {}} 
                         className={styles.radioInput}
                       />
                       <div className={styles.subOptionText}>
@@ -723,7 +723,7 @@ export default function PostAdPage() {
             )}
           </div>
 
-          {/* SECTION 2: Ad Details */}
+          {}
           <div className={styles.formSection}>
             <h2 className={styles.sectionTitle}>
               <span className={styles.sectionStep}>2</span> Advertisement
@@ -862,7 +862,7 @@ export default function PostAdPage() {
             </div>
           </div>
 
-          {/* SECTION 3: Image Uploads */}
+          {}
           <div className={styles.formSection}>
             <h2 className={styles.sectionTitle}>
               <span className={styles.sectionStep}>3</span> Photos (Up to 5)
@@ -894,7 +894,7 @@ export default function PostAdPage() {
               <div className={styles.previewGrid}>
                 {uploadedImages.map((src, index) => (
                   <div key={index} className={styles.previewItem}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {}
                     <img
                       src={src}
                       alt={`Preview ${index + 1}`}
@@ -922,7 +922,7 @@ export default function PostAdPage() {
             </div>
           </div>
 
-          {/* SECTION 4: Tier Selection */}
+          {}
           <div className={styles.formSection}>
             <h2 className={styles.sectionTitle}>
               <span className={styles.sectionStep}>4</span> Visibility Tier
@@ -1013,7 +1013,7 @@ export default function PostAdPage() {
         </form>
       )}
 
-      {/* LankaQR & Bank Transfer Confirmation Modal */}
+      {}
       {isCheckoutOpen &&
         (() => {
           const t = {
@@ -1176,7 +1176,7 @@ export default function PostAdPage() {
                     </span>
                   </h3>
 
-                  {/* Language Select Buttons */}
+                  {}
                   <div
                     style={{
                       display: "flex",
@@ -1259,7 +1259,7 @@ export default function PostAdPage() {
                   </div>
                 </div>
 
-                {/* Essential Reference Box (Top Section) */}
+                {}
                 <div
                   style={{
                     background: "rgba(255, 255, 255, 0.01)",
@@ -1309,7 +1309,7 @@ export default function PostAdPage() {
                   </p>
                 </div>
 
-                {/* Billing Details */}
+                {}
                 <div
                   className={styles.checkoutDetails}
                   style={{ marginBottom: "1.25rem" }}
@@ -1334,7 +1334,7 @@ export default function PostAdPage() {
                   </div>
                 </div>
 
-                {/* Payment Mode Selector */}
+                {}
                 <div style={{ marginBottom: "1.25rem" }}>
                   <label
                     style={{
@@ -1366,7 +1366,7 @@ export default function PostAdPage() {
                   </select>
                 </div>
 
-                {/* Conditional Payment details render */}
+                {}
                 {paymentMethod === "qr" && (
                   <div
                     style={{
@@ -1451,7 +1451,7 @@ export default function PostAdPage() {
                   </div>
                 )}
 
-                {/* Manual Reference input for instant validation */}
+                {}
                 <div
                   style={{
                     borderTop: "1px solid rgba(255, 255, 255, 0.08)",
@@ -1512,12 +1512,12 @@ export default function PostAdPage() {
                           return;
                         }
 
-                        // Hidden 2-minute validation (120 seconds) Cooldown Block
+                        
                         const secondsElapsed = Math.floor(
                           (Date.now() - checkoutOpenTime) / 1000,
                         );
                         if (secondsElapsed < 120) {
-                          // 1. Show fake loading spinner first
+                          
                           setIsVerifyingReference(true);
                           setVerificationStepText(
                             paymentLanguage === "si"
@@ -1543,7 +1543,7 @@ export default function PostAdPage() {
 
                           setTimeout(() => {
                             setIsVerifyingReference(false);
-                            // 2. Open the custom alert modal
+                            
                             setCustomAlert({
                               title:
                                 paymentLanguage === "si"
@@ -1585,18 +1585,18 @@ export default function PostAdPage() {
                           const data = await res.json();
                           if (res.ok && data.success) {
                             setIsPolling(false);
-                            // Trigger the fake validation timeline
+                            
                             setIsVerifyingReference(true);
                             setIsSubmitting(false);
 
-                            // Stage 1
+                            
                             setVerificationStepText(
                               paymentLanguage === "si"
                                 ? "නේෂන්ස් ට්‍රස්ට් බැංකු ගේට්වේ වෙත සම්බන්ධ වෙමින්..."
                                 : "Connecting to Nations Trust Bank Gateway...",
                             );
 
-                            // Stage 2
+                            
                             setTimeout(() => {
                               setVerificationStepText(
                                 paymentLanguage === "si"
@@ -1605,7 +1605,7 @@ export default function PostAdPage() {
                               );
                             }, 800);
 
-                            // Stage 3
+                            
                             setTimeout(() => {
                               setVerificationStepText(
                                 paymentLanguage === "si"
@@ -1614,7 +1614,7 @@ export default function PostAdPage() {
                               );
                             }, 1600);
 
-                            // Stage 4
+                            
                             setTimeout(() => {
                               setVerificationStepText(
                                 paymentLanguage === "si"
@@ -1623,7 +1623,7 @@ export default function PostAdPage() {
                               );
                             }, 2400);
 
-                            // Complete
+                            
                             setTimeout(() => {
                               setIsVerifyingReference(false);
                               setIsCheckoutOpen(false);
@@ -1666,7 +1666,7 @@ export default function PostAdPage() {
                   )}
                 </div>
 
-                {/* Auto status verify spinner (backup) */}
+                {}
                 <div
                   style={{
                     display: "flex",
@@ -1801,7 +1801,7 @@ export default function PostAdPage() {
               }}
               onClick={() => {
                 setCustomAlert(null);
-                setCheckoutOpenTime(Date.now()); // Reset 2-min hidden timer reference upon OK click
+                setCheckoutOpenTime(Date.now()); 
               }}
             >
               OK

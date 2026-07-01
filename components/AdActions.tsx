@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Ad Action Buttons (Like, Save, Share)
-// ============================================================
+
+
+
 
 import { useState, useEffect } from "react";
 import styles from "./AdActions.module.css";
@@ -30,7 +30,7 @@ export default function AdActions({ adId, title, initialLikes = 0 }: AdActionsPr
     const likedAds = JSON.parse(localStorage.getItem("lankan_ads_liked_ads") || "[]");
     const isLiking = !liked;
 
-    // Optimistic UI updates
+    
     setLiked(isLiking);
     setLikeCount((prev) => (isLiking ? prev + 1 : Math.max(0, prev - 1)));
 
@@ -52,13 +52,13 @@ export default function AdActions({ adId, title, initialLikes = 0 }: AdActionsPr
         }
         localStorage.setItem("lankan_ads_liked_ads", JSON.stringify(likedAds));
       } else {
-        // Rollback
+        
         setLiked(!isLiking);
         setLikeCount((prev) => (isLiking ? prev - 1 : prev + 1));
         if (data.error) alert(data.error);
       }
     } catch {
-      // Rollback
+      
       setLiked(!isLiking);
       setLikeCount((prev) => (isLiking ? prev - 1 : prev + 1));
     }
@@ -72,10 +72,10 @@ export default function AdActions({ adId, title, initialLikes = 0 }: AdActionsPr
       try {
         await navigator.share({ title, url });
       } catch {
-        // User cancelled
+        
       }
     } else {
-      // Fallback: copy to clipboard
+      
       await navigator.clipboard.writeText(url);
       setShared(true);
       setTimeout(() => setShared(false), 2000);

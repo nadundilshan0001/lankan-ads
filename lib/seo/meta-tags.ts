@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Meta Tags Generator
-// ============================================================
+
+
+
 
 import type { Metadata } from "next";
 import { SITE_CONFIG } from "../constants";

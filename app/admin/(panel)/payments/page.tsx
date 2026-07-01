@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Payments & Revenue (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./page.module.css";
@@ -43,7 +43,7 @@ export default function AdminPaymentsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filters
+  
   const [status, setStatus] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -119,7 +119,7 @@ export default function AdminPaymentsPage() {
         </button>
       </header>
 
-      {/* Revenue aggregated statistics cards */}
+      {}
       <section className={styles.revenueGrid}>
         <div className={styles.revCard}>
           <span className={styles.revLabel}>Revenue Today</span>
@@ -139,7 +139,7 @@ export default function AdminPaymentsPage() {
         </div>
       </section>
 
-      {/* Date & status filters */}
+      {}
       <section className={styles.filters}>
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Payment Status</label>
@@ -172,7 +172,7 @@ export default function AdminPaymentsPage() {
         </div>
       </section>
 
-      {/* Table */}
+      {}
       {isLoading ? (
         <div className={styles.loader}>
           <div className={styles.spinner}></div>
@@ -230,7 +230,7 @@ export default function AdminPaymentsPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <footer className={styles.pagination}>
           <button

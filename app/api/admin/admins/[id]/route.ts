@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin CRUD Actions (by ID)
-// DELETE: remove admin user
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -22,13 +22,13 @@ export async function DELETE(
     return NextResponse.json({ error: "Invalid admin ID." }, { status: 400 });
   }
 
-  // Prevent admin from deleting themselves
+  
   if (targetId === admin.userId) {
     return NextResponse.json({ error: "You cannot delete your own administrator account." }, { status: 400 });
   }
 
   try {
-    // 1. Fetch total admin users count to prevent locking out all admins
+    
     const { count } = await supabaseAdmin
       .from("admin_users")
       .select("*", { count: "exact", head: true });
@@ -37,7 +37,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Cannot delete the last remaining administrator account." }, { status: 400 });
     }
 
-    // 2. Fetch target admin to get their email for the logs
+    
     const { data: targetAdmin } = await supabaseAdmin
       .from("admin_users")
       .select("email")
@@ -48,7 +48,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Administrator not found." }, { status: 404 });
     }
 
-    // 3. Delete admin
+    
     const { error } = await supabaseAdmin
       .from("admin_users")
       .delete()

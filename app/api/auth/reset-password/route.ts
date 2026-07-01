@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: Reset Password (OTP Verified)
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -49,9 +49,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // SECURITY: Rate limit reset attempts — 5 per phone per 15 minutes
+    
     const rlKey = `reset-password:${phoneNumber.trim()}`;
-    const rl = rateLimit(rlKey, 5, 15 * 60 * 1000);
+    const rl = await rateLimit(rlKey, 5, 15 * 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: `Too many attempts. Please try again in ${rl.retryAfterSeconds} seconds.` },
@@ -59,22 +59,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify OTP from memory store or DB
-    const memoryRecord = otpStore.get(phoneNumber);
     
-    // Also query database as backup
+    const memoryRecord = await otpStore.get(phoneNumber);
+    
+    
     const { data: dbRecord } = await supabaseAdmin
       .from("password_resets")
       .select("otp_code, expires_at, used")
       .eq("phone_number", phoneNumber)
       .maybeSingle();
 
-    // SECURITY: No dev bypass — validate OTP strictly against stored record only
+    
     let isValid = false;
     let isExpired = false;
     let isUsed = false;
 
-    // Check memory first
+    
     if (memoryRecord) {
       if (memoryRecord.otpCode === otp) {
         isValid = true;
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Check DB if memory didn’t match
+    
     if (!isValid && dbRecord) {
       if (dbRecord.otp_code === otp) {
         isValid = true;
@@ -113,11 +113,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash the new password with PBKDF2-SHA512 + random salt (VULN-1 fix)
+    
     const newSalt = generateSalt();
     const newPasswordHash = hashPassword(newPassword, newSalt);
 
-    // Update user password
+    
     const { error: updateError } = await supabaseAdmin
       .from("users")
       .update({ password_hash: newPasswordHash, salt: newSalt })
@@ -130,15 +130,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mark OTP as used in memory
+    
     if (memoryRecord) {
-      otpStore.set(phoneNumber, {
+      await otpStore.set(phoneNumber, {
         ...memoryRecord,
         used: true,
       });
     }
 
-    // Mark OTP as used in DB
+    
     if (dbRecord) {
       await supabaseAdmin
         .from("password_resets")

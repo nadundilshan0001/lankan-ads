@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — robots.txt
-// ============================================================
+
+
+
 
 import type { MetadataRoute } from "next";
 import { SITE_CONFIG } from "@/lib/constants";

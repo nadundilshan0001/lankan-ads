@@ -1,9 +1,9 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Forgot Password Page
-// 3 steps: Enter Phone → Verify OTP → Set New Password
-// ============================================================
+
+
+
+
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
@@ -23,12 +23,12 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [devOtp, setDevOtp] = useState(""); // shown in dev mode
+  const [devOtp, setDevOtp] = useState(""); 
 
-  // OTP input refs for auto-advance
+  
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // ── Step 1: Send OTP ──
+  
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // ── OTP input handling with auto-advance ──
+  
   const handleOtpChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const updated = [...otp];
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // ── Step 2: Verify OTP ──
+  
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -82,11 +82,11 @@ export default function ForgotPasswordPage() {
       setError("Please enter all 6 digits of the OTP.");
       return;
     }
-    // Store code for step 3 and advance
+    
     setStep("password");
   };
 
-  // ── Step 3: Reset Password ──
+  
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -111,7 +111,7 @@ export default function ForgotPasswordPage() {
         setTimeout(() => router.push("/login"), 2500);
       } else {
         setError(data.error || "Failed to reset password.");
-        // If OTP expired, go back to step 1
+        
         if (data.error?.toLowerCase().includes("expired")) setStep("phone");
       }
     } catch {
@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       <div className={styles.authCard}>
-        {/* Header */}
+        {}
         <div className={styles.header}>
           <h1 className={styles.title}>
             {step === "phone" && "Forgot Password?"}
@@ -146,7 +146,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {/* Step Progress Indicator */}
+        {}
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", alignItems: "center" }}>
           {stepLabels.map((label, i) => (
             <React.Fragment key={label}>
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
           ))}
         </div>
 
-        {/* Errors / Success */}
+        {}
         {error && (
           <div className={styles.errorMsg} style={{ marginBottom: "1rem", textAlign: "center" }}>
             ⚠️ {error}
@@ -184,14 +184,14 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {/* Dev OTP hint */}
+        {}
         {devOtp && step === "otp" && (
           <div className={styles.infoBox} style={{ textAlign: "center" }}>
             🔧 <strong>Dev Mode OTP:</strong> {devOtp}
           </div>
         )}
 
-        {/* ── STEP 1: Phone ── */}
+        {}
         {step === "phone" && (
           <form className={styles.form} onSubmit={handleSendOtp}>
             <div className={styles.formGroup}>
@@ -219,7 +219,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        {/* ── STEP 2: OTP ── */}
+        {}
         {step === "otp" && (
           <form className={styles.form} onSubmit={handleVerifyOtp}>
             <div className={styles.otpGroup}>
@@ -259,7 +259,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        {/* ── STEP 3: New Password ── */}
+        {}
         {step === "password" && (
           <form className={styles.form} onSubmit={handleResetPassword}>
             <div className={styles.formGroup}>
@@ -300,7 +300,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        {/* Footer */}
+        {}
         <div className={styles.footer}>
           Remember your password?{" "}
           <Link href="/login" className={styles.link}>

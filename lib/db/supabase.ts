@@ -8,10 +8,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables in .env.local");
 }
 
-// Standard Supabase client (respects Row Level Security)
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Admin client (bypasses RLS - server-side only)
+
 export const supabaseAdmin = supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {

@@ -1,20 +1,9 @@
-// ============================================================
-// Lankan Ads — In-Memory Rate Limiter
-// Protects auth endpoints from brute-force and enumeration attacks
-// ============================================================
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number; // unix timestamp ms
-}
 
-const globalForRL = global as unknown as {
-  rateLimitStore: Map<string, RateLimitEntry>;
-};
 
-// Always persist globally across hot-reloads
-const store = globalForRL.rateLimitStore ?? new Map<string, RateLimitEntry>();
-globalForRL.rateLimitStore = store;
+
+
+import { redis } from "./redis";
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -22,46 +11,58 @@ export interface RateLimitResult {
   retryAfterSeconds: number;
 }
 
-/**
- * Check and record a rate-limited attempt for a given key.
- *
- * @param key        Unique identifier — e.g. `"login:0771234567"` or `"otp:ip:192.168.1.1"`
- * @param maxAttempts Maximum number of attempts allowed in the window
- * @param windowMs   Window duration in milliseconds (e.g. 15 * 60 * 1000 = 15 min)
- */
-export function rateLimit(
+const REDIS_PREFIX = "ratelimit:";
+
+
+export async function rateLimit(
   key: string,
   maxAttempts: number,
   windowMs: number
-): RateLimitResult {
-  const now = Date.now();
-  const entry = store.get(key);
+): Promise<RateLimitResult> {
+  const fullKey = `${REDIS_PREFIX}${key}`;
+  try {
+    
+    const currentCount = await redis.incr(fullKey);
 
-  // Window has expired — reset
-  if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, remaining: maxAttempts - 1, retryAfterSeconds: 0 };
+    
+    if (currentCount === 1) {
+      await redis.pexpire(fullKey, windowMs);
+    }
+
+    
+    const ttlMs = await redis.pttl(fullKey);
+    const retryAfterSeconds = ttlMs > 0 ? Math.ceil(ttlMs / 1000) : Math.ceil(windowMs / 1000);
+
+    if (currentCount > maxAttempts) {
+      return {
+        allowed: false,
+        remaining: 0,
+        retryAfterSeconds,
+      };
+    }
+
+    return {
+      allowed: true,
+      remaining: Math.max(0, maxAttempts - currentCount),
+      retryAfterSeconds: 0,
+    };
+  } catch (err) {
+    console.error("[Redis] Rate limiting check error for key:", key, err);
+    
+    return {
+      allowed: true,
+      remaining: 1,
+      retryAfterSeconds: 0,
+    };
   }
-
-  // Within window — increment
-  entry.count += 1;
-  store.set(key, entry);
-
-  if (entry.count > maxAttempts) {
-    const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
-    return { allowed: false, remaining: 0, retryAfterSeconds };
-  }
-
-  return {
-    allowed: true,
-    remaining: maxAttempts - entry.count,
-    retryAfterSeconds: 0,
-  };
 }
 
-/**
- * Reset the rate limit for a key (e.g. on successful login)
- */
-export function resetRateLimit(key: string): void {
-  store.delete(key);
+
+export async function resetRateLimit(key: string): Promise<void> {
+  const fullKey = `${REDIS_PREFIX}${key}`;
+  try {
+    await redis.del(fullKey);
+  } catch (err) {
+    console.error("[Redis] Error resetting rate limit for key:", key, err);
+  }
 }

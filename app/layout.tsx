@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Root Layout
-// ============================================================
+
+
+
 
 import type { Metadata, Viewport } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -65,9 +65,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  alternates: {
-    canonical: SITE_CONFIG.url,
   },
 };
 

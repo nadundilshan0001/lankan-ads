@@ -1,4 +1,4 @@
-/* District-wide Listing Page Styles */
+
 
 .container {
   max-width: 1200px;
@@ -33,7 +33,7 @@
   color: var(--text-muted);
 }
 
-/* Category Filter Chips */
+
 .filtersSection {
   margin-bottom: var(--space-2xl);
 }
@@ -70,7 +70,7 @@
   color: var(--text-primary);
 }
 
-/* Tier Sections */
+
 .tierSection {
   margin-bottom: var(--space-2xl);
 }
@@ -91,7 +91,7 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Districts Directory */
+
 .districtsSection {
   margin: var(--space-3xl) 0 var(--space-xl);
   padding: var(--space-2xl) 0;
@@ -133,7 +133,7 @@
   transform: translateY(-1px);
 }
 
-/* Empty State */
+
 .empty {
   text-align: center;
   padding: var(--space-3xl) 0;

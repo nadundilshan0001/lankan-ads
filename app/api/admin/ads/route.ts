@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Ads Management
-// GET: paginated ads list | POST: bulk/single ad actions
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";

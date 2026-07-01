@@ -1,10 +1,11 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Ad Gallery Client Component (with Lightbox)
-// ============================================================
+
+
+
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { AdImage } from "@/lib/types";
 import styles from "./AdGallery.module.css";
 
@@ -33,7 +34,7 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
     setLightboxOpen(false);
   }, []);
 
-  // Keyboard navigation controls
+  
   useEffect(() => {
     if (!lightboxOpen) return;
 
@@ -52,18 +53,22 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
 
   return (
     <div className={styles.gallery}>
-      {/* Main Image View */}
+      {}
       <div
         className={styles.mainImage}
         onClick={() => hasImages && setLightboxOpen(true)}
         style={{ cursor: hasImages ? "zoom-in" : "default" }}
       >
         {currentImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          
+          <Image
             src={currentImage.cloudinaryUrl}
             alt={`${titleEn} - view ${activeIdx + 1}`}
+            width={800}
+            height={600}
             className={styles.mainImg}
+            sizes="(max-width: 768px) 100vw, 800px"
+            priority
           />
         ) : (
           <div className={styles.imagePlaceholder}>
@@ -76,7 +81,7 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
         </span>
       </div>
 
-      {/* Thumbnails list */}
+      {}
       {hasImages && images.length > 1 && (
         <div className={styles.thumbnails}>
           {images.map((img, idx) => (
@@ -85,18 +90,21 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
               className={`${styles.thumbnail} ${idx === activeIdx ? styles.activeThumbnail : ""}`}
               onClick={() => setActiveIdx(idx)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {}
+              <Image
                 src={img.cloudinaryUrl}
                 alt={`${titleEn} thumbnail ${idx + 1}`}
+                width={100}
+                height={75}
                 className={styles.thumbImg}
+                sizes="100px"
               />
             </div>
           ))}
         </div>
       )}
 
-      {/* Full-Screen Lightbox Overlay */}
+      {}
       {lightboxOpen && currentImage && (
         <div className={styles.lightbox} onClick={handleClose}>
           <button
@@ -124,11 +132,15 @@ export default function AdGallery({ images, titleEn, adTier, categoryIcon }: AdG
           )}
 
           <div className={styles.lightboxImageContainer} onClick={(e) => e.stopPropagation()}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {}
+            <Image
               src={currentImage.cloudinaryUrl}
               alt={`${titleEn} - large view ${activeIdx + 1}`}
+              width={1200}
+              height={900}
               className={styles.lightboxImg}
+              sizes="(max-width: 1200px) 100vw, 1200px"
+              priority
             />
             <div className={styles.lightboxCaption}>
               {activeIdx + 1} / {images.length}

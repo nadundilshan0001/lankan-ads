@@ -1,23 +1,28 @@
-// ============================================================
-// Lankan Ads — Ad Expiry Cron Endpoint
-// Called by Vercel Cron (or any scheduler) daily at midnight
-// Protected by CRON_SECRET environment variable
-// ============================================================
+
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 
 export async function GET(request: Request) {
-  // Verify this is a legitimate cron invocation
+  
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("[Cron/Expire-Ads] CRON_SECRET is missing on the server.");
+      return NextResponse.json({ error: "Cron service is not configured on the server." }, { status: 500 });
+    }
+  } else if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    // Expire all active ads whose expires_at has passed
+    
     const { data, error, count } = await supabaseAdmin
       .from("ads")
       .update({ status: "expired" })

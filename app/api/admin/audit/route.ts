@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Audit Logs
-// GET: paginated list of all logs
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";

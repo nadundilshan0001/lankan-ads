@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Dashboard Overview (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -65,7 +65,7 @@ export default function AdminDashboardOverview() {
       if (res.ok && data.success) {
         setStats(data.stats);
         setPendingAds(data.pendingAds);
-        setRecentUsers(data.users.slice(0, 5)); // show top 5
+        setRecentUsers(data.users.slice(0, 5)); 
       } else {
         setError(data.error || "Failed to fetch dashboard data.");
       }
@@ -119,7 +119,7 @@ export default function AdminDashboardOverview() {
     <div className={styles.dashboard}>
       {error && <div className={styles.errorBanner}>{error}</div>}
 
-      {/* Overview Cards */}
+      {}
       <section className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
           <div className={styles.kpiInfo}>
@@ -154,9 +154,9 @@ export default function AdminDashboardOverview() {
         </div>
       </section>
 
-      {/* Main split sections */}
+      {}
       <div className={styles.sectionsSplit}>
-        {/* Pending Queue */}
+        {}
         <section className={styles.sectionMain}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Ad Moderation Queue</h2>
@@ -241,9 +241,9 @@ export default function AdminDashboardOverview() {
           )}
         </section>
 
-        {/* Sidebar widgets */}
+        {}
         <div className={styles.sidebarWidgets}>
-          {/* Recent registrations */}
+          {}
           <section className={styles.sectionSide}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Recent Users</h2>
@@ -268,7 +268,7 @@ export default function AdminDashboardOverview() {
             </div>
           </section>
 
-          {/* Quick operations */}
+          {}
           <section className={styles.sectionSide}>
             <h2 className={styles.sectionTitle}>Emergency Controls</h2>
             <div className={styles.quickOpsGrid}>

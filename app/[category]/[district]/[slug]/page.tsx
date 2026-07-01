@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Ad Detail Page (Dynamic SSR)
-// ============================================================
+
+
+
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default async function AdDetailPage({ params }: PageProps) {
         />
 
         <article className={styles.adDetail} id={`ad-detail-${ad.id}`}>
-          {/* Image Gallery (Client Component) */}
+          {}
           <AdGallery
             images={ad.images || []}
             titleEn={ad.titleEn}
@@ -66,9 +66,9 @@ export default async function AdDetailPage({ params }: PageProps) {
             categoryIcon={category?.icon}
           />
 
-          {/* Content */}
+          {}
           <div className={styles.content}>
-            {/* Title & Meta */}
+            {}
             <header className={styles.adHeader}>
               <div className={styles.adMeta}>
                 <span className="badge badge-category">{category?.name}</span>
@@ -96,10 +96,10 @@ export default async function AdDetailPage({ params }: PageProps) {
               </div>
             </header>
 
-            {/* Like, Save, Share Buttons */}
+            {}
             <AdActions adId={ad.id} title={ad.titleEn} initialLikes={ad.likeCount || 0} />
 
-            {/* Price */}
+            {}
             {ad.priceRange && (
               <div className={styles.priceBox}>
                 <span className={styles.priceLabel}>Starting Price</span>
@@ -107,7 +107,7 @@ export default async function AdDetailPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Description */}
+            {}
             <section className={styles.descriptionSection}>
               <h2 className={styles.sectionTitle}>Description</h2>
               <p className={styles.description}>{ad.descriptionEn}</p>
@@ -115,7 +115,7 @@ export default async function AdDetailPage({ params }: PageProps) {
 
 
 
-            {/* Contact CTA */}
+            {}
             <section className={styles.contactSection}>
               <h2 className={styles.sectionTitle}>Contact</h2>
               <div className={styles.contactActions}>
@@ -141,7 +141,7 @@ export default async function AdDetailPage({ params }: PageProps) {
               </p>
             </section>
 
-            {/* Report */}
+            {}
             <div className={styles.reportLink}>
               <ReportAdButton adId={ad.id} />
             </div>

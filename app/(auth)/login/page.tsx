@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Login Page (Client Component)
-// ============================================================
+
+
+
 
 import React, { useState } from "react";
 import Link from "next/link";

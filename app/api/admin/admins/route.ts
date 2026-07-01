@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Management CRUD
-// GET: list all | POST: create | DELETE: delete (by ID)
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Password must be at least 6 characters." }, { status: 400 });
     }
 
-    // Check if email already exists
+    
     const { data: existing } = await supabaseAdmin
       .from("admin_users")
       .select("id")
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "An administrator with this email already exists." }, { status: 400 });
     }
 
-    // Create new admin user with PBKDF2 hash + salt
+    
     const salt = generateSalt();
     const passwordHash = hashPassword(password, salt);
 

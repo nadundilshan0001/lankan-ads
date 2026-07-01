@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: PayHere Payment Webhook Callback
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import crypto from "crypto";
@@ -8,7 +8,7 @@ import { supabaseAdmin } from "@/lib/db/supabase";
 
 export async function POST(request: Request) {
   try {
-    // Parse form-urlencoded parameters sent by PayHere
+    
     const formData = await request.formData();
     
     const merchantId = formData.get("merchant_id")?.toString();
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const statusCode = formData.get("status_code")?.toString();
     const md5sig = formData.get("md5sig")?.toString();
 
-    // Required fields check
+    
     if (!merchantId || !orderId || !statusCode || !md5sig) {
       return NextResponse.json(
         { error: "Bad request. Missing transaction parameters." },
@@ -27,12 +27,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify signature to validate authenticity
-    // PayHere signature formula: MD5(merchant_id + order_id + payhere_amount + payhere_currency + status_code + MD5(merchant_secret))
-    const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET || "MOCK_MERCHANT_SECRET_12345";
+    
+    
+    const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
+    if (!merchantSecret) {
+      if (process.env.NODE_ENV === "production") {
+        console.error("[Webhook] PAYHERE_MERCHANT_SECRET is missing on the server.");
+        return NextResponse.json({ error: "PayHere service is not configured on the server." }, { status: 500 });
+      }
+    }
+    const safeSecret = merchantSecret || "MOCK_MERCHANT_SECRET_12345";
     const hashedSecret = crypto
       .createHash("md5")
-      .update(merchantSecret)
+      .update(safeSecret)
       .digest("hex")
       .toUpperCase();
       
@@ -50,17 +57,17 @@ export async function POST(request: Request) {
       .digest("hex")
       .toUpperCase();
 
-    // SECURITY: Enforce PayHere signature validation (prevents fake webhook calls)
+    
     if (localSignature !== md5sig?.toUpperCase()) {
       console.error("[Webhook] Invalid PayHere signature for order:", orderId);
       return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
     }
 
-    // status_code 2 = successful payment
+    
     if (statusCode === "2") {
       console.log(`[Webhook] Payment successful — Order: ${orderId}, PayHere ID: ${paymentId}`);
 
-      // 1. Look up the payment record by PayHere order ID
+      
       const { data: payment, error: paymentLookupError } = await supabaseAdmin
         .from("payments")
         .select("id, ad_id")
@@ -69,11 +76,11 @@ export async function POST(request: Request) {
 
       if (paymentLookupError || !payment) {
         console.error("[Webhook] Payment record not found for order:", orderId, paymentLookupError);
-        // Still return 200 so PayHere doesn't retry repeatedly
+        
         return new Response("OK", { status: 200 });
       }
 
-      // 2. Mark payment as completed
+      
       const { error: paymentUpdateError } = await supabaseAdmin
         .from("payments")
         .update({
@@ -87,7 +94,7 @@ export async function POST(request: Request) {
         console.error("[Webhook] Failed to update payment record:", paymentUpdateError);
       }
 
-      // 3. Activate the linked ad immediately
+      
       const { error: adUpdateError } = await supabaseAdmin
         .from("ads")
         .update({ status: "active" })
@@ -100,20 +107,20 @@ export async function POST(request: Request) {
       }
 
     } else if (statusCode === "0") {
-      // Pending / processing
+      
       console.log(`[Webhook] Payment pending for Order: ${orderId}`);
     } else {
-      // statusCode -1 = cancelled, -2 = failed, -3 = chargebacked
+      
       console.log(`[Webhook] Payment failed/cancelled for Order: ${orderId}, status: ${statusCode}`);
 
-      // Mark payment as failed in DB
+      
       await supabaseAdmin
         .from("payments")
         .update({ status: "failed" })
         .eq("payhere_order_id", orderId);
     }
 
-    // PayHere requires a simple 200 OK text response
+    
     return new Response("OK", { status: 200 });
   } catch {
     console.error("[Webhook] Unhandled error");

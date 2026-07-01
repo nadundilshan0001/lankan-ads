@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Mock Data for Development
-// ============================================================
+
+
+
 
 import type { Ad, FAQ } from "./types";
 
@@ -20,7 +20,7 @@ const MOCK_IMAGES = [
 ];
 
 export const MOCK_ADS: Ad[] = [
-  // Platinum Ads
+  
   {
     id: "ad-001",
     userId: "u1",
@@ -92,7 +92,7 @@ export const MOCK_ADS: Ad[] = [
     images: MOCK_IMAGES,
   },
 
-  // Premium Ads
+  
   {
     id: "ad-004",
     userId: "u4",
@@ -185,7 +185,7 @@ export const MOCK_ADS: Ad[] = [
     images: MOCK_IMAGES,
   },
 
-  // Standard Ads
+  
   {
     id: "ad-008",
     userId: "u8",
@@ -337,19 +337,19 @@ export const MOCK_FAQS: FAQ[] = [
   },
 ];
 
-// Helper: Get ads by tier
+
 export function getAdsByTier(tier: Ad["adTier"]) {
   return MOCK_ADS.filter((ad) => ad.adTier === tier && ad.status === "active");
 }
 
-// Helper: Get ads by category
+
 export function getAdsByCategory(categorySlug: string) {
   return MOCK_ADS.filter(
     (ad) => ad.category === categorySlug && ad.status === "active"
   );
 }
 
-// Helper: Get ads by district
+
 export function getAdsByDistrict(district: string) {
   return MOCK_ADS.filter(
     (ad) =>
@@ -358,7 +358,7 @@ export function getAdsByDistrict(district: string) {
   );
 }
 
-// Helper: Get ad by slug
+
 export function getAdBySlug(slug: string) {
   return MOCK_ADS.find((ad) => ad.slug === slug);
 }

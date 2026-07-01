@@ -1,15 +1,15 @@
-// ============================================================
-// Lankan Ads — API: Admin Storage Stats
-// Cloudinary + Supabase storage usage
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { verifyAdminCookieOrBearer } from "@/lib/adminAuth";
 
-// Simple in-memory cache (1 hour TTL) to avoid hammering Cloudinary API
+
 let cloudinaryCache: { data: any; fetchedAt: number } | null = null;
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL_MS = 60 * 60 * 1000; 
 
 async function fetchCloudinaryUsage() {
   if (cloudinaryCache && Date.now() - cloudinaryCache.fetchedAt < CACHE_TTL_MS) {
@@ -70,10 +70,10 @@ export async function GET(request: Request) {
   if (!admin) return NextResponse.json({ error: "Access denied." }, { status: 403 });
 
   try {
-    // Fetch Cloudinary stats (cached 1h)
+    
     const cloudinary = await fetchCloudinaryUsage();
 
-    // Fetch Supabase table row counts
+    
     const [usersRes, adsRes, imagesRes, paymentsRes, auditRes] = await Promise.all([
       supabaseAdmin.from("users").select("*", { count: "exact", head: true }),
       supabaseAdmin.from("ads").select("*", { count: "exact", head: true }),
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
       supabaseAdmin.from("audit_logs").select("*", { count: "exact", head: true }),
     ]);
 
-    // Fetch ad status breakdown
+    
     const statusBreakdown: Record<string, number> = {};
     const statuses = ["active", "pending", "draft", "expired", "deleted"];
     await Promise.all(

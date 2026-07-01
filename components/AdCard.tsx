@@ -1,8 +1,9 @@
-// ============================================================
-// Lankan Ads — Ad Card Component
-// ============================================================
+
+
+
 
 import Link from "next/link";
+import Image from "next/image";
 import type { Ad } from "@/lib/types";
 import { getCategoryBySlug } from "@/lib/constants";
 import CategoryIcon from "./CategoryIcon";
@@ -26,7 +27,7 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
 
   const timeAgo = getTimeAgo(ad.createdAt);
 
-  // Stats formatting helpers
+  
   const formatStatsNumber = (num: number): string => {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
@@ -37,7 +38,7 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
     return num.toString();
   };
 
-  // Simulate active stats for high-fidelity appearance
+  
   const simulatedViews = ad.viewCount;
   const simulatedLikes = ad.likeCount || 0;
 
@@ -49,21 +50,25 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
       className={`${styles.card} ${tierClass} ${ad.adTier === "platinum" ? styles.platinumCard : ""}`}
       id={`ad-${ad.id}`}
     >
-      {/* Overlapping Top Badges */}
+      {}
       <div className={styles.topBadges}>
         <span className={`${styles.badgeOverlapping} ${styles["badge" + ad.adTier.charAt(0).toUpperCase() + ad.adTier.slice(1)]}`}>
           {ad.adTier === "platinum" ? "Platinum Ad" : ad.adTier === "premium" ? "Premium Ad" : "Standard Ad"}
         </span>
       </div>
 
-      {/* Image Area (Left) */}
+      {}
       <Link href={adUrl} className={styles.imageWrapper}>
         {ad.images && ad.images.length > 0 ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          
+          <Image
             src={ad.images[0].cloudinaryUrl}
             alt={ad.titleEn}
+            width={400}
+            height={300}
             className={styles.adImage}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={ad.adTier === "platinum"}
           />
         ) : (
           <div className={styles.imagePlaceholder}>
@@ -73,13 +78,13 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
           </div>
         )}
 
-        {/* Small Category Label Overlay */}
+        {}
         <span className={styles.categoryBadge}>
           {category?.name || ad.category}
         </span>
       </Link>
 
-      {/* Content Area (Right) */}
+      {}
       <div className={styles.content}>
         <Link href={adUrl} className={styles.titleLink}>
           <h3 className={styles.title}>{ad.titleEn}</h3>

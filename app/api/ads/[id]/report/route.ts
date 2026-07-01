@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { rateLimit } from "@/lib/rateLimit";
 
-// POST /api/ads/[id]/report — submits a user report on an ad
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,13 +16,23 @@ export async function POST(
       return NextResponse.json({ error: "A reason is required." }, { status: 400 });
     }
 
-    // Get forwarded IP for basic spam prevention
+    
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
       request.headers.get("x-real-ip") ||
-      "unknown";
+      "127.0.0.1";
 
-    // Verify ad exists
+    
+    const rlKey = `report:${id}:${ip}`;
+    const rl = await rateLimit(rlKey, 3, 60 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Too many reports submitted. Please try again in ${rl.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
+    
     const { data: ad, error: adError } = await supabaseAdmin
       .from("ads")
       .select("id, title_en")
@@ -32,7 +43,7 @@ export async function POST(
       return NextResponse.json({ error: "Ad not found." }, { status: 404 });
     }
 
-    // Store report in audit_logs table (reuse existing infra)
+    
     const { error: insertError } = await supabaseAdmin
       .from("audit_logs")
       .insert({

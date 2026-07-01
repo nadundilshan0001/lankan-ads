@@ -1,22 +1,22 @@
-// ============================================================
-// Lankan Ads — API Route: Admin Panel Actions (Secured)
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { mapDbAd } from "@/lib/db/queries";
 import { verifyAdminCookieOrBearer } from "@/lib/adminAuth";
 
-// GET admin data: stats, pending ads, and users
+
 export async function GET(request: Request) {
   try {
-    // Verify admin privileges
+    
     const admin = verifyAdminCookieOrBearer(request);
     if (!admin) {
       return NextResponse.json({ error: "Access denied. Administrator privileges required." }, { status: 403 });
     }
 
-    // 1. Fetch pending ads
+    
     const { data: pendingAds, error: pendingError } = await supabaseAdmin
       .from("ads")
       .select("*, ad_images(*)")
@@ -27,19 +27,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: pendingError.message }, { status: 500 });
     }
 
-    // 2. Fetch active ads count
+    
     const { count: activeCount, error: activeError } = await supabaseAdmin
       .from("ads")
       .select("*", { count: "exact", head: true })
       .eq("status", "active");
 
-    // 3. Fetch users
+    
     const { data: dbUsers, error: usersError } = await supabaseAdmin
       .from("users")
       .select("*")
       .order("created_at", { ascending: false });
 
-    // 4. Fetch completed payments today (sum of amount_lkr)
+    
     const today = new Date();
     today.setHours(0,0,0,0);
     const { data: paymentsToday } = await supabaseAdmin
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
         id: u.id,
         phoneNumber: u.phone_number,
         isVerified: u.is_verified,
-        status: u.is_verified ? "active" : "pending", // fallback status
+        status: u.is_verified ? "active" : "pending", 
         createdAt: new Date(u.created_at).toLocaleDateString("en-LK"),
       })),
       stats,
@@ -80,10 +80,10 @@ export async function GET(request: Request) {
   }
 }
 
-// POST admin actions: approve ad, reject ad
+
 export async function POST(request: Request) {
   try {
-    // Verify admin privileges
+    
     const admin = verifyAdminCookieOrBearer(request);
     if (!admin) {
       return NextResponse.json({ error: "Access denied. Administrator privileges required." }, { status: 403 });
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     if (action === "approve_ad") {
       if (!adId) return NextResponse.json({ error: "Ad ID is required." }, { status: 400 });
 
-      // Approve: set status to 'active' and extend expiration to 7 days
+      
       const { error } = await supabaseAdmin
         .from("ads")
         .update({
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
     if (action === "reject_ad") {
       if (!adId) return NextResponse.json({ error: "Ad ID is required." }, { status: 400 });
 
-      // Reject: delete or draft the ad. We will set it to draft.
+      
       const { error } = await supabaseAdmin
         .from("ads")
         .update({ status: "draft" })
@@ -141,7 +141,7 @@ export async function POST(request: Request) {
 
     if (action === "toggle_user_status") {
       if (!userId) return NextResponse.json({ error: "User ID is required." }, { status: 400 });
-      // Since schema doesn't have banned status, we toggle is_verified for demo purposes
+      
       const { data: user } = await supabaseAdmin
         .from("users")
         .select("is_verified")

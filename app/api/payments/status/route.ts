@@ -1,13 +1,25 @@
-// ============================================================
-// Lankan Ads — API Route: Check Payment Status
-// Used by frontend to poll if LANKAQR transfer was received
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(request: Request) {
   try {
+    
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
+    const rlKey = `payment-status:${ip}`;
+    const rl = await rateLimit(rlKey, 30, 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Too many attempts. Please try again in ${rl.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get("order_id");
 
@@ -26,7 +38,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      status: payment.status, // "pending" | "completed" | "failed"
+      status: payment.status, 
       adId: payment.ad_id,
     });
   } catch {

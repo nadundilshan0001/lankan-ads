@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin User Actions (by ID)
-// POST: activate | deactivate | delete
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -22,7 +22,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid user ID." }, { status: 400 });
   }
 
-  // Prevent admin from acting on themselves
+  
   if (userId === admin.userId) {
     return NextResponse.json({ error: "Cannot perform this action on your own account." }, { status: 400 });
   }
@@ -44,14 +44,14 @@ export async function POST(
     }
 
     if (action === "deactivate") {
-      // Soft-disable: set is_active = false, hide their ads
+      
       const { error } = await supabaseAdmin
         .from("users")
         .update({ is_active: false })
         .eq("id", userId);
       if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
 
-      // Deactivate their ads too
+      
       await supabaseAdmin
         .from("ads")
         .update({ status: "draft" })
@@ -60,7 +60,7 @@ export async function POST(
     }
 
     if (action === "delete") {
-      // Soft delete: get all ads first, delete images, payments, ads, then user
+      
       const { data: userAds } = await supabaseAdmin
         .from("ads")
         .select("id")

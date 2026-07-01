@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API Route: Submit Manual Transaction Reference
-// Activates ad optimistically and saves Ref ID for admin review
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -22,10 +22,10 @@ export async function POST(request: Request) {
 
     const cleanRef = reference.trim();
     
-    // HIDDEN VALIDATION: Reject simple/obvious fake patterns
-    const isRepeated = /^(.)\1+$/.test(cleanRef); // e.g. "11111111"
+    
+    const isRepeated = /^(.)\1+$/.test(cleanRef); 
     const isSequential = "12345678901234567890".includes(cleanRef) || "98765432109876543210".includes(cleanRef);
-    const isTooShort = cleanRef.length < 8; // Sri Lankan bank CEFT/LANKAQR ref IDs are always at least 8-16 characters
+    const isTooShort = cleanRef.length < 8; 
     const isCommonFake = /^(test|testing|admin|payhere|lankaqr|1234|abc|fake)/i.test(cleanRef);
 
     if (isTooShort) {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Authenticate the user making the request
+    
     const authHeader = request.headers.get("authorization");
     let token: string | undefined;
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid session. Please log in again." }, { status: 401 });
     }
 
-    // 1. Look up the pending payment record
+    
     const { data: payment, error: lookupError } = await supabaseAdmin
       .from("payments")
       .select("id, ad_id, status")
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "Payment already verified." });
     }
 
-    // Check if this reference ID was already used recently to prevent duplicate inputs
+    
     const { data: duplicateRef } = await supabaseAdmin
       .from("payments")
       .select("id")
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Optimistically mark payment as completed and save the Reference ID
+    
     const { error: paymentUpdateError } = await supabaseAdmin
       .from("payments")
       .update({
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Failed to process transaction: ${paymentUpdateError.message}` }, { status: 500 });
     }
 
-    // 3. Activate the linked ad immediately (Optimistic live activation!)
+    
     const { error: adUpdateError } = await supabaseAdmin
       .from("ads")
       .update({ status: "active" })
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to publish listing." }, { status: 500 });
     }
 
-    // Log this optimistic validation in audit logs for security transparency
+    
     await supabaseAdmin.from("audit_logs").insert({
       action: "payment_reference_submitted",
       target_type: "payment",

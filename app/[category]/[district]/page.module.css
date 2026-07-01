@@ -1,4 +1,4 @@
-/* Category-District and Category-Subcategory Listing Page Styles */
+
 
 .container {
   max-width: 1200px;
@@ -47,7 +47,7 @@
   color: var(--text-muted);
 }
 
-/* Editorial Section for GEO/AEO */
+
 .editorialSection {
   margin: var(--space-xl) 0 var(--space-2xl);
   padding: var(--space-xl);
@@ -69,7 +69,7 @@
   color: var(--text-secondary);
 }
 
-/* Tier Sections */
+
 .tierSection {
   margin-bottom: var(--space-2xl);
   padding-top: var(--space-md);
@@ -91,7 +91,7 @@
   margin-bottom: var(--space-lg);
 }
 
-/* FAQs Section */
+
 .faqSection {
   margin: var(--space-3xl) 0 var(--space-xl);
   padding-top: var(--space-2xl);
@@ -157,7 +157,7 @@
   color: var(--text-secondary);
 }
 
-/* Empty State */
+
 .empty {
   text-align: center;
   padding: var(--space-3xl) 0;

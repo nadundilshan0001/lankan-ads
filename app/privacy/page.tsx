@@ -1,12 +1,15 @@
-// ============================================================
-// Lankan Ads — Privacy Policy Page
-// ============================================================
+
+
+
+
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const metadata = {
   title: "Privacy Policy | Lankan Ads",
   description:
     "Read the Privacy Policy for Lankan Ads — how we collect, use, and protect your personal data.",
   robots: { index: true, follow: true },
+  alternates: { canonical: `${SITE_CONFIG.url}/privacy` },
 };
 
 export default function PrivacyPage() {

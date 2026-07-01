@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Category + Subcategory OR Category + District Page (Dynamic SSR)
-// ============================================================
+
+
+
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -27,18 +27,18 @@ interface PageProps {
   params: Promise<{ category: string; district: string }>;
 }
 
-// Check what kind of page this is: sub-category or district
+
 async function getPageType(categorySlug: string, districtParam: string) {
   const category = CATEGORIES.find((c) => c.slug === categorySlug);
   if (!category) return null;
 
-  // 1. Check if the parameter matches a sub-category slug
+  
   const subCategory = category.subCategories.find((sub) => sub.slug === districtParam);
   if (subCategory) {
     return { type: "subcategory" as const, category, subCategory };
   }
 
-  // 2. Check if the parameter matches a district name
+  
   const districtName = DISTRICTS.find(
     (d) => d.toLowerCase().replace(/\s+/g, "-") === districtParam.toLowerCase()
   );
@@ -65,14 +65,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export function generateStaticParams() {
   const params: { category: string; district: string }[] = [];
 
-  // Generate for all categories × subcategories
+  
   CATEGORIES.forEach((cat) => {
     cat.subCategories.forEach((sub) => {
       params.push({ category: cat.slug, district: sub.slug });
     });
   });
 
-  // Generate for all categories × districts
+  
   CATEGORIES.forEach((cat) => {
     DISTRICTS.forEach((dist) => {
       params.push({
@@ -100,7 +100,7 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
   let editorialText = "";
   let breadcrumbs: { label: string; href: string }[] = [];
   let ads = [];
-  let pageUrl = `${SITE_CONFIG.url}/${category.slug}/${districtParam}`;
+  const pageUrl = `${SITE_CONFIG.url}/${category.slug}/${districtParam}`;
   let pageFaqs: FAQ[] = [];
   let schemaData: any[] = [];
 
@@ -113,13 +113,13 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
       { label: subCategory.name, href: `/${category.slug}/${subCategory.slug}` },
     ];
     
-    // Filter ads by category and subcategory
+    
     ads = await getAdsByCategoryAndSubcategory(category.slug, subCategory.id);
 
     editorialTitle = `About ${category.name} - ${subCategory.name} Services in Sri Lanka`;
     editorialText = `Welcome to the dedicated directory for ${category.name} ${subCategory.name} services on Lankan Ads. In the Sri Lankan local market, individuals seeking independent female, male, or transgender providers have specific preferences regarding availability and location. Our ${subCategory.name} sub-category features active ads from verified providers who offer services conforming to this location type (whether they host at their own private place, travel to client locations like homes and hotels, or both). We recommend checking provider profiles, reading their descriptions carefully, and contacting them directly via the WhatsApp links or direct phone numbers provided in their listings.`;
 
-    // FAQs for subcategory
+    
     pageFaqs = [
       {
         id: `faq-sub-1-${subCategory.id}`,
@@ -149,13 +149,13 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
       { label: districtName, href: `/${category.slug}/${districtParam}` },
     ];
 
-    // Filter ads by category and district
+    
     ads = await getAdsByCategoryAndDistrict(category.slug, districtParam);
 
     editorialTitle = `Browse ${category.name} Services in ${districtName}, Sri Lanka`;
     editorialText = `Discover leading local providers and businesses offering ${category.name.toLowerCase()} services in the ${districtName} district. As Sri Lanka's premium advertising platform, Lankan Ads serves the entire ${districtName} region, including major towns and suburbs. Every advertisement is posted by a local provider and reviewed by our administration. By choosing to search locally within ${districtName}, you can easily find providers close to you, minimizing travel and facilitating quick bookings. Check active listings to view rates, verified images, and direct WhatsApp contact details.`;
 
-    // FAQs for district page
+    
     pageFaqs = [
       {
         id: `faq-dist-1-${districtParam}`,
@@ -195,7 +195,7 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
       <div className={styles.container}>
         <Breadcrumbs items={breadcrumbs} />
 
-        {/* Header */}
+        {}
         <section className={styles.header}>
           <div className={styles.headerContent}>
             <span className={styles.headerIcon}>{category.icon}</span>
@@ -209,13 +209,13 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Programmatic SEO Editorial Content (GEO/AEO optimized) */}
+        {}
         <section className={styles.editorialSection} id="editorial-content">
           <h2 className={styles.editorialTitle}>{editorialTitle}</h2>
           <p className={styles.editorialText}>{editorialText}</p>
         </section>
 
-        {/* Ads by tier */}
+        {}
         {platinumAds.length > 0 && (
           <section className={styles.tierSection}>
             <div className={styles.tierHeader}>
@@ -267,7 +267,7 @@ export default async function SubCategoryOrDistrictPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* FAQs Accordion for AEO (Voice / Featured Snippets) */}
+        {}
         {pageFaqs.length > 0 && (
           <section className={styles.faqSection} id="faqs">
             <h2 className={styles.faqTitle}>Frequently Asked Questions</h2>

@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API: Admin Auth Logout
-// Clears the admin_session HttpOnly cookie
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function POST() {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
-    maxAge: 0, // expire immediately
+    maxAge: 0, 
   });
   return response;
 }

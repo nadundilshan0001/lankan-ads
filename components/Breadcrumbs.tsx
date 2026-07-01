@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Breadcrumbs Component (with BreadcrumbList schema)
-// ============================================================
+
+
+
 
 import Link from "next/link";
 import { SITE_CONFIG } from "@/lib/constants";

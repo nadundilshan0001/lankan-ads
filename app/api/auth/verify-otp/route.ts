@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — API Route: Verify OTP (Connected to DB)
-// ============================================================
+
+
+
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate format
+    
     const phoneRegex = /^(?:\+94|0)?7[0-9]{8}$/;
     if (typeof phoneNumber !== "string" || !phoneRegex.test(phoneNumber.trim())) {
       return NextResponse.json({ error: "Invalid phone number format." }, { status: 400 });
@@ -30,9 +30,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Verification code must be a 6-digit number." }, { status: 400 });
     }
 
-    // SECURITY: Rate limit OTP attempts — 5 per phone per 10 minutes
+    
     const rlKey = `verify-otp:${phoneNumber.trim()}`;
-    const rl = rateLimit(rlKey, 5, 10 * 60 * 1000);
+    const rl = await rateLimit(rlKey, 5, 10 * 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: `Too many verification attempts. Please try again in ${rl.retryAfterSeconds} seconds.` },
@@ -40,10 +40,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // SECURITY: Validate OTP against stored record (expiry + used + attempt tracking)
-    const stored = otpStore.get(phoneNumber.trim());
+    
+    const stored = await otpStore.get(phoneNumber.trim());
 
-    // Allow dev bypass ONLY in development mode
+    
     const isDevBypass = process.env.NODE_ENV !== "production" && code === stored?.otpCode;
 
     if (!stored) {
@@ -68,18 +68,18 @@ export async function POST(request: Request) {
     }
 
     if (stored.otpCode !== code) {
-      // Increment attempt counter on the stored OTP
-      otpStore.set(phoneNumber.trim(), { ...stored, attempts: (stored.attempts ?? 0) + 1 });
+      
+      await otpStore.set(phoneNumber.trim(), { ...stored, attempts: (stored.attempts ?? 0) + 1 });
       return NextResponse.json(
         { error: "Invalid verification code. Please check and try again." },
         { status: 400 }
       );
     }
 
-    // Mark OTP as used immediately
-    otpStore.set(phoneNumber.trim(), { ...stored, used: true });
+    
+    await otpStore.set(phoneNumber.trim(), { ...stored, used: true });
 
-    // Get user from DB
+    
     const { data: user, error: fetchError } = await supabaseAdmin
       .from("users")
       .select("id, phone_number, is_verified")
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update user status to verified in database
+    
     const { error: updateError } = await supabaseAdmin
       .from("users")
       .update({ is_verified: true })
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Verification failed. Please try again." }, { status: 500 });
     }
 
-    // Issue cryptographically signed token
+    
     const token = signToken({
       userId: user.id,
       phoneNumber: user.phone_number,

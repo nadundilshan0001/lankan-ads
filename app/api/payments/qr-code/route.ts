@@ -1,7 +1,7 @@
-// ============================================================
-// Lankan Ads — API Route: Secure LankaQR Image Server
-// Serves the payment QR code ONLY to logged-in verified users
-// ============================================================
+
+
+
+
 
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
@@ -11,7 +11,7 @@ import path from "path";
 
 export async function GET(request: Request) {
   try {
-    // 1. Authenticate the request
+    
     const authHeader = request.headers.get("authorization");
     let token: string | undefined;
 
@@ -36,8 +36,8 @@ export async function GET(request: Request) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    // 2. Read the private QR code file
-    // We store this file inside a private "secure-assets" folder
+    
+    
     const qrPath = path.join(process.cwd(), "secure-assets", "lanka-qr.jpeg");
 
     if (!fs.existsSync(qrPath)) {
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
 
     const fileBuffer = fs.readFileSync(qrPath);
 
-    // 3. Return the image with correct headers
+    
     return new Response(fileBuffer, {
       headers: {
         "Content-Type": "image/jpeg",

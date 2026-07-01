@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Ads Mod / Listings (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState, useCallback } from "react";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
@@ -28,7 +28,7 @@ export default function AdminAdsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filters
+  
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
@@ -81,7 +81,7 @@ export default function AdminAdsPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        // Optimistic update
+        
         if (action === "delete") {
           setAds((prev) => prev.filter((a) => a.id !== adId));
           setTotal((prev) => prev - 1);
@@ -142,14 +142,14 @@ export default function AdminAdsPage() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    setPage(1); // reset to page 1 on new filter
+    setPage(1); 
   };
 
   const handleFilterChange = (setter: (val: string) => void) => (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setter(e.target.value);
-    setPage(1); // reset to page 1
+    setPage(1); 
   };
 
   return (
@@ -165,7 +165,7 @@ export default function AdminAdsPage() {
         </div>
       </header>
 
-      {/* Filter Bar */}
+      {}
       <section className={styles.filters}>
         <input
           type="text"
@@ -211,7 +211,7 @@ export default function AdminAdsPage() {
         </div>
       </section>
 
-      {/* Table */}
+      {}
       {isLoading ? (
         <div className={styles.loader}>
           <div className={styles.spinner}></div>
@@ -352,7 +352,7 @@ export default function AdminAdsPage() {
         </div>
       )}
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <footer className={styles.pagination}>
           <button

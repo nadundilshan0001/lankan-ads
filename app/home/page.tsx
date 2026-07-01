@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — Landing Page (SSR)
-// ============================================================
+
+
+
 
 import Link from "next/link";
 import { generateHomeMetadata } from "@/lib/seo/meta-tags";
@@ -26,7 +26,7 @@ export default async function HomePage() {
     <>
       <SchemaMarkup data={generateFAQSchema(homeFaqs)} />
 
-      {/* ========== HERO SECTION ========== */}
+      {}
       <section className={styles.hero} id="hero">
         <div className={styles.heroBackground}>
           <video
@@ -81,7 +81,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== PLATINUM ADS ========== */}
+      {}
       {platinumAds.length > 0 && (
         <section className={`${styles.adSection} ${styles.platinumSection}`} id="platinum-ads">
           <div className="container">
@@ -110,7 +110,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ========== PREMIUM ADS ========== */}
+      {}
       {premiumAds.length > 0 && (
         <section className={`${styles.adSection} ${styles.premiumSection}`} id="premium-ads">
           <div className="container">
@@ -139,7 +139,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ========== STANDARD ADS ========== */}
+      {}
       {standardAds.length > 0 && (
         <section className={`${styles.adSection} ${styles.standardSection}`} id="standard-ads">
           <div className="container">
@@ -168,7 +168,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ========== CATEGORIES ========== */}
+      {}
       <section className={styles.categoriesSection} id="categories">
         <div className="container">
           <div className="section-header">
@@ -205,7 +205,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== PRICING TIERS ========== */}
+      {}
       <section className={styles.pricingSection} id="pricing">
         <div className="container">
           <div className="section-header">
@@ -254,7 +254,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== DISTRICTS BANNER ========== */}
+      {}
       <section className={styles.districtsSection} id="districts">
         <div className="container">
           <div className="section-header" style={{ marginBottom: 0 }}>
@@ -265,7 +265,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== FAQ ========== */}
+      {}
       <section className={styles.faqSection} id="faq-preview">
         <div className="container">
           <div className="section-header">
@@ -290,7 +290,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ========== CTA ========== */}
+      {}
       <section className={styles.ctaSection} id="cta">
         <div className="container">
           <div className={styles.ctaCard}>

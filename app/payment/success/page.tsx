@@ -1,9 +1,9 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Payment Success / Return Page
-// PayHere redirects here after successful payment
-// ============================================================
+
+
+
+
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -16,7 +16,7 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState<"loading" | "success" | "pending">("loading");
 
   useEffect(() => {
-    // Give the webhook a moment to fire and activate the ad
+    
     const timer = setTimeout(() => {
       setStatus("success");
     }, 2000);

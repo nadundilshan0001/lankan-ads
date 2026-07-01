@@ -1,4 +1,4 @@
-/* Category Page Styles */
+
 
 .header {
   padding: var(--space-2xl) 0;
@@ -37,7 +37,7 @@
   color: var(--text-muted);
 }
 
-/* Sub-categories */
+
 .subCategories {
   margin-bottom: var(--space-2xl);
 }
@@ -99,7 +99,7 @@
   transform: translateY(-50%) translateX(2px);
 }
 
-/* Tier Sections */
+
 .tierSection {
   margin-bottom: var(--space-2xl);
   padding-top: var(--space-xl);
@@ -121,7 +121,7 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Empty State */
+
 .empty {
   text-align: center;
   padding: var(--space-3xl) 0;

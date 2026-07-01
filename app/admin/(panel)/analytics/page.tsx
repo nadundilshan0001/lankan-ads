@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Charts & Diagnostics (Client Component)
-// ============================================================
+
+
+
 
 import React, { useEffect, useState } from "react";
 import {
@@ -104,7 +104,7 @@ export default function AdminAnalyticsPage() {
 
       {data && (
         <div className={styles.dashboardGrid}>
-          {/* Daily Revenue Chart */}
+          {}
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.chartTitle}>Daily Revenue Trends (LKR)</h2>
             <div className={styles.chartContainer}>
@@ -129,7 +129,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </section>
 
-          {/* Listings Created Per Day */}
+          {}
           <section className={styles.card}>
             <h2 className={styles.chartTitle}>Listings Posted Per Day</h2>
             <div className={styles.chartContainer}>
@@ -148,7 +148,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </section>
 
-          {/* Users Registered Per Day */}
+          {}
           <section className={styles.card}>
             <h2 className={styles.chartTitle}>User Registrations Per Day</h2>
             <div className={styles.chartContainer}>
@@ -167,7 +167,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </section>
 
-          {/* Category split donut chart */}
+          {}
           <section className={styles.card}>
             <h2 className={styles.chartTitle}>Listings by Category</h2>
             <div className={styles.chartContainer}>
@@ -195,7 +195,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </section>
 
-          {/* Tier distribution breakdown */}
+          {}
           <section className={styles.card}>
             <h2 className={styles.chartTitle}>Ads Distribution by Tier</h2>
             <div className={styles.chartContainer}>

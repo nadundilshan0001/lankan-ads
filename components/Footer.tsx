@@ -1,8 +1,9 @@
-// ============================================================
-// Lankan Ads — Footer Component
-// ============================================================
+
+
+
 
 import Link from "next/link";
+import Image from "next/image";
 import { CATEGORIES, SITE_CONFIG } from "@/lib/constants";
 import styles from "./Footer.module.css";
 
@@ -13,14 +14,16 @@ export default function Footer() {
     <footer className={styles.footer} id="site-footer">
       <div className={styles.container}>
         <div className={styles.grid}>
-          {/* Brand */}
+          {}
           <div className={styles.brand}>
             <Link href="/" className={styles.logo}>
               <div className={styles.logoIconContainer}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {}
+                <Image
                   src="/logo/logo-dark-mode.svg"
                   alt="Lankan Ads Logo"
+                  width={32}
+                  height={32}
                   className={styles.logoImage}
                 />
               </div>
@@ -41,7 +44,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Categories */}
+          {}
           <div className={styles.column}>
             <h3 className={styles.columnTitle}>Categories</h3>
             <ul className={styles.list}>
@@ -55,7 +58,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Quick Links */}
+          {}
           <div className={styles.column}>
             <h3 className={styles.columnTitle}>Quick Links</h3>
             <ul className={styles.list}>
@@ -67,7 +70,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {}
           <div className={styles.column}>
             <h3 className={styles.columnTitle}>Contact</h3>
             <ul className={styles.list}>

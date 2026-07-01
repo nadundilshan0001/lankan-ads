@@ -1,6 +1,6 @@
-// ============================================================
-// Lankan Ads — District Ads Listing Page (Dynamic SSR)
-// ============================================================
+
+
+
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -134,7 +134,7 @@ export default async function DistrictPage({ params }: PageProps) {
       <div className={styles.container}>
         <Breadcrumbs items={breadcrumbs} />
 
-        {/* Header */}
+        {}
         <section className={styles.header}>
           <h1 className={styles.title}>Ads in {districtName}</h1>
           <p className={styles.description}>
@@ -145,7 +145,7 @@ export default async function DistrictPage({ params }: PageProps) {
           </p>
         </section>
 
-        {/* Category Filters */}
+        {}
         <section className={styles.filtersSection}>
           <h2 className={styles.filterTitle}>Filter by Category</h2>
           <div className={styles.filterChips}>
@@ -161,7 +161,7 @@ export default async function DistrictPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Ads by tier */}
+        {}
         {platinumAds.length > 0 && (
           <section className={styles.tierSection}>
             <div className={styles.tierHeader}>
@@ -213,7 +213,7 @@ export default async function DistrictPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Other Districts Directory */}
+        {}
         <section className={styles.districtsSection}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Browse Other Locations</h2>

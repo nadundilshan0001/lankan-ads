@@ -1,4 +1,4 @@
-/* Ad Detail Page Styles */
+
 
 .adDetail {
   display: grid;
@@ -7,7 +7,7 @@
   padding: var(--space-xl) 0 var(--space-3xl);
 }
 
-/* Content */
+
 .content {
   display: flex;
   flex-direction: column;
@@ -49,7 +49,7 @@
   color: var(--text-secondary);
 }
 
-/* Price */
+
 .priceBox {
   display: flex;
   flex-direction: column;
@@ -74,7 +74,7 @@
   color: var(--color-primary-light);
 }
 
-/* Sections */
+
 .sectionTitle {
   font-size: var(--text-lg);
   font-weight: 700;
@@ -90,7 +90,7 @@
   white-space: pre-wrap;
 }
 
-/* Details Grid */
+
 .detailsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -120,7 +120,7 @@
   font-weight: 500;
 }
 
-/* Contact */
+
 .contactActions {
   display: flex;
   gap: var(--space-md);
@@ -147,7 +147,7 @@
   text-align: center;
 }
 
-/* Report */
+
 .reportLink {
   padding-top: var(--space-md);
   border-top: 1px solid var(--border-subtle);
@@ -167,12 +167,12 @@
   color: var(--color-secondary);
 }
 
-/* Back Link */
+
 .backLink {
   padding: var(--space-xl) 0 var(--space-3xl);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .adDetail {
     grid-template-columns: 1fr;

@@ -1,8 +1,8 @@
 "use client";
 
-// ============================================================
-// Lankan Ads — Admin Login (Client Component)
-// ============================================================
+
+
+
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,12 +33,12 @@ export default function AdminLogin() {
       if (res.ok && data.success) {
         localStorage.removeItem("lankan_ads_token");
         localStorage.removeItem("lankan_ads_phone");
-        // Since session is stored in an HttpOnly cookie, we don't store token in localStorage.
-        // We store user info in localStorage only for client-side context if needed.
+        
+        
         localStorage.setItem("lankan_ads_admin", JSON.stringify(data.admin));
         
-        // For backwards compatibility with old client header requests, if any component still expects it:
-        // Note: HttpOnly cookie is the secure way, but we can set dummy storage to avoid breaking any other client requests.
+        
+        
         localStorage.setItem("lankan_ads_token_role", "admin");
 
         router.push("/admin");
@@ -59,7 +59,7 @@ export default function AdminLogin() {
         <div className={styles.logoArea}>
           <Link href="/" className={styles.logo}>
             <div className={styles.logoIconContainer}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {}
               <img
                 src="/logo/logo-dark-mode.svg"
                 alt="Lankan Ads Logo"
