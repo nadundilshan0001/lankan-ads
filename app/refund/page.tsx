@@ -78,7 +78,7 @@ export default function RefundPage() {
             If you are charged twice for a single listing due to a technical glitch or payment gateway error:
           </p>
           <ul style={ulStyle}>
-            <li>Please contact us immediately at <a href="mailto:support@lankan-ads.lk" style={{ color: "var(--color-primary)" }}>support@lankan-ads.lk</a> with your transaction details and order ID.</li>
+            <li>Please contact us immediately at <a href="mailto:info@lankanads.lk" style={{ color: "var(--color-primary)" }}>info@lankanads.lk</a> with your transaction details and order ID.</li>
             <li>We will investigate the issue and process a refund for the duplicate charge within 5-7 working days.</li>
           </ul>
         </section>
@@ -88,7 +88,7 @@ export default function RefundPage() {
           <p>
             If you have questions regarding this policy, please reach out to our team:
             <br />
-            Email: <a href="mailto:support@lankan-ads.lk" style={{ color: "var(--color-primary)" }}>support@lankan-ads.lk</a>
+            Email: <a href="mailto:info@lankanads.lk" style={{ color: "var(--color-primary)" }}>info@lankanads.lk</a>
           </p>
         </section>
 

@@ -130,7 +130,7 @@ export async function POST(request: Request) {
         amount: formattedAmount,
         first_name: firstName || "Customer",
         last_name: "",
-        email: email || "customer@lankan-ads.lk",
+        email: email || "customer@lankanads.lk",
         phone: phone || "0771234567",
         address: "Sri Lanka",
         city: "Colombo",

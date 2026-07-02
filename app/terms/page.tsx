@@ -138,8 +138,8 @@ export default function TermsPage() {
           <h2 style={h2Style}>13. Contact</h2>
           <p>
             For questions about these Terms, please contact us at{" "}
-            <a href="mailto:support@lankan-ads.lk" style={{ color: "var(--color-primary)" }}>
-              support@lankan-ads.lk
+            <a href="mailto:info@lankanads.lk" style={{ color: "var(--color-primary)" }}>
+              info@lankanads.lk
             </a>
             .
           </p>

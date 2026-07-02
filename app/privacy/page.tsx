@@ -134,8 +134,8 @@ export default function PrivacyPage() {
           </ul>
           <p style={{ marginTop: "0.75rem" }}>
             To exercise these rights, contact us at{" "}
-            <a href="mailto:support@lankan-ads.lk" style={{ color: "var(--color-primary)" }}>
-              support@lankan-ads.lk
+            <a href="mailto:info@lankanads.lk" style={{ color: "var(--color-primary)" }}>
+              info@lankanads.lk
             </a>
             .
           </p>
@@ -159,8 +159,8 @@ export default function PrivacyPage() {
           <h2 style={h2Style}>11. Contact Us</h2>
           <p>
             If you have questions or concerns about this Privacy Policy, please contact:{" "}
-            <a href="mailto:support@lankan-ads.lk" style={{ color: "var(--color-primary)" }}>
-              support@lankan-ads.lk
+            <a href="mailto:info@lankanads.lk" style={{ color: "var(--color-primary)" }}>
+              info@lankanads.lk
             </a>
           </p>
         </section>

@@ -6,8 +6,8 @@ import { Category, TierInfo } from "./types";
 
 export const SITE_CONFIG = {
   name: "Lankan Ads",
-  domain: "lankan-ads.lk",
-  url: "https://lankan-ads.lk",
+  domain: "lankanads.lk",
+  url: "https://lankanads.lk",
   description:
     "Sri Lanka's premier classified ads platform for personal services, wellness, marriage proposals, and more. Find verified providers across all 25 districts.",
   tagline: "Sri Lanka's #1 Classified Ads Platform",
