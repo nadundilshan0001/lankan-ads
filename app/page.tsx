@@ -7,6 +7,7 @@ import { generateHomeMetadata } from "@/lib/seo/meta-tags";
 import { getAllActiveAds } from "@/lib/db/queries";
 import ListingsFilter from "@/components/ListingsFilter";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import MobileBanner from "@/components/MobileBanner";
 
 export const metadata = generateHomeMetadata();
 
@@ -17,6 +18,9 @@ export default async function BrowsePage() {
     <div className="container" style={{ paddingTop: "var(--space-xl)" }}>
       {}
       <Breadcrumbs items={[]} />
+
+      {}
+      <MobileBanner />
 
       {}
       <header style={{ marginBottom: "var(--space-md)" }}>

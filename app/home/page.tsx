@@ -9,6 +9,7 @@ import { getAdsByTier, getFaqs, getAllActiveAdsCount } from "@/lib/db/queries";
 import { generateFAQSchema } from "@/lib/seo/structured-data";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import AdCard from "@/components/AdCard";
+import MobileBanner from "@/components/MobileBanner";
 import styles from "./page.module.css";
 
 export const metadata = generateHomeMetadata();
@@ -49,6 +50,7 @@ export default async function HomePage() {
           <div className={styles.heroOrb3} />
         </div>
         <div className={`container ${styles.heroContent}`}>
+          <MobileBanner />
           <span className="section-label">Sri Lanka&apos;s #1 Classified Ads Platform</span>
           <h1 className={styles.heroTitle}>
             Discover Services
