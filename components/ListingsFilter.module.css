@@ -394,8 +394,10 @@
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 0.45rem 2.8rem;
+  padding: 0.45rem;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
 }
 
 .categoryBarTabs {
@@ -454,6 +456,7 @@
   transition: all 0.2s ease;
   z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  display: none; /* Hidden by default on desktop */
 }
 
 .scrollBtnLeft {
@@ -474,44 +477,8 @@
   height: 14px;
 }
 
-@media (min-width: 1024px) {
-  .categoryBarWrapper {
-    padding: 0.45rem;
-  }
-  .scrollBtn {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
   .categoryBarWrapper {
-    padding: 0.4rem 2.6rem;
-    margin-bottom: var(--space-sm);
-  }
-  .categoryTab {
-    font-size: 11px;
-    padding: 0.4rem 0.75rem;
-    flex: 0 0 135px !important;
-    width: 135px !important;
-    min-width: 135px !important;
-    max-width: 135px !important;
-    text-align: center;
-    justify-content: center;
-  }
-  .categoryTab:first-child {
-    flex: 0 0 60px !important;
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-  }
-  .scrollBtn {
-    width: 26px;
-    height: 26px;
-  }
-  .scrollBtnLeft {
-    left: 0.4rem;
-  }
-  .scrollBtnRight {
-    right: 0.4rem;
+    display: none !important; /* Hide completely in mobile view */
   }
 }
