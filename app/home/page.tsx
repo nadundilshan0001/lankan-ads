@@ -57,6 +57,26 @@ export default async function HomePage() {
             <br />
             <span className={styles.heroGradient}>Across Sri Lanka</span>
           </h1>
+          
+          <div className={styles.heroFeatures}>
+            <div className={styles.heroFeature}>
+              <span className={styles.heroFeatureIcon}>💸</span>
+              <span>100% Free Ads</span>
+            </div>
+            <div className={styles.heroFeature}>
+              <span className={styles.heroFeatureIcon}>⚡</span>
+              <span>Instant Live (No Approval Delay)</span>
+            </div>
+            <div className={styles.heroFeature}>
+              <span className={styles.heroFeatureIcon}>💬</span>
+              <span>24/7 Support</span>
+            </div>
+            <div className={styles.heroFeature}>
+              <span className={styles.heroFeatureIcon}>📍</span>
+              <span>All-Island Coverage</span>
+            </div>
+          </div>
+
           <p className={styles.heroSubtitle}>
             Browse verified providers in personal services, spa &amp; wellness,
             marriage proposals, and live cam — across all 25 districts.

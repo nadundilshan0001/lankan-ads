@@ -99,6 +99,35 @@
   background-clip: text;
 }
 
+.heroFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  animation: fadeInUp 0.8s ease-out 0.05s forwards;
+  opacity: 0;
+}
+
+.heroFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 50px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+}
+
+.heroFeatureIcon {
+  font-size: 1.1rem;
+}
+
 .heroSubtitle {
   font-size: var(--text-lg);
   max-width: 560px;
