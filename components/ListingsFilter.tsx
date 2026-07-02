@@ -143,9 +143,62 @@ export default function ListingsFilter({ initialAds }: ListingsFilterProps) {
     return processedAds.slice(startIndex, startIndex + adsPerPage);
   }, [processedAds, currentPage, adsPerPage]);
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollAmount = clientWidth * 0.6;
+      scrollRef.current.scrollTo({
+        left: direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <div className={styles.container}>
-      {}
+      {/* Category Bar */}
+      <div className={styles.categoryBarWrapper}>
+        <button 
+          onClick={() => scroll("left")} 
+          className={`${styles.scrollBtn} ${styles.scrollBtnLeft}`}
+          aria-label="Scroll left"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        
+        <div ref={scrollRef} className={styles.categoryBarTabs}>
+          <button
+            onClick={() => handleCategoryChange("")}
+            className={`${styles.categoryTab} ${selectedCategory === "" ? styles.categoryTabActive : ""}`}
+          >
+            All
+          </button>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleCategoryChange(cat.slug)}
+              className={`${styles.categoryTab} ${selectedCategory === cat.slug ? styles.categoryTabActive : ""}`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+
+        <button 
+          onClick={() => scroll("right")} 
+          className={`${styles.scrollBtn} ${styles.scrollBtnRight}`}
+          aria-label="Scroll right"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
       <aside className={`${styles.sidebar} ${showMobileFilters ? styles.sidebarOpen : ""}`}>
         {}
         <div className={styles.sidebarResultsHeader}>

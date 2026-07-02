@@ -111,7 +111,7 @@ export default async function HomePage() {
             </div>
             <div className={styles.heroStatDivider} />
             <div className={styles.heroStat}>
-              <span className={styles.heroStatNumber}>6</span>
+              <span className={styles.heroStatNumber}>{CATEGORIES.length}</span>
               <span className={styles.heroStatLabel}>Categories</span>
             </div>
           </div>
