@@ -483,7 +483,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .categoryBarWrapper {
     padding: 0.4rem 2.6rem;
     margin-bottom: var(--space-sm);
@@ -491,6 +491,12 @@
   .categoryTab {
     font-size: 11px;
     padding: 0.4rem 0.75rem;
+    flex: 0 0 135px;
+    text-align: center;
+    justify-content: center;
+  }
+  .categoryTab:first-child {
+    flex: 0 0 60px;
   }
   .scrollBtn {
     width: 26px;
