@@ -123,7 +123,10 @@
 }
 
 .heroFeatureIcon {
-  font-size: 1.1rem;
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .heroSubtitle {

@@ -60,19 +60,29 @@ export default async function HomePage() {
           
           <div className={styles.heroFeatures}>
             <div className={styles.heroFeature}>
-              <span className={styles.heroFeatureIcon}>💸</span>
+              <svg className={styles.heroFeatureIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
               <span>100% Free Ads</span>
             </div>
             <div className={styles.heroFeature}>
-              <span className={styles.heroFeatureIcon}>⚡</span>
+              <svg className={styles.heroFeatureIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
               <span>Instant Live (No Approval Delay)</span>
             </div>
             <div className={styles.heroFeature}>
-              <span className={styles.heroFeatureIcon}>💬</span>
+              <svg className={styles.heroFeatureIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
               <span>24/7 Support</span>
             </div>
             <div className={styles.heroFeature}>
-              <span className={styles.heroFeatureIcon}>📍</span>
+              <svg className={styles.heroFeatureIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
               <span>All-Island Coverage</span>
             </div>
           </div>
