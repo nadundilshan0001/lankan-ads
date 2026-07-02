@@ -34,8 +34,11 @@ export default async function HomePage() {
             muted
             loop
             playsInline
+            preload="auto"
+            poster="/media/Background-poster.jpg"
             className={styles.heroVideo}
           >
+            <source src="/media/Background-video-frontpage.webm" type="video/webm" />
             <source src="/media/Background-video-frontpage.mp4" type="video/mp4" />
           </video>
           <div className={styles.heroVideoOverlay} />
