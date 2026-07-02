@@ -12,6 +12,7 @@ import SchemaMarkup from "@/components/SchemaMarkup";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AgeGate from "@/components/AgeGate";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -93,6 +94,17 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <NextTopLoader
+          color="#8b5cf6"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={true}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #8b5cf6,0 0 5px #8b5cf6"
+        />
         {!isAdmin && <AgeGate />}
         {!isAdmin && <Header />}
         <main id="main-content">{children}</main>
