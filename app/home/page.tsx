@@ -14,12 +14,14 @@ import styles from "./page.module.css";
 export const metadata = generateHomeMetadata();
 
 export default async function HomePage() {
-  const platinumAds = await getAdsByTier("platinum");
-  const premiumAds = await getAdsByTier("premium");
-  const standardAds = await getAdsByTier("standard");
-  const faqs = await getFaqs();
+  const [platinumAds, premiumAds, standardAds, faqs, dbActiveCount] = await Promise.all([
+    getAdsByTier("platinum"),
+    getAdsByTier("premium"),
+    getAdsByTier("standard"),
+    getFaqs(),
+    getAllActiveAdsCount(),
+  ]);
   const homeFaqs = faqs.slice(0, 4);
-  const dbActiveCount = await getAllActiveAdsCount();
   const displayActiveCount = dbActiveCount > 0 ? `${dbActiveCount}+` : "500+";
 
   return (
