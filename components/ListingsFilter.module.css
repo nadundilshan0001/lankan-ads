@@ -491,12 +491,18 @@
   .categoryTab {
     font-size: 11px;
     padding: 0.4rem 0.75rem;
-    flex: 0 0 135px;
+    flex: 0 0 135px !important;
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
     text-align: center;
     justify-content: center;
   }
   .categoryTab:first-child {
-    flex: 0 0 60px;
+    flex: 0 0 60px !important;
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
   }
   .scrollBtn {
     width: 26px;
