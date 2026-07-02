@@ -27,7 +27,7 @@ export default function AgeGate() {
 
   const handleConfirm = () => {
     
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
     document.cookie = `age_verified=true; expires=${expires}; path=/; SameSite=Strict`;
     document.body.style.overflow = "";
     setVisible(false);
