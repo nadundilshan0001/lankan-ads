@@ -387,15 +387,13 @@
 
 .categoryBarWrapper {
   grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
   position: relative;
   width: 100%;
   margin-bottom: var(--space-sm);
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 0.4rem;
+  padding: 0.4rem 2.2rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -403,9 +401,8 @@
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
-  flex: 1;
   gap: 0.35rem;
-  padding: 0 0.25rem;
+  padding: 0.2rem 0;
   scrollbar-width: none;
 }
 
@@ -438,6 +435,9 @@
 }
 
 .scrollBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,15 +445,23 @@
   height: 28px;
   border-radius: 50%;
   border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
-  flex-shrink: 0;
+  z-index: 10;
+}
+
+.scrollBtnLeft {
+  left: 0.5rem;
+}
+
+.scrollBtnRight {
+  right: 0.5rem;
 }
 
 .scrollBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-glass);
   border-color: var(--text-secondary);
 }
 
@@ -463,6 +471,9 @@
 }
 
 @media (min-width: 1024px) {
+  .categoryBarWrapper {
+    padding: 0.4rem;
+  }
   .scrollBtn {
     display: none;
   }
