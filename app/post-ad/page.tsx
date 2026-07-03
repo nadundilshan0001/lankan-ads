@@ -118,6 +118,12 @@ export default function PostAdPage() {
   }, []);
 
   useEffect(() => {
+    if (selectedCategory === "live-cam") {
+      setCity("");
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
     if (typeof window === "undefined") return;
     const queryParams = new URLSearchParams(window.location.search);
     const initialTier = queryParams.get("tier");
@@ -305,9 +311,11 @@ export default function PostAdPage() {
     }
 
     const trimmedCity = city.trim();
-    if (trimmedCity.length < 2 || trimmedCity.length > 150) {
-      triggerValidationError("City must be between 2 and 150 characters long.");
-      return;
+    if (selectedCategory !== "live-cam" && trimmedCity.length > 0) {
+      if (trimmedCity.length < 2 || trimmedCity.length > 150) {
+        triggerValidationError("City must be between 2 and 150 characters long.");
+        return;
+      }
     }
 
     if (isAdmin) {
@@ -388,7 +396,7 @@ export default function PostAdPage() {
           priceRange,
           contactNumber: `${contactNumber}|${whatsappNumber || contactNumber}`,
           district,
-          city,
+          city: selectedCategory === "live-cam" ? "" : city.trim(),
           availabilityHours,
           role: selectedCategory === "gay" ? role : undefined,
           adTier: selectedTier,
@@ -449,7 +457,7 @@ export default function PostAdPage() {
           priceRange,
           contactNumber: `${contactNumber}|${whatsappNumber || contactNumber}`,
           district,
-          city,
+          city: selectedCategory === "live-cam" ? "" : city.trim(),
           availabilityHours,
           role: selectedCategory === "gay" ? role : undefined,
           adTier: selectedTier,
@@ -892,19 +900,20 @@ export default function PostAdPage() {
                 </select>
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="city">
-                  City / Area
-                </label>
-                <textarea
-                  id="city"
-                  placeholder="e.g. Colombo 07, Cinnamon Gardens, Colombo 03 (You can enter multiple areas)"
-                  className={styles.cityTextarea}
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                />
-              </div>
+              {selectedCategory !== "live-cam" && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label} htmlFor="city">
+                    City / Area (Optional)
+                  </label>
+                  <textarea
+                    id="city"
+                    placeholder="e.g. Colombo 07, Cinnamon Gardens, Colombo 03 (You can enter multiple areas)"
+                    className={styles.cityTextarea}
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                </div>
+              )}
 
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                 <label className={styles.label} htmlFor="hours">

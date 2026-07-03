@@ -275,11 +275,15 @@ export async function POST(request: Request) {
       );
     }
 
-    if (sanitizedCity.length < 2 || sanitizedCity.length > 150) {
-      return NextResponse.json(
-        { error: "City must be between 2 and 150 characters long." },
-        { status: 400 }
-      );
+    const finalCity = category === "live-cam" ? "" : sanitizedCity.trim();
+
+    if (finalCity.length > 0) {
+      if (finalCity.length < 2 || finalCity.length > 150) {
+        return NextResponse.json(
+          { error: "City must be between 2 and 150 characters long." },
+          { status: 400 }
+        );
+      }
     }
 
     
@@ -361,7 +365,7 @@ export async function POST(request: Request) {
       .trim()
       .replace(/\s+/g, "-");
     
-    let cleanCity = sanitizedCity
+    let cleanCity = finalCity
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .trim()
@@ -385,9 +389,9 @@ export async function POST(request: Request) {
         description_si: sanitizedDescriptionSi,
         slug,
         contact_number: contactNumber,
-        service_area: `${sanitizedCity}, ${matchedDistrict}`,
+        service_area: finalCity ? `${finalCity}, ${matchedDistrict}` : matchedDistrict,
         district: matchedDistrict,
-        city: sanitizedCity,
+        city: finalCity,
         price_range: sanitizedPriceRange,
         availability_hours: role ? JSON.stringify({ role, hours: sanitizedAvailabilityHours }) : sanitizedAvailabilityHours,
         ad_tier: adTier || "standard",
