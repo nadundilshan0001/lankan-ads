@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { verifyToken } from "@/lib/auth";
+import { sendAdToTelegram } from "@/lib/telegram";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
@@ -118,6 +119,11 @@ export async function POST(request: Request) {
       console.error("[submit-reference] Failed to activate ad:", adUpdateError.message);
       return NextResponse.json({ error: "Failed to publish listing." }, { status: 500 });
     }
+
+    // Trigger Telegram notification in the background
+    sendAdToTelegram(payment.ad_id).catch((err) => {
+      console.error("[submit-reference] Telegram background notify error:", err);
+    });
 
     
     await supabaseAdmin.from("audit_logs").insert({

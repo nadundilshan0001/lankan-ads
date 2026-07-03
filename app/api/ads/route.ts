@@ -7,6 +7,7 @@ import { supabase, supabaseAdmin } from "@/lib/db/supabase";
 import { mapDbAd } from "@/lib/db/queries";
 
 import { verifyToken, generateSalt, hashPassword } from "@/lib/auth";
+import { sendAdToTelegram } from "@/lib/telegram";
 import crypto from "crypto";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
 import { cookies } from "next/headers";
@@ -475,6 +476,11 @@ export async function POST(request: Request) {
       if (paymentError) {
         console.error("Failed to insert payment record:", paymentError);
       }
+
+      // Trigger Telegram notification in the background
+      sendAdToTelegram(adRow.id).catch((err) => {
+        console.error("[TELEGRAM] Background notifier error:", err);
+      });
     }
 
     return NextResponse.json({

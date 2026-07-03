@@ -5,6 +5,7 @@
 
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { sendAdToTelegram } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -176,6 +177,11 @@ export async function POST(request: Request) {
       console.error(`[SMS Webhook] Failed to activate ad ${payment.ad_id}:`, adUpdateError);
       return NextResponse.json({ error: "Failed to activate ad" }, { status: 500 });
     }
+
+    // Trigger Telegram notification in the background
+    sendAdToTelegram(payment.ad_id).catch((err) => {
+      console.error("[SMS Webhook] Telegram background notify error:", err);
+    });
 
     console.log(`[SMS Webhook] Success! Ad ${payment.ad_id} is now ACTIVE.`);
 

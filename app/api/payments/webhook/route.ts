@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/db/supabase";
+import { sendAdToTelegram } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -104,6 +105,11 @@ export async function POST(request: Request) {
         console.error("[Webhook] Failed to activate ad:", payment.ad_id, adUpdateError);
       } else {
         console.log(`[Webhook] Ad ${payment.ad_id} is now ACTIVE.`);
+        
+        // Trigger Telegram notification in the background
+        sendAdToTelegram(payment.ad_id).catch((err) => {
+          console.error("[Webhook] Telegram background notify error:", err);
+        });
       }
 
     } else if (statusCode === "0") {

@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/db/supabase";
 import { verifyAdminCookieOrBearer } from "@/lib/adminAuth";
 import { logAdminAction, getClientIp } from "@/lib/adminAudit";
+import { sendAdToTelegram } from "@/lib/telegram";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -51,6 +52,11 @@ export async function POST(
         })
         .eq("id", adId);
       if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+
+      // Trigger Telegram notification in the background
+      sendAdToTelegram(adId).catch((err) => {
+        console.error("[TELEGRAM] Background notifier error:", err);
+      });
     }
 
     if (action === "deactivate") {
