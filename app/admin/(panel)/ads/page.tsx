@@ -161,8 +161,21 @@ export default function AdminAdsPage() {
           <p className={styles.subtitle}>Moderate, deactivate, delete and filter all ads listed on LankanAds.</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <Link href="/post-ad" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-            <span>➕</span> Post Ad (Free)
+          <Link href="/post-ad" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "4px", textDecoration: "none" }}>
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Post Ad (Free)
           </Link>
           <div className={styles.counterBox}>
             <span className={styles.counterVal}>{total}</span>
