@@ -6,7 +6,8 @@ import { NextResponse } from "next/server";
 import { supabase, supabaseAdmin } from "@/lib/db/supabase";
 import { mapDbAd } from "@/lib/db/queries";
 
-import { verifyToken } from "@/lib/auth";
+import { verifyToken, generateSalt, hashPassword } from "@/lib/auth";
+import crypto from "crypto";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
 import { cookies } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
@@ -187,11 +188,18 @@ export async function POST(request: Request) {
       }
 
       if (!user) {
-        
+        // If the user profile doesn't exist, we auto-create a user profile for them
+        const randomTempPassword = crypto.randomBytes(16).toString("hex");
+        const salt = generateSalt();
+        const passwordHash = hashPassword(randomTempPassword, salt);
+
         const { data: newUser, error: createError } = await supabaseAdmin
           .from("users")
           .insert({
             phone_number: targetPhone,
+            password_hash: passwordHash,
+            salt,
+            language_preference: "en",
             is_verified: false,
             is_active: true,
           })
@@ -199,6 +207,7 @@ export async function POST(request: Request) {
           .single();
 
         if (createError || !newUser) {
+          console.error("[POST /api/ads] Failed to auto-create user profile:", createError);
           return NextResponse.json(
             { error: "Failed to auto-create user profile for the contact number." },
             { status: 500 }
