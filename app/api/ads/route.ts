@@ -160,8 +160,7 @@ export async function POST(request: Request) {
       !titleEn ||
       !descriptionEn ||
       !contactNumber ||
-      !district ||
-      !city
+      !district
     ) {
       return NextResponse.json(
         { error: "Missing required fields." },
