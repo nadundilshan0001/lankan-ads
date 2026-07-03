@@ -5,6 +5,7 @@
 
 
 import React, { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { CATEGORIES, DISTRICTS } from "@/lib/constants";
 import styles from "./page.module.css";
 
@@ -159,9 +160,14 @@ export default function AdminAdsPage() {
           <h1 className={styles.title}>Listings Moderation</h1>
           <p className={styles.subtitle}>Moderate, deactivate, delete and filter all ads listed on LankanAds.</p>
         </div>
-        <div className={styles.counterBox}>
-          <span className={styles.counterVal}>{total}</span>
-          <span className={styles.counterLabel}>Total Ads</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Link href="/post-ad" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+            <span>➕</span> Post Ad (Free)
+          </Link>
+          <div className={styles.counterBox}>
+            <span className={styles.counterVal}>{total}</span>
+            <span className={styles.counterLabel}>Total Ads</span>
+          </div>
         </div>
       </header>
 
