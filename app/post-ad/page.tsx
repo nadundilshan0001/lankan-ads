@@ -305,8 +305,8 @@ export default function PostAdPage() {
     }
 
     const trimmedCity = city.trim();
-    if (trimmedCity.length < 2 || trimmedCity.length > 50) {
-      triggerValidationError("City must be between 2 and 50 characters long.");
+    if (trimmedCity.length < 2 || trimmedCity.length > 150) {
+      triggerValidationError("City must be between 2 and 150 characters long.");
       return;
     }
 

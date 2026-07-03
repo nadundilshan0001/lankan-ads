@@ -275,9 +275,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (sanitizedCity.length < 2 || sanitizedCity.length > 50) {
+    if (sanitizedCity.length < 2 || sanitizedCity.length > 150) {
       return NextResponse.json(
-        { error: "City must be between 2 and 50 characters long." },
+        { error: "City must be between 2 and 150 characters long." },
         { status: 400 }
       );
     }
