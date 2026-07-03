@@ -247,16 +247,16 @@ export async function POST(request: Request) {
     const sanitizedAvailabilityHours = sanitizeInput(availabilityHours || "");
 
     
-    if (sanitizedTitleEn.length < 5 || sanitizedTitleEn.length > 100) {
+    if (sanitizedTitleEn.length < 5 || sanitizedTitleEn.length > 500) {
       return NextResponse.json(
-        { error: "English Title must be between 5 and 100 characters long." },
+        { error: "English Title must be between 5 and 500 characters long." },
         { status: 400 }
       );
     }
 
-    if (titleSi && (sanitizedTitleSi.length < 5 || sanitizedTitleSi.length > 100)) {
+    if (titleSi && (sanitizedTitleSi.length < 5 || sanitizedTitleSi.length > 500)) {
       return NextResponse.json(
-        { error: "Sinhala Title must be between 5 and 100 characters long if provided." },
+        { error: "Sinhala Title must be between 5 and 500 characters long if provided." },
         { status: 400 }
       );
     }

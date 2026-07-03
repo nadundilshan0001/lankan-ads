@@ -262,9 +262,9 @@ export default function PostAdPage() {
     }
 
     const trimmedTitle = titleEn.trim();
-    if (trimmedTitle.length < 5 || trimmedTitle.length > 100) {
+    if (trimmedTitle.length < 5 || trimmedTitle.length > 500) {
       triggerValidationError(
-        "Ad Title must be between 5 and 100 characters long.",
+        "Ad Title must be between 5 and 500 characters long.",
       );
       return;
     }
