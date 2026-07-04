@@ -108,16 +108,20 @@ export async function sendAdToTelegram(adId: string) {
       await supabaseAdmin
         .from("ads")
         .update({ telegram_posted: false })
-        .eq("id", adId).catch(() => {});
+        .eq("id", adId);
     } else {
       console.log(`[TELEGRAM] Successfully posted ad ${adId} to Telegram channel.`);
     }
   } catch (err) {
     console.error("[TELEGRAM] Exception posting ad to Telegram:", err);
     // Reset the flag in case of network/fetch errors
-    await supabaseAdmin
-      .from("ads")
-      .update({ telegram_posted: false })
-      .eq("id", adId).catch(() => {});
+    try {
+      await supabaseAdmin
+        .from("ads")
+        .update({ telegram_posted: false })
+        .eq("id", adId);
+    } catch (dbErr) {
+      console.error("[TELEGRAM] Failed to reset flag in catch:", dbErr);
+    }
   }
 }
