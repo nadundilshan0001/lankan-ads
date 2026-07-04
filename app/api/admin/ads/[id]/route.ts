@@ -54,7 +54,7 @@ export async function POST(
       if (error) return NextResponse.json({ error: "Internal server error." }, { status: 500 });
 
       // Trigger Telegram notification in the background
-      sendAdToTelegram(adId).catch((err) => {
+      await sendAdToTelegram(adId).catch((err) => {
         console.error("[TELEGRAM] Background notifier error:", err);
       });
     }

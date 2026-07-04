@@ -478,7 +478,7 @@ export async function POST(request: Request) {
       }
 
       // Trigger Telegram notification in the background
-      sendAdToTelegram(adRow.id).catch((err) => {
+      await sendAdToTelegram(adRow.id).catch((err) => {
         console.error("[TELEGRAM] Background notifier error:", err);
       });
     }

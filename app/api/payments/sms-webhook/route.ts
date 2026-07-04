@@ -179,7 +179,7 @@ export async function POST(request: Request) {
     }
 
     // Trigger Telegram notification in the background
-    sendAdToTelegram(payment.ad_id).catch((err) => {
+    await sendAdToTelegram(payment.ad_id).catch((err) => {
       console.error("[SMS Webhook] Telegram background notify error:", err);
     });
 
