@@ -11,8 +11,7 @@
   animation: fadeInUp 0.5s ease-out forwards;
   opacity: 0;
   margin-top: 10px; 
-  min-height: 145px; 
-  height: auto; 
+  height: 145px; 
 }
 
 .card:hover {
@@ -244,8 +243,7 @@
   .card {
     flex-direction: row;
     margin-top: 8px;
-    min-height: 110px; 
-    height: auto;
+    height: 110px; 
   }
 
   .imageWrapper {
