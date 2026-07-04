@@ -10,7 +10,7 @@ export const SITE_CONFIG = {
   url: "https://lankanads.lk",
   description:
     "Sri Lanka's premier classified ads platform for personal services, wellness, marriage proposals, and more. Find verified providers across all 25 districts.",
-  tagline: "Sri Lanka's #1 Classified Ads Platform",
+  tagline: "Sri Lanka's #1 Free Classified & Personal Ads Platform",
   locale: "en_LK",
   ogImage: "/og-default.png",
 };

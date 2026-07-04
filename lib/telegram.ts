@@ -79,7 +79,7 @@ export async function sendAdToTelegram(adId: string) {
     const categoryName = getCategoryName(ad.category);
     const location = ad.service_area || ad.district;
     const contact = ad.contact_number ? ad.contact_number.split("|")[0].trim() : "N/A";
-    const adUrl = `${appUrl}/ad/${ad.slug}`;
+    const adUrl = `${appUrl}/${ad.category}/${encodeURIComponent(ad.district.toLowerCase())}/${ad.slug}`;
 
     const text = `🔥 *New Ad Posted on LankanAds!* 🔥\n\n` +
                  `📌 *Category:* ${categoryEmoji} ${categoryName}\n` +

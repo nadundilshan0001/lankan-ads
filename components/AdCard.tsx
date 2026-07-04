@@ -101,7 +101,9 @@ export default function AdCard({ ad, variant = "default" }: AdCardProps) {
 
         <div className={styles.meta}>
           <span className={styles.metaItem}>
-            {ad.city}, {ad.district}
+            <span className={styles.locationText} title={ad.city ? `${ad.city}, ${ad.district}` : ad.district}>
+              {ad.city ? `${ad.city}, ` : ""}{ad.district}
+            </span>
           </span>
           {ad.priceRange && (
             <span className={styles.metaItem}>

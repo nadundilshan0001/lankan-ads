@@ -17,6 +17,13 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
+  icons: {
+    icon: [
+      { url: "/logo/logo-dark-mode.svg", type: "image/svg+xml" }
+    ],
+    shortcut: "/logo/logo-dark-mode.svg",
+    apple: "/logo/logo-dark-mode.svg",
+  },
   title: {
     default: `${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`,
     template: `%s | ${SITE_CONFIG.name}`,
