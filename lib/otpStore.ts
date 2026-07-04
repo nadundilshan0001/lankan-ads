@@ -1,9 +1,4 @@
-
-
-
-
-
-import { redis } from "./redis";
+import { supabaseAdmin } from "@/lib/db/supabase";
 
 export interface OtpData {
   otpCode: string;
@@ -12,21 +7,26 @@ export interface OtpData {
   attempts: number; 
 }
 
-const REDIS_PREFIX = "otp:";
-
 export const otpStore = {
   
   async get(key: string): Promise<OtpData | null> {
     try {
-      const data = await redis.get<OtpData>(`${REDIS_PREFIX}${key}`);
-      if (!data) return null;
-      
+      const { data, error } = await supabaseAdmin
+        .from("otps")
+        .select("*")
+        .eq("phone_number", key)
+        .maybeSingle();
+
+      if (error || !data) return null;
+
       return {
-        ...data,
-        expiresAt: new Date(data.expiresAt),
+        otpCode: data.otp_code,
+        expiresAt: new Date(data.expires_at),
+        used: data.used,
+        attempts: data.attempts,
       };
     } catch (err) {
-      console.error("[Redis] Error fetching OTP key:", key, err);
+      console.error("[Supabase OTP] Error fetching OTP key:", key, err);
       return null;
     }
   },
@@ -34,25 +34,37 @@ export const otpStore = {
   
   async set(key: string, data: OtpData): Promise<void> {
     try {
-      const expiresTime = new Date(data.expiresAt).getTime();
-      const ttlSeconds = Math.max(0, Math.ceil((expiresTime - Date.now()) / 1000));
-      
-      if (ttlSeconds > 0) {
-        await redis.set(`${REDIS_PREFIX}${key}`, data, { ex: ttlSeconds });
-      } else {
-        await redis.del(`${REDIS_PREFIX}${key}`);
+      const { error } = await supabaseAdmin
+        .from("otps")
+        .upsert({
+          phone_number: key,
+          otp_code: data.otpCode,
+          expires_at: new Date(data.expiresAt).toISOString(),
+          used: data.used,
+          attempts: data.attempts,
+        });
+
+      if (error) {
+        console.error("[Supabase OTP] Error setting OTP key:", key, error.message);
       }
     } catch (err) {
-      console.error("[Redis] Error setting OTP key:", key, err);
+      console.error("[Supabase OTP] Error setting OTP key:", key, err);
     }
   },
 
   
   async delete(key: string): Promise<void> {
     try {
-      await redis.del(`${REDIS_PREFIX}${key}`);
+      const { error } = await supabaseAdmin
+        .from("otps")
+        .delete()
+        .eq("phone_number", key);
+      
+      if (error) {
+        console.error("[Supabase OTP] Error deleting OTP key:", key, error.message);
+      }
     } catch (err) {
-      console.error("[Redis] Error deleting OTP key:", key, err);
+      console.error("[Supabase OTP] Error deleting OTP key:", key, err);
     }
   }
 };

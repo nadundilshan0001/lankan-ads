@@ -173,8 +173,6 @@ export default function RegisterPage() {
           <form className={styles.form} onSubmit={handleOtpSubmit}>
             <div className={styles.infoBox}>
               We sent a verification code to <strong>{phoneNumber}</strong> via SMS. Enter the code below to complete registration.
-              <br />
-              <span style={{ color: "var(--color-primary-light)", fontSize: "10px" }}>* For testing, enter any 6 digits (e.g. 123456)</span>
             </div>
 
             <div className={styles.formGroup}>
