@@ -1,7 +1,3 @@
-
-
-
-
 import type { Metadata, Viewport } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
 import {
@@ -18,9 +14,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
   icons: {
-    icon: [
-      { url: "/logo/logo-dark-mode.svg", type: "image/svg+xml" }
-    ],
+    icon: [{ url: "/logo/logo-dark-mode.svg", type: "image/svg+xml" }],
     shortcut: "/logo/logo-dark-mode.svg",
     apple: "/logo/logo-dark-mode.svg",
   },
@@ -37,10 +31,26 @@ export const metadata: Metadata = {
     "Lankan ads",
     "Colombo services",
     "Sri Lanka massage",
+    "lankanads.lk",
+    "classified ads LK",
+    "adult ads Sri Lanka",
+    "personal ads Colombo",
+    "free classified ads Sri Lanka",
   ],
-  authors: [{ name: SITE_CONFIG.name }],
+  authors: [{ name: SITE_CONFIG.name, url: SITE_CONFIG.url }],
   creator: SITE_CONFIG.name,
   publisher: SITE_CONFIG.name,
+  // Add your Google Search Console verification code here once you have it:
+  verification: { google: "HX9hJNG1gILxzqngRgtkVE5R_wd9ewbXhV_khUojrSE" },
+  alternates: {
+    canonical: SITE_CONFIG.url,
+    languages: {
+      "en-LK": SITE_CONFIG.url,
+      "si-LK": `${SITE_CONFIG.url}/si`,
+      "ta-LK": `${SITE_CONFIG.url}/ta`,
+      "x-default": SITE_CONFIG.url,
+    },
+  },
   openGraph: {
     type: "website",
     locale: SITE_CONFIG.locale,
@@ -53,7 +63,7 @@ export const metadata: Metadata = {
         url: `${SITE_CONFIG.url}${SITE_CONFIG.ogImage}`,
         width: 1200,
         height: 630,
-        alt: SITE_CONFIG.name,
+        alt: `${SITE_CONFIG.name} — Sri Lanka's #1 Classified Ads Platform`,
       },
     ],
   },
@@ -62,6 +72,8 @@ export const metadata: Metadata = {
     title: `${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`,
     description: SITE_CONFIG.description,
     images: [`${SITE_CONFIG.url}${SITE_CONFIG.ogImage}`],
+    site: "@lankanads",
+    creator: "@lankanads",
   },
   robots: {
     index: true,
@@ -94,8 +106,24 @@ export default async function RootLayout({
   const isAdmin = pathname.startsWith("/admin");
 
   return (
-    <html lang="en">
+    <html lang="en-LK">
       <head>
+        {/* Performance: preconnect to external origins for faster LCP */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        {/* Geo targeting: Sri Lanka */}
+        <meta name="geo.region" content="LK" />
+        <meta name="geo.country" content="Sri Lanka" />
+        <meta name="geo.placename" content="Sri Lanka" />
+        <meta name="language" content="English" />
+        <meta name="revisit-after" content="3 days" />
+        <meta name="rating" content="adult" />
         <SchemaMarkup
           data={[generateWebsiteSchema(), generateOrganizationSchema()]}
         />

@@ -65,8 +65,10 @@ export default function Footer() {
               <li><Link href="/home" className={styles.link}>Home</Link></li>
               <li><Link href="/" className={styles.link}>Browse Ads</Link></li>
               <li><Link href="/post-ad" className={styles.link}>Post an Ad</Link></li>
+              <li><Link href="/blog" className={styles.link}>Blog &amp; Guides</Link></li>
               <li><Link href="/faq" className={styles.link}>FAQ</Link></li>
               <li><Link href="/about" className={styles.link}>About Us</Link></li>
+              <li><Link href="/sitemap-html" className={styles.link}>Sitemap</Link></li>
             </ul>
           </div>
 
@@ -81,7 +83,17 @@ export default function Footer() {
                 {SITE_CONFIG.domain}
               </li>
               <li className={styles.contactItem}>
-                Sri Lanka
+                🇱🇰 Sri Lanka
+              </li>
+              <li>
+                <Link
+                  href="https://t.me/lankanadslk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
+                  📢 Telegram Channel
+                </Link>
               </li>
             </ul>
           </div>
