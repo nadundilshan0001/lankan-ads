@@ -276,9 +276,9 @@ export default function PostAdPage() {
     }
 
     const trimmedDesc = descriptionEn.trim();
-    if (trimmedDesc.length < 20 || trimmedDesc.length > 3000) {
+    if (trimmedDesc.length < 20 || trimmedDesc.length > 4000) {
       triggerValidationError(
-        "Ad Description must be between 20 and 3000 characters long.",
+        "Ad Description must be between 20 and 4000 characters long.",
       );
       return;
     }
@@ -820,17 +820,17 @@ export default function PostAdPage() {
                 </label>
                 <textarea
                   id="descEn"
-                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 2500 characters."
+                  placeholder="Describe your service in detail. Mention details, requirements, facilities, qualifications. Max 4000 characters."
                   className={styles.textarea}
                   value={descriptionEn}
                   onChange={(e) =>
-                    setDescriptionEn(e.target.value.substring(0, 2500))
+                    setDescriptionEn(e.target.value.substring(0, 4000))
                   }
-                  maxLength={2500}
+                  maxLength={4000}
                   required
                 />
                 <div className={styles.charCounter}>
-                  {descriptionEn.length}/2500 characters
+                  {descriptionEn.length}/4000 characters
                 </div>
               </div>
 

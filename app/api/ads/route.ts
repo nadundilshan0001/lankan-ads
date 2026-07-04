@@ -261,16 +261,16 @@ export async function POST(request: Request) {
       );
     }
 
-    if (sanitizedDescriptionEn.length < 20 || sanitizedDescriptionEn.length > 3000) {
+    if (sanitizedDescriptionEn.length < 20 || sanitizedDescriptionEn.length > 4000) {
       return NextResponse.json(
-        { error: "English Description must be between 20 and 3000 characters long." },
+        { error: "English Description must be between 20 and 4000 characters long." },
         { status: 400 }
       );
     }
 
-    if (descriptionSi && (sanitizedDescriptionSi.length < 20 || sanitizedDescriptionSi.length > 3000)) {
+    if (descriptionSi && (sanitizedDescriptionSi.length < 20 || sanitizedDescriptionSi.length > 4000)) {
       return NextResponse.json(
-        { error: "Sinhala Description must be between 20 and 3000 characters long if provided." },
+        { error: "Sinhala Description must be between 20 and 4000 characters long if provided." },
         { status: 400 }
       );
     }
