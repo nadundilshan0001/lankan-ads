@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { SITE_CONFIG } from "@/lib/constants";
 import {
   generateWebsiteSchema,
@@ -10,6 +11,8 @@ import Footer from "@/components/Footer";
 import AgeGate from "@/components/AgeGate";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
+
+const GA_MEASUREMENT_ID = "G-Z5JJRSP34K";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
@@ -144,6 +147,23 @@ export default async function RootLayout({
         {!isAdmin && <Header />}
         <main id="main-content">{children}</main>
         {!isAdmin && <Footer />}
+
+        {/* Google Analytics 4 — loads after page is interactive (non-blocking) */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}', {
+              page_path: window.location.pathname,
+              cookie_flags: 'SameSite=None;Secure',
+            });
+          `}
+        </Script>
       </body>
     </html>
   );
