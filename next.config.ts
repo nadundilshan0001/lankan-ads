@@ -46,13 +46,15 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
+              // GA4 requires googletagmanager.com and google-analytics.com
               process.env.NODE_ENV === "production"
-                ? "script-src 'self' 'unsafe-inline'"
-                : "script-src 'self' 'unsafe-inline' 'unsafe-eval'", 
+                ? "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com"
+                : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https:",
-              "connect-src 'self' https://*.supabase.co https://api.cloudinary.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https: https://www.google-analytics.com https://www.googletagmanager.com",
+              // GA4 sends data to google-analytics.com and region-specific analytics endpoints
+              "connect-src 'self' https://*.supabase.co https://api.cloudinary.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
