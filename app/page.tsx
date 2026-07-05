@@ -156,43 +156,6 @@ export default async function BrowsePage() {
           </p>
         </header>
 
-        {/* ── Categories Grid — internal links for PageRank flow ── */}
-        <section aria-label="Browse by category" style={{ marginBottom: "var(--space-xl)" }}>
-          <h2 style={{ fontSize: "var(--text-xl)", fontWeight: "700", marginBottom: "var(--space-md)" }}>
-            Browse by Category
-          </h2>
-          <div className="grid grid-4" style={{ gap: "var(--space-sm)" }}>
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/${cat.slug}`}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "var(--space-md)",
-                  background: "var(--surface-elevated)",
-                  borderRadius: "var(--radius-md)",
-                  border: "1px solid var(--border-subtle)",
-                  textDecoration: "none",
-                  textAlign: "center",
-                  transition: "border-color 0.2s, transform 0.2s",
-                }}
-              >
-                <span style={{ fontSize: "1.5rem" }}>{cat.icon || "📋"}</span>
-                <span style={{ fontSize: "var(--text-sm)", fontWeight: "600", color: "var(--text-primary)" }}>
-                  {cat.name}
-                </span>
-                <span style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)" }}>
-                  {cat.subCategories.length > 0
-                    ? `${cat.subCategories.length} sub-types`
-                    : "All Sri Lanka"}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
 
         {/* ── Listings Filter (client component — the actual browsable listings) ── */}
         <ListingsFilter initialAds={allAds} />
